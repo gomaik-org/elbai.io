@@ -44,7 +44,7 @@ extra_css:
   - stylesheets/extra.css
 
 extra_javascript:
-  - javascripts/mermaid.min.js
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
   - javascripts/extra.js
 
 markdown_extensions:
