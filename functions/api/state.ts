@@ -113,10 +113,15 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
     }
 
     if (action === "update") {
-      const { prompt, current_state } = body;
+      const { prompt, current_state, pathname } = body;
       if (!prompt) {
         return new Response(JSON.stringify({ error: "Prompt erforderlich" }), { status: 400 });
       }
+
+      // Check page context (Home vs. Product Detail Page)
+      const isProductPage = pathname && pathname.includes("/products/");
+      const productSlugMatch = pathname ? pathname.match(/\/products\/([^\/\?#]+)/) : null;
+      const productSlug = productSlugMatch ? productSlugMatch[1] : null;
 
       // Fetch active state
       const stateRow = await env.DB.prepare(
@@ -125,6 +130,8 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
       
       const activeState = stateRow ? JSON.parse(stateRow.content_json) : (current_state || {});
       const newState = { ...activeState };
+      if (!newState.products) newState.products = {};
+
       const p = prompt.toLowerCase();
       let changeSummary = "";
 
@@ -150,8 +157,15 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
           cyan: "#06b6d4"
         };
         const hex = colorMap[colorName] || "#ec4899";
-        newState.hero_title_color = hex;
-        changeSummary = `Farbe der Überschrift auf ${colorName} geändert (${hex})`;
+
+        if (isProductPage && productSlug) {
+          if (!newState.products[productSlug]) newState.products[productSlug] = {};
+          newState.products[productSlug].title_color = hex;
+          changeSummary = `Farbe des Produkttitels auf ${colorName} geändert (${hex})`;
+        } else {
+          newState.hero_title_color = hex;
+          changeSummary = `Farbe der Startseiten-Überschrift auf ${colorName} geändert (${hex})`;
+        }
       } 
       // 2. Banner Request
       else if (p.includes("banner") || p.includes("hinweis") || p.includes("leiste")) {
@@ -172,15 +186,27 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
       else if (p.includes("titel") || p.includes("überschrift") || p.includes("headline")) {
         const match = prompt.match(/(?:zu|in|auf|mit dem text|lautet)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
         const newTitle = match ? match[1].trim() : prompt.replace(/.*(?:titel|überschrift|headline)\s*(?:zu|auf|in)?\s*/i, "").trim();
-        newState.hero_title = newTitle || "ELBI – Freude am Schreibenlernen";
-        changeSummary = `Hauptüberschrift geändert: "${newState.hero_title}"`;
+        
+        if (isProductPage && productSlug) {
+          if (!newState.products[productSlug]) newState.products[productSlug] = {};
+          newState.products[productSlug].title = newTitle;
+          changeSummary = `Produkttitel geändert: "${newTitle}"`;
+        } else {
+          newState.hero_title = newTitle || "ELBI – Freude am Schreibenlernen";
+          changeSummary = `Startseiten-Überschrift geändert: "${newState.hero_title}"`;
+        }
       } 
       // 5. General fallback text
       else {
-        // If it starts with an imperative phrase like "ändere...", clean it up
         const cleaned = prompt.replace(/^(ändere|mache|setze|aktualisiere)\s+/i, "");
-        newState.hero_title = cleaned;
-        changeSummary = `Überschrift aktualisiert: "${newState.hero_title}"`;
+        if (isProductPage && productSlug) {
+          if (!newState.products[productSlug]) newState.products[productSlug] = {};
+          newState.products[productSlug].title = cleaned;
+          changeSummary = `Produkttitel aktualisiert: "${cleaned}"`;
+        } else {
+          newState.hero_title = cleaned;
+          changeSummary = `Überschrift aktualisiert: "${newState.hero_title}"`;
+        }
       }
 
       const stateJson = JSON.stringify(newState);

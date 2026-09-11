@@ -234,7 +234,7 @@
   function applyLiveState(state: any) {
     if (!state) return;
 
-    // 1. Headline Text & Color
+    // 1. Headline Text & Color (Home or Product Detail Page)
     const heroTitle = document.getElementById('shop-hero-headline');
     if (heroTitle) {
       if (state.hero_title) {
@@ -244,6 +244,24 @@
         heroTitle.style.color = state.hero_title_color;
       } else {
         heroTitle.style.color = '';
+      }
+    }
+
+    // Product Detail Page Title & Color
+    const productTitle = document.getElementById('product-detail-title');
+    if (productTitle && state.products) {
+      const slugMatch = window.location.pathname.match(/\/products\/([^\/\?#]+)/);
+      const slug = slugMatch ? slugMatch[1] : null;
+      if (slug && state.products[slug]) {
+        const pState = state.products[slug];
+        if (pState.title) {
+          productTitle.textContent = pState.title;
+        }
+        if (pState.title_color) {
+          productTitle.style.color = pState.title_color;
+        } else {
+          productTitle.style.color = '';
+        }
       }
     }
 
@@ -401,6 +419,7 @@
         body: JSON.stringify({
           action: 'update',
           prompt: prompt,
+          pathname: window.location.pathname,
         }),
       });
 
