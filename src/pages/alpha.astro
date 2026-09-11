@@ -106,9 +106,33 @@ function cleanTitle(title: string): string {
             <span class="font-semibold">Kauf auf Rechnung für Schulen</span>
           </div>
           
-          <button class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 shadow-sm transition">
-            <span>🛒 Warenkorb</span>
-            <span class="w-5 h-5 rounded-full bg-sky-500 text-slate-950 flex items-center justify-center text-[10px] font-black">0</span>
+          <!-- Official Cart Trigger Button matching Elbi Storefront exactly -->
+          <button
+            type="button"
+            class="relative inline-flex items-center gap-2 h-10 px-3.5 py-2 text-[15px] font-medium text-slate-800 hover:text-slate-950 hover:bg-slate-100 focus:outline-none rounded-full transition-colors shrink-0"
+            aria-label="Warenkorb öffnen"
+          >
+            <svg
+              class="w-5 h-5 text-slate-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+              />
+            </svg>
+            <span class="hidden sm:inline font-sans font-medium text-sm text-slate-800">Warenkorb</span>
+            <span
+              class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-[#0b57d0] rounded-full"
+              aria-hidden="true"
+            >
+              0
+            </span>
           </button>
         </div>
 
