@@ -2,13 +2,11 @@
 import '../styles/global.css';
 import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
 import { getAllProducts } from '../data/catalog';
+import { shopConfig } from '../config/shop.config';
 
 const allProducts = getAllProducts();
-// Curated 47 active products with real images
-const products = allProducts.filter((p) => p.image_url && !p.image_url.includes('placeholder'));
-
-const schreibhefte = products.filter((p) => p.sku.startsWith('H') || p.title.toLowerCase().includes('heft') || p.title.toLowerCase().includes('schreib'));
-const stempel = products.filter((p) => p.sku.startsWith('S') || p.sku.startsWith('K') || p.title.toLowerCase().includes('stempel'));
+// Curated active products with valid images
+const validProducts = allProducts.filter((p) => p.image_url && !p.image_url.includes('placeholder'));
 
 function formatPriceEur(cents: number): string {
   return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
@@ -22,251 +20,436 @@ function cleanTitle(title: string): string {
     .split(' - ')[0];
 }
 ---
-<!DOCTYPE html>
-<html lang="de" class="min-h-full">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elbi Verlag // Interaktiver Alpha-Shop & Live-Copilot</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #f8fafc;
-      color: #0f172a;
-    }
-    .mono { font-family: 'Fira Code', monospace; }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+<!doctype html>
+<html lang="de" class="h-full bg-slate-50 text-slate-900 antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elbi Verlag | Schreiben lernen, Lehrerstempel, Schreiblehrgänge & Schulhefte</title>
+    <!-- Google Fonts: Merriweather & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      body {
+        font-family: 'Outfit', sans-serif;
+      }
+      .font-serif {
+        font-family: 'Merriweather', Georgia, serif;
+      }
+      .mono {
+        font-family: 'Fira Code', monospace;
+      }
+    </style>
+  </head>
+  <body class="min-h-full flex flex-col justify-between selection:bg-sky-500 selection:text-white">
 
-  <!-- TOP BAR (Zero Trust Indicator + Navigation) -->
-  <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
-        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px] mono">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          ZERO TRUST AKTIV
-        </span>
-        <span class="text-slate-400">Interaktive Test-Umgebung &bull; D1 Live-Speicher</span>
-      </div>
-      <div class="flex items-center gap-4 mono text-xs">
-        <a href="https://elbai.io/docs/" class="text-cyan-400 hover:text-cyan-300 underline font-semibold">
-          📚 Dokumentation
-        </a>
-        <a href="https://elbai.io" class="text-slate-400 hover:text-white">
-          ← Zu elbai.io
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- STORE HEADER -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-      <div class="flex items-center space-x-4">
-        <a href="/alpha" class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 flex items-center justify-center text-white font-black text-xl shadow-md">
-            E
-          </div>
-          <div>
-            <span class="text-2xl font-black tracking-tight text-slate-900">ELBI <span class="text-sky-600">Verlag</span></span>
-            <span class="block text-[10px] mono text-slate-400 font-semibold uppercase tracking-wider">Lehrmittel &amp; Schreibhefte</span>
-          </div>
-        </a>
-      </div>
-
-      <!-- Live Search / Trust Badges -->
-      <div class="hidden md:flex items-center space-x-6 text-sm text-slate-600">
+    <!-- TOP ANNOUNCEMENT BAR (ZERO TRUST BADGE & ACCESS HINT) -->
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-emerald-600 font-bold">✓</span>
-          <span>Kauf auf Rechnung</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-emerald-600 font-bold">✓</span>
-          <span>Praxiserprobt</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-emerald-600 font-bold">✓</span>
-          <span>Schnelle Lieferung</span>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- STORE HERO (MUTABLE VIA COPILOT) -->
-  <section class="bg-gradient-to-b from-sky-50/50 via-white to-slate-50 border-b border-slate-200/80 py-10 sm:py-14 relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <!-- Live Dynamic Banner (Editable via Copilot) -->
-      <div id="dynamic-alpha-banner" class="hidden mb-6 p-4 rounded-2xl border border-sky-300 bg-sky-100 text-sky-950 shadow-md">
-        <!-- Injected via JavaScript from D1 state -->
-      </div>
-
-      <div class="max-w-3xl">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-sky-800 bg-sky-100/80 border border-sky-200 mb-4">
-          <span>★</span>
-          <span>Original Elbi Sortiment (ca. 50 Kern-Artikel)</span>
-        </div>
-
-        <!-- Hero Title (Editable via Copilot) -->
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-tight">
-          Schreiben lernen mit System &amp; <span id="dynamic-hero-title" class="text-sky-600">Freude</span>.
-        </h1>
-
-        <!-- Hero Subtitle (Editable via Copilot) -->
-        <p id="dynamic-hero-subtitle" class="mt-4 text-lg text-slate-600 leading-relaxed font-normal">
-          Willkommen beim Elbi Verlag. Wir entwickeln und fertigen praxiserprobte Schreiblernhefte für alle Ausgangsschriften und motivierende Holzstempel für Grund- und Förderschulen.
-        </p>
-
-        <!-- Quick Info Callout -->
-        <div class="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500">
-          <span class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
-            👉 <strong>Tipp für Tester:</strong> Änderungen am Shop rechts unten über den Copilot-Button testen.
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px] mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            ZERO TRUST GESCHÜTZT
           </span>
+          <span class="text-slate-400">Interaktive Test-Umgebung &bull; D1 Live-Speicher</span>
+        </div>
+        <div class="flex items-center gap-4 mono text-xs">
+          <a href="https://elbai.io/docs/" class="text-cyan-400 hover:text-cyan-300 underline font-semibold">
+            📚 Dokumentation
+          </a>
+          <a href="https://elbai.io" class="text-slate-400 hover:text-white">
+            ← Zu elbai.io
+          </a>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- PRODUCT CATALOG SECTION -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
-    
-    <!-- Filter Controls & Count -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
-      <div>
-        <h2 class="text-2xl font-black text-slate-900">
-          Unser aktuelles Sortiment
-        </h2>
-        <p class="text-sm text-slate-500 mt-0.5">
-          {products.length} sofort lieferbare Original-Artikel
-        </p>
+    <!-- AUTHENTIC ELBI STORE HEADER (ORIGINAL LOGO, NAVI, AND ACTIONS) -->
+    <header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3.5 gap-4">
+        
+        <!-- Authentic Logo -->
+        <div class="flex items-center gap-3 shrink-0">
+          <a href="/alpha" class="flex items-center gap-3 group">
+            <img
+              src="/images/branding/elbiLogo.png"
+              alt="Elbi Verlag Logo"
+              width="140"
+              height="106"
+              class="w-auto h-12 object-contain drop-shadow-2xs group-hover:scale-102 transition-transform duration-200"
+            />
+          </a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-1.5 text-slate-800 font-medium text-sm">
+          <a href="/alpha" class="px-4 py-2 rounded-full bg-sky-50 text-sky-700 font-bold">
+            Startseite
+          </a>
+          <a href="#katalog" class="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-950 transition">
+            Elbi Schreibhefte
+          </a>
+          <a href="#katalog" class="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-950 transition">
+            Lehrerstempel
+          </a>
+          <a href="https://elbai.io/docs/" class="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-950 transition">
+            Dokumentation
+          </a>
+        </nav>
+
+        <!-- Right Side: Trust & Cart Badge -->
+        <div class="flex items-center gap-3">
+          <div class="hidden lg:flex items-center gap-2 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+            <span class="text-emerald-600 font-bold">✓</span>
+            <span class="font-semibold">Kauf auf Rechnung für Schulen</span>
+          </div>
+          
+          <button class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 shadow-sm transition">
+            <span>🛒 Warenkorb</span>
+            <span class="w-5 h-5 rounded-full bg-sky-500 text-slate-950 flex items-center justify-center text-[10px] font-black">0</span>
+          </button>
+        </div>
+
       </div>
+    </header>
 
-      <!-- Filter Buttons -->
-      <div class="flex items-center gap-2 text-xs font-semibold">
-        <button id="filter-all-btn" class="filter-tab px-4 py-2 rounded-xl bg-slate-900 text-white shadow-sm transition">
-          Alle ({products.length})
-        </button>
-        <button id="filter-hefte-btn" class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition">
-          Schreibhefte ({schreibhefte.length})
-        </button>
-        <button id="filter-stempel-btn" class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition">
-          Lehrerstempel ({stempel.length})
-        </button>
-      </div>
-    </div>
+    <!-- HERO SECTION (WITH VORSCHULE / LERNSTUFEN BOX & DER ELBI MASCOT) -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-[#f8fafd] via-[#f1f5f9]/20 to-white pt-4 pb-10 border-b border-slate-200/50">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        <!-- Live Dynamic Banner (Editable via Copilot) -->
+        <div id="dynamic-alpha-banner" class="hidden mb-6 p-4 rounded-2xl border border-sky-300 bg-sky-100 text-sky-950 shadow-sm">
+          <!-- Injected via JavaScript from D1 state -->
+        </div>
 
-    <!-- Product Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="product-card-grid">
-      {products.map((p) => {
-        const isHeft = p.sku.startsWith('H') || p.title.toLowerCase().includes('heft') || p.title.toLowerCase().includes('schreib');
-        const isStempel = p.sku.startsWith('S') || p.sku.startsWith('K') || p.title.toLowerCase().includes('stempel');
-        const tag = isHeft ? 'hefte' : (isStempel ? 'stempel' : 'other');
-        const title = cleanTitle(p.title);
-
-        return (
-          <article 
-            class="product-card group flex flex-col justify-between rounded-2xl bg-white border border-slate-200/90 hover:border-sky-400 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-            data-category={tag}
-          >
+        <div class="lg:grid lg:grid-cols-12 lg:gap-10 xl:gap-14 items-center">
+          
+          <!-- Left Column: Google Store Headline & Value Proposition -->
+          <div class="lg:col-span-7 text-left flex flex-col justify-between">
             <div>
-              <!-- Image Area -->
-              <div class="aspect-square w-full rounded-xl bg-slate-50 p-4 flex items-center justify-center overflow-hidden mb-4 border border-slate-100 relative">
-                <img 
-                  src={p.image_url} 
-                  alt={p.title} 
-                  loading="lazy" 
-                  class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-xs"
-                  onerror="this.onerror=null; this.src='/images/placeholder.svg'"
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-700 bg-white border border-slate-200 shadow-2xs mb-4">
+                <span class="text-amber-500 font-bold">★</span>
+                <span>Praxiserprobte Lehrmittel seit über 30 Jahren</span>
+              </div>
+
+              <!-- Main Hero Headline (Dynamically Editable) -->
+              <h1 class="font-extrabold text-4xl sm:text-5xl lg:text-[48px] xl:text-[52px] text-slate-900 tracking-tight leading-[1.14]">
+                Schreiben lernen mit System &amp; <span id="dynamic-hero-title" class="text-[#3395d1]">Freude</span>.
+              </h1>
+
+              <!-- Subtitle (Dynamically Editable) -->
+              <p id="dynamic-hero-subtitle" class="mt-4 text-base sm:text-lg lg:text-xl text-slate-600 font-normal leading-relaxed max-w-2xl">
+                Willkommen beim Elbi Verlag. Wir entwickeln und fertigen praxiserprobte Schreiblernhefte für alle Ausgangsschriften und motivierende Holzstempel für Grund- und Förderschulen.
+              </p>
+
+              <!-- Primary Actions Buttons -->
+              <div class="mt-6 sm:mt-7 flex flex-wrap items-center gap-3.5">
+                <a
+                  href="#katalog"
+                  class="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-slate-900 text-white text-base font-semibold hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-sm"
+                >
+                  <span>Schreibhefte entdecken</span>
+                  <span class="ml-2 font-bold">&rarr;</span>
+                </a>
+                <a
+                  href="#katalog"
+                  class="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-white text-slate-800 text-base font-semibold border border-slate-300 hover:bg-slate-50 hover:border-slate-400 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-2xs"
+                >
+                  Lehrerstempel ansehen
+                </a>
+              </div>
+            </div>
+
+            <!-- Trust Reassurance Bar -->
+            <div class="mt-7 pt-5 border-t border-slate-200/70 flex flex-wrap items-center gap-y-2 gap-x-5 text-xs sm:text-sm text-slate-600 font-medium">
+              <div class="flex items-center gap-2">
+                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span>
+                <span>Kauf auf Rechnung</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[#3395d1] text-xs font-bold">⚡</span>
+                <span>Schneller Direktversand</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xs font-bold">★</span>
+                <span>100% Verlag &amp; Druck in Deutschland</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Educational Showcase with DER ELBI Mascot & Vorschule Navigation -->
+          <div class="mt-8 lg:mt-0 lg:col-span-5 flex justify-center lg:justify-end">
+            <div class="w-full max-w-md rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-300">
+              
+              <!-- Mascot Greeting Card -->
+              <div class="flex items-center gap-3.5 bg-gradient-to-br from-amber-50/90 to-orange-50/70 rounded-2xl p-3.5 border border-amber-200/60 mb-3.5">
+                <img
+                  src="/images/branding/der-elbi.png"
+                  alt="Der Elbi – Maskottchen des Elbi Verlags"
+                  width="88"
+                  height="148"
+                  class="h-16 sm:h-18 w-auto object-contain shrink-0 drop-shadow-sm"
+                  fetchpriority="high"
                 />
-                <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] mono text-white font-bold">
-                  {p.sku}
-                </span>
+                <div>
+                  <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 uppercase tracking-wider">
+                    <span>★</span> Hallo, ich bin der Elbi!
+                  </div>
+                  <p class="text-xs sm:text-sm text-slate-700 mt-0.5 leading-relaxed">
+                    Seit über 30 Jahren begleite ich Kinder beim Schreibenlernen – vom ersten Schwung bis zum flüssigen Aufsatz.
+                  </p>
+                </div>
               </div>
 
-              <!-- Tags -->
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-[10px] mono uppercase font-semibold text-slate-600 px-2 py-0.5 rounded bg-slate-100 border border-slate-200">
-                  {isHeft ? 'Schreibheft' : 'Holzstempel'}
-                </span>
-                <span class="text-[10px] font-semibold text-emerald-600">✓ Auf Lager</span>
+              <!-- Lernstufen Schnellnavigation (4 Stufen: Vorschule bis Kl. 4) -->
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 mb-3.5">
+                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Schreibhefte nach Lernstufe
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm font-semibold text-slate-800">
+                  <a
+                    href="#katalog"
+                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-[#0b57d0] hover:bg-blue-50/50 hover:shadow-xs transition-all"
+                    title="Schreibhefte für Vorschule & Förderschule anzeigen"
+                  >
+                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-[#0b57d0] transition-colors">
+                      <span class="text-blue-500">●</span> Vorschule / Förder
+                    </span>
+                    <span class="text-xs text-slate-400 group-hover/font:text-[#0b57d0] transition-colors">&rarr;</span>
+                  </a>
+                  <a
+                    href="#katalog"
+                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-amber-600 hover:bg-amber-50/40 hover:shadow-xs transition-all"
+                    title="Schreibhefte für 1. Halbjahr Klasse 1 anzeigen"
+                  >
+                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-amber-800 transition-colors">
+                      <span class="text-amber-500">●</span> 1. Halbjahr Kl. 1
+                    </span>
+                    <span class="text-xs text-slate-400 group-hover/font:text-amber-600 transition-colors">&rarr;</span>
+                  </a>
+                  <a
+                    href="#katalog"
+                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-emerald-600 hover:bg-emerald-50/40 hover:shadow-xs transition-all"
+                    title="Schreibhefte für 2. Halbjahr Klasse 1 anzeigen"
+                  >
+                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-emerald-800 transition-colors">
+                      <span class="text-emerald-500">●</span> 2. Halbjahr Kl. 1
+                    </span>
+                    <span class="text-xs text-slate-400 group-hover/font:text-emerald-600 transition-colors">&rarr;</span>
+                  </a>
+                  <a
+                    href="#katalog"
+                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-purple-600 hover:bg-purple-50/40 hover:shadow-xs transition-all"
+                    title="Schreibhefte für Klasse 2 bis 4 anzeigen"
+                  >
+                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-purple-800 transition-colors">
+                      <span class="text-purple-500">●</span> Klasse 2 bis 4
+                    </span>
+                    <span class="text-xs text-slate-400 group-hover/font:text-purple-600 transition-colors">&rarr;</span>
+                  </a>
+                </div>
               </div>
 
-              <!-- Title & Desc -->
-              <h3 class="font-bold text-slate-900 text-base leading-snug group-hover:text-sky-600 transition-colors line-clamp-2">
-                {title}
-              </h3>
-              {p.short_description && (
-                <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                  {p.short_description}
-                </p>
-              )}
+              <!-- Quick Info Note -->
+              <div class="text-[11px] text-slate-500 text-center">
+                Direktlieferung an Schulen und Behörden &bull; Auf offene Rechnung
+              </div>
+
             </div>
+          </div>
 
-            <!-- Price & Button -->
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-              <div>
-                <span class="text-[11px] text-slate-400 block">inkl. MwSt.</span>
-                <span class="text-lg font-black text-slate-900 mono">
-                  {formatPriceEur(p.price_gross ?? p.price_net ?? 290)}
-                </span>
-              </div>
-              <span class="px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-700 text-xs font-bold group-hover:bg-sky-600 group-hover:text-white transition">
-                Details
-              </span>
-            </div>
-          </article>
-        );
-      })}
-    </div>
-
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-16">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>&copy; 2026 Elbi Verlag &bull; Schulbedarf &amp; Lehrmittel</div>
-      <div class="mono">
-        Coded with 💖 <a href="https://emaik.io" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-white underline">emaik.io</a>
+        </div>
       </div>
-    </div>
-  </footer>
+    </section>
 
-  <!-- FLOATING COPILOT & TIME MACHINE WIDGET -->
-  <AlphaSandboxWidget />
+    <!-- PRODUCT CATALOG (ACTIVE BESTSELLERS) -->
+    <section id="katalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
+        <div>
+          <span class="text-xs font-bold text-sky-600 uppercase tracking-wider block mb-1">Original Sortiment</span>
+          <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Praxiserprobte Hefte &amp; Lehrerstempel
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">
+            {validProducts.length} sofort lieferbare Bestseller-Artikel
+          </p>
+        </div>
 
-  <script>
-    // Tab filter logic
-    const allBtn = document.getElementById('filter-all-btn');
-    const hefteBtn = document.getElementById('filter-hefte-btn');
-    const stempelBtn = document.getElementById('filter-stempel-btn');
-    const cards = document.querySelectorAll('.product-card');
+        <!-- Filter Controls -->
+        <div class="flex items-center gap-2 text-xs font-semibold">
+          <button id="filter-all-btn" class="filter-tab px-4 py-2 rounded-full bg-slate-900 text-white shadow-xs transition">
+            Alle ({validProducts.length})
+          </button>
+          <button id="filter-hefte-btn" class="filter-tab px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition">
+            Schreibhefte
+          </button>
+          <button id="filter-stempel-btn" class="filter-tab px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition">
+            Lehrerstempel
+          </button>
+        </div>
+      </div>
 
-    function filterCategory(cat: string, activeBtn: HTMLElement) {
-      [allBtn, hefteBtn, stempelBtn].forEach(b => {
-        b?.classList.remove('bg-slate-900', 'text-white');
-        b?.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-200');
-      });
-      activeBtn.classList.add('bg-slate-900', 'text-white');
-      activeBtn.classList.remove('bg-white', 'text-slate-700', 'border');
+      <!-- Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="product-card-grid">
+        {validProducts.map((p) => {
+          const isHeft = p.sku.startsWith('H') || p.title.toLowerCase().includes('heft') || p.title.toLowerCase().includes('schreib');
+          const isStempel = p.sku.startsWith('S') || p.sku.startsWith('K') || p.title.toLowerCase().includes('stempel');
+          const tag = isHeft ? 'hefte' : (isStempel ? 'stempel' : 'other');
+          const title = cleanTitle(p.title);
 
-      cards.forEach(card => {
-        const c = card.getAttribute('data-category');
-        if (cat === 'all' || c === cat) {
-          (card as HTMLElement).style.display = 'flex';
-        } else {
-          (card as HTMLElement).style.display = 'none';
-        }
-      });
-    }
+          return (
+            <article 
+              class="product-card group flex flex-col justify-between rounded-3xl bg-white border border-slate-200/90 hover:border-slate-300 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              data-category={tag}
+            >
+              <div>
+                <!-- Packshot Container -->
+                <div class="aspect-[4/3] w-full rounded-2xl bg-[#f8f9fa] p-4 flex items-center justify-center overflow-hidden mb-4 border border-slate-100 relative">
+                  <img 
+                    src={p.image_url} 
+                    alt={p.title} 
+                    loading="lazy" 
+                    class="h-full w-full object-contain group-hover:scale-103 transition-transform duration-300 drop-shadow-xs"
+                    onerror="this.onerror=null; this.src='/images/placeholder.svg'"
+                  />
+                  <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-xs text-[10px] mono text-slate-700 font-bold border border-slate-200/80 shadow-2xs">
+                    {p.sku}
+                  </span>
+                </div>
 
-    allBtn?.addEventListener('click', () => filterCategory('all', allBtn));
-    hefteBtn?.addEventListener('click', () => filterCategory('hefte', hefteBtn));
-    stempelBtn?.addEventListener('click', () => filterCategory('stempel', stempelBtn));
-  </script>
-</body>
+                <!-- Tags -->
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-[10px] font-semibold text-slate-600 px-2.5 py-0.5 rounded-full bg-slate-100">
+                    {isHeft ? 'Schreibheft' : 'Holzstempel'}
+                  </span>
+                  <span class="text-[10px] font-semibold text-emerald-700">✓ Auf Lager</span>
+                </div>
+
+                <!-- Title & Desc -->
+                <h3 class="font-bold text-slate-900 text-base leading-snug group-hover:text-sky-600 transition-colors line-clamp-2">
+                  {title}
+                </h3>
+                {p.short_description && (
+                  <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                    {p.short_description}
+                  </p>
+                )}
+              </div>
+
+              <!-- Price & Add Action -->
+              <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] text-slate-400 block font-medium">inkl. MwSt.</span>
+                  <span class="text-lg font-black text-slate-900 mono">
+                    {formatPriceEur(p.price_gross ?? p.price_net ?? 290)}
+                  </span>
+                </div>
+                <button class="px-3.5 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-2xs">
+                  In den Korb
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- AUTHENTIC ELBI FOOTER (COLUMNS, LEGAL, REVIEWS & BGB COMPLIANCE) -->
+    <footer class="bg-slate-900 text-slate-300 mt-20 border-t border-slate-800" aria-label="Fußbereich">
+      <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          
+          <!-- Col 1: Brand -->
+          <div class="md:col-span-1">
+            <div class="flex items-center gap-2.5 group">
+              <img
+                src="/images/branding/elbiLogo.png"
+                alt="Elbi Verlag Logo"
+                width="48"
+                height="36"
+                class="h-9 w-auto object-contain brightness-110"
+                loading="lazy"
+              />
+              <div class="flex flex-col">
+                <span class="text-lg font-bold tracking-tight text-white">ELBI Verlag</span>
+                <span class="text-[10px] text-amber-400 font-semibold tracking-wider uppercase -mt-0.5">Hersteller für Schulen</span>
+              </div>
+            </div>
+            <p class="mt-4 text-xs text-slate-400 leading-relaxed">
+              Hersteller für praxiserprobte Schreibhefte, Schreiblehrgänge und Lehrerstempel für Grundschulen und Förderschulen seit über 30 Jahren.
+            </p>
+          </div>
+
+          <!-- Col 2: Sortiment -->
+          <div>
+            <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Sortiment</h3>
+            <ul class="mt-4 space-y-2 text-xs">
+              <li><a href="#katalog" class="hover:text-white transition-colors">Elbi Schreibhefte</a></li>
+              <li><a href="#katalog" class="hover:text-white transition-colors">Lehrerstempel</a></li>
+              <li><a href="#katalog" class="hover:text-white transition-colors">Vorschule &amp; Förderschule</a></li>
+            </ul>
+          </div>
+
+          <!-- Col 3: Service -->
+          <div>
+            <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Service &amp; Hilfe</h3>
+            <ul class="mt-4 space-y-2 text-xs">
+              <li><span class="text-slate-400">Versandkosten: 4,90 € (ab 50 € versandkostenfrei)</span></li>
+              <li><span class="text-slate-400">Lieferzeit: 1–3 Werktage</span></li>
+              <li><span class="text-slate-400">Telefon: +49 (0) 40 / 656 00 01</span></li>
+            </ul>
+          </div>
+
+          <!-- Col 4: Digitaler Widerruf & BGB -->
+          <div>
+            <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Verbraucherrechte</h3>
+            <p class="mt-4 text-xs text-slate-400 leading-relaxed">
+              Gesetzlicher elektronischer Widerrufsservice (§ 356a BGB) und vollständige Button-Lösung im Checkout (§ 312j BGB).
+            </p>
+          </div>
+
+        </div>
+
+        <div class="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+          <p>&copy; {new Date().getFullYear()} ELBI Verlag GmbH &bull; Alle Rechte vorbehalten.</p>
+          <p class="mono">Coded with 💖 <a href="https://emaik.io" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-white underline">emaik.io</a></p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- COMPACT, NON-BLUR FLOATING SHOP-COPILOT & ZEITMASCHINE -->
+    <AlphaSandboxWidget />
+
+    <script>
+      // Filter functionality
+      const allBtn = document.getElementById('filter-all-btn');
+      const hefteBtn = document.getElementById('filter-hefte-btn');
+      const stempelBtn = document.getElementById('filter-stempel-btn');
+      const cards = document.querySelectorAll('.product-card');
+
+      function filterCategory(cat: string, activeBtn: HTMLElement) {
+        [allBtn, hefteBtn, stempelBtn].forEach(b => {
+          b?.classList.remove('bg-slate-900', 'text-white');
+          b?.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-300');
+        });
+        activeBtn.classList.add('bg-slate-900', 'text-white');
+        activeBtn.classList.remove('bg-white', 'text-slate-700', 'border');
+
+        cards.forEach(card => {
+          const c = card.getAttribute('data-category');
+          if (cat === 'all' || c === cat) {
+            (card as HTMLElement).style.display = 'flex';
+          } else {
+            (card as HTMLElement).style.display = 'none';
+          }
+        });
+      }
+
+      allBtn?.addEventListener('click', () => filterCategory('all', allBtn));
+      hefteBtn?.addEventListener('click', () => filterCategory('hefte', hefteBtn));
+      stempelBtn?.addEventListener('click', () => filterCategory('stempel', stempelBtn));
+    </script>
+  </body>
 </html>

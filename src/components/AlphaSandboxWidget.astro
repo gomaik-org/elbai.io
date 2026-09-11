@@ -1,117 +1,125 @@
 ---
-// Alpha Sandbox Interactive Time Machine & AI Assistant Floating Widget
+// Alpha Sandbox Interactive Floating Widget (Non-modal, draggable/docked floating card)
 ---
 <div id="alpha-sandbox-container">
   <!-- Floating Launcher Button Bottom-Right -->
   <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-    <button id="sandbox-toggle-btn" class="group relative flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-black text-sm tracking-wide shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:shadow-[0_0_40px_rgba(6,182,212,0.8)] transition-all transform hover:-translate-y-1 cursor-pointer">
-      <span class="text-2xl group-hover:rotate-12 transition-transform">🤖</span>
-      <span class="font-extrabold uppercase tracking-wider">Alpha Copilot & Zeitmaschine</span>
-      <span class="relative flex h-3 w-3">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+    <button id="sandbox-toggle-btn" class="group relative flex items-center gap-3 px-5 py-3.5 rounded-full bg-slate-900/90 hover:bg-slate-950 text-white font-bold text-sm tracking-wide shadow-2xl border border-sky-400/40 backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+      <span class="text-xl group-hover:rotate-12 transition-transform">🤖</span>
+      <span class="tracking-normal font-sans">Alpha Copilot &amp; Zeitmaschine</span>
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-400"></span>
       </span>
     </button>
   </div>
 
-  <!-- Interactive Slide-Over Drawer / Modal -->
-  <div id="sandbox-modal" class="fixed inset-0 z-50 hidden">
-    <!-- Backdrop -->
-    <div id="sandbox-backdrop" class="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer"></div>
+  <!-- Non-Modal Floating Compact Window (No full-screen blur backdrop!) -->
+  <div id="sandbox-modal" class="fixed bottom-20 right-4 sm:right-6 z-50 hidden w-[94vw] sm:w-[460px] max-h-[82vh] bg-slate-900/95 text-slate-100 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden transition-all duration-300">
+    
+    <!-- Compact Header -->
+    <div class="p-3.5 px-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="text-lg">🤖</span>
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>Shop-Copilot &amp; Zeitmaschine</span>
+            <span class="px-1.5 py-0.2 rounded text-[9px] mono bg-sky-950 text-sky-300 border border-sky-800 font-bold uppercase">D1 Live</span>
+          </h3>
+          <p class="text-[11px] text-slate-400">Änderungen werden live im Shop sichtbar</p>
+        </div>
+      </div>
+      <button id="sandbox-close-btn" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition cursor-pointer" title="Schließen">
+        ✕
+      </button>
+    </div>
 
-    <!-- Panel Drawer -->
-    <div class="absolute right-0 top-0 bottom-0 w-full max-w-xl bg-[#0f111a] border-l border-cyan-500/30 shadow-2xl flex flex-col z-10 overflow-hidden">
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-800 bg-slate-950/40 text-xs font-semibold">
+      <button id="tab-btn-assistant" class="flex-1 py-2.5 px-3 border-b-2 border-sky-400 text-sky-400 bg-sky-950/20 flex items-center justify-center gap-1.5 cursor-pointer">
+        <span>✨ 1. Text ändern</span>
+      </button>
+      <button id="tab-btn-history" class="flex-1 py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer">
+        <span>⏳ 2. Zeitmaschine (Snapshots)</span>
+      </button>
+    </div>
+
+    <!-- Scrollable Body -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
       
-      <!-- Drawer Header -->
-      <div class="p-5 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-xl">
-            🤖
-          </div>
-          <div>
-            <h3 class="text-lg font-black text-white flex items-center gap-2">
-              <span>Next-Gen Alpha Lab</span>
-              <span class="px-2 py-0.5 rounded text-[10px] mono bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold uppercase">D1 Live</span>
-            </h3>
-            <p class="text-xs text-slate-400 mono">Echtzeit-Anpassung & Zeitmaschine mit 1-Klick-Rollback</p>
-          </div>
-        </div>
-        <button id="sandbox-close-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">
-          ✕
-        </button>
-      </div>
-
-      <!-- Drawer Tabs -->
-      <div class="flex border-b border-slate-800 bg-[#090a10]">
-        <button id="tab-btn-assistant" class="flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wider mono text-cyan-400 border-b-2 border-cyan-400 bg-cyan-950/20 flex items-center justify-center gap-2 cursor-pointer">
-          <span>✨ 1. Text ändern (Copilot)</span>
-        </button>
-        <button id="tab-btn-history" class="flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wider mono text-slate-400 hover:text-white border-b-2 border-transparent flex items-center justify-center gap-2 cursor-pointer">
-          <span>⏳ 2. Zeitmaschine (Snapshots)</span>
-        </button>
-      </div>
-
-      <!-- Drawer Body -->
-      <div class="flex-1 overflow-y-auto p-5 space-y-6">
+      <!-- VIEW 1: ASSISTANT -->
+      <div id="view-assistant" class="space-y-3.5">
         
-        <!-- VIEW 1: ASSISTANT -->
-        <div id="view-assistant" class="space-y-5">
-          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 leading-relaxed">
-            <p class="font-bold text-white mb-1">💡 Wie es funktioniert:</p>
-            Geben Sie einfach auf Deutsch ein, was geändert werden soll. Die KI generiert die Änderung sofort live und erstellt automatisch einen <strong>Sicherheits-Snapshot</strong> in der Cloudflare D1 Datenbank.
+        <!-- Suggestions -->
+        <div>
+          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Vorschläge zum Ausprobieren:</span>
+          <div class="grid grid-cols-1 gap-1.5">
+            <button class="suggestion-chip text-left px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 text-sky-300 transition cursor-pointer">
+              Ändere den Titel zu "ELBI – Freude am Schreibenlernen"
+            </button>
+            <button class="suggestion-chip text-left px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 text-sky-300 transition cursor-pointer">
+              Banner oben: "Schulen bestellen bei uns bequem auf Rechnung!"
+            </button>
+            <button class="suggestion-chip text-left px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 text-sky-300 transition cursor-pointer">
+              Untertitel: "Praxiserprobte Hefte und Stempel direkt vom Hamburger Schulbuchverlag"
+            </button>
+          </div>
+        </div>
+
+        <!-- Prompt Form -->
+        <form id="assistant-form" class="space-y-2.5">
+          <label for="user-prompt" class="block font-semibold text-slate-300">
+            Eigene Anweisung an den Copiloten:
+          </label>
+          <div class="relative">
+            <textarea
+              id="user-prompt"
+              rows="3"
+              placeholder="z.B. 'Ändere die Hauptüberschrift in...' oder 'Erstelle ein gelbes Hinweis-Banner...'"
+              class="w-full rounded-xl bg-slate-950/80 border border-slate-700 p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition"
+              required
+            ></textarea>
           </div>
 
-          <!-- Quick Suggestion Buttons for Senior Testers -->
-          <div>
-            <label class="block text-xs mono font-bold text-slate-400 uppercase mb-2">Schnell-Vorschläge zum Ausprobieren:</label>
-            <div class="flex flex-col gap-2">
-              <button class="suggestion-chip text-left px-3 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-cyan-300 mono transition cursor-pointer">
-                Ändere den Titel zu "ELBI – Freude am Lernen"
-              </button>
-              <button class="suggestion-chip text-left px-3 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-cyan-300 mono transition cursor-pointer">
-                Hinweis: Schulen bestellen ab sofort auf Rechnung
-              </button>
-              <button class="suggestion-chip text-left px-3 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-cyan-300 mono transition cursor-pointer">
-                Untertitel: Der moderne Bildungsverlag für Schule, Kita und Therapie
-              </button>
-            </div>
-          </div>
-
-          <!-- Prompt Form -->
-          <div>
-            <label for="prompt-input" class="block text-xs mono font-bold text-slate-300 uppercase mb-2">Ihre Anweisung an den KI-Copiloten:</label>
-            <textarea id="prompt-input" rows="3" class="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-sm text-white placeholder-slate-500 outline-none transition" placeholder="z.B.: Ändere den Titel zu 'Willkommen bei ELBI'"></textarea>
-          </div>
-
-          <button id="submit-prompt-btn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 transition-all cursor-pointer">
-            <span id="submit-spinner" class="hidden animate-spin">⚡</span>
-            <span id="submit-btn-text">Änderung live anwenden</span>
+          <button
+            type="submit"
+            id="assistant-submit-btn"
+            class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold tracking-wide shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span id="btn-spinner" class="hidden animate-spin">⚡</span>
+            <span id="btn-text">Im Shop anwenden &amp; Snapshot sichern</span>
           </button>
+        </form>
 
-          <!-- Result / Status Box -->
-          <div id="assistant-status-box" class="hidden p-4 rounded-xl border text-xs mono"></div>
-        </div>
-
-        <!-- VIEW 2: TIME MACHINE SNAPSHOTS -->
-        <div id="view-history" class="hidden space-y-4">
-          <div class="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-slate-300 leading-relaxed">
-            <p class="font-bold text-indigo-300 mb-1">⏳ Die Zeitmaschine (Sicherheits-Garantie):</p>
-            Hier ist jeder einzelne historische Stand gespeichert. Gefällt eine Änderung nicht? Einfach anklicken und mit einem Klick exakt zu diesem Zustand zurückkehren!
-          </div>
-
-          <div id="snapshots-list" class="space-y-2.5">
-            <div class="p-4 text-center mono text-xs text-slate-500">Lade Snapshots aus der D1 Datenbank...</div>
-          </div>
-        </div>
-
+        <div id="assistant-status" class="hidden p-3 rounded-xl text-xs"></div>
       </div>
 
-      <!-- Drawer Footer -->
-      <div class="p-4 border-t border-slate-800 bg-[#090a10] flex items-center justify-between text-[11px] mono text-slate-400">
-        <span>Cloudflare D1 &bull; elbi-alpha-db</span>
-        <button id="refresh-state-btn" class="hover:text-cyan-400 transition flex items-center gap-1 cursor-pointer">
-          <span>🔄</span> <span>Aktualisieren</span>
-        </button>
+      <!-- VIEW 2: TIME MACHINE (SNAPSHOTS) -->
+      <div id="view-history" class="hidden space-y-3.5">
+        <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
+          <span>Gespeicherte Stände in Cloudflare D1:</span>
+          <button id="refresh-snapshots-btn" class="text-sky-400 hover:underline cursor-pointer">Neu laden</button>
+        </div>
+
+        <div id="snapshots-list" class="space-y-2">
+          <div class="p-4 text-center text-slate-500">Lade Snapshots...</div>
+        </div>
+
+        <!-- Confirm Rollback Action -->
+        <div id="rollback-prompt" class="hidden p-3.5 rounded-xl bg-amber-950/60 border border-amber-600/50 space-y-2">
+          <p class="font-bold text-amber-200">Zurücksetzen bestätigen?</p>
+          <p id="rollback-details" class="text-slate-300 text-[11px]"></p>
+          <div class="flex gap-2 pt-1">
+            <button id="confirm-rollback-btn" class="flex-1 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition cursor-pointer">
+              Ja, Stand laden
+            </button>
+            <button id="cancel-rollback-btn" class="py-1.5 px-3 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer">
+              Abbrechen
+            </button>
+          </div>
+        </div>
+
+        <div id="rollback-status" class="hidden p-3 rounded-xl text-xs"></div>
       </div>
 
     </div>
@@ -119,205 +127,226 @@
 </div>
 
 <script>
-  let currentSiteState = {};
-  let currentSnapshots = [];
+  let activeSnapshotIdToRollback: number | null = null;
 
   // DOM Elements
-  const modal = document.getElementById('sandbox-modal');
   const toggleBtn = document.getElementById('sandbox-toggle-btn');
+  const modal = document.getElementById('sandbox-modal');
   const closeBtn = document.getElementById('sandbox-close-btn');
-  const backdrop = document.getElementById('sandbox-backdrop');
-  
+
   const tabAssistant = document.getElementById('tab-btn-assistant');
   const tabHistory = document.getElementById('tab-btn-history');
   const viewAssistant = document.getElementById('view-assistant');
   const viewHistory = document.getElementById('view-history');
 
-  const promptInput = document.getElementById('prompt-input') as HTMLTextAreaElement;
-  const submitBtn = document.getElementById('submit-prompt-btn');
-  const submitText = document.getElementById('submit-btn-text');
-  const submitSpinner = document.getElementById('submit-spinner');
-  const statusBox = document.getElementById('assistant-status-box');
+  const assistantForm = document.getElementById('assistant-form') as HTMLFormElement;
+  const userPrompt = document.getElementById('user-prompt') as HTMLTextAreaElement;
+  const submitBtn = document.getElementById('assistant-submit-btn');
+  const btnSpinner = document.getElementById('btn-spinner');
+  const btnText = document.getElementById('btn-text');
+  const assistantStatus = document.getElementById('assistant-status');
+
   const snapshotsList = document.getElementById('snapshots-list');
-  const refreshBtn = document.getElementById('refresh-state-btn');
+  const refreshBtn = document.getElementById('refresh-snapshots-btn');
+  const rollbackPrompt = document.getElementById('rollback-prompt');
+  const rollbackDetails = document.getElementById('rollback-details');
+  const confirmRollbackBtn = document.getElementById('confirm-rollback-btn');
+  const cancelRollbackBtn = document.getElementById('cancel-rollback-btn');
+  const rollbackStatus = document.getElementById('rollback-status');
 
-  // Open / Close
-  function openModal(tab = 'assistant') {
-    modal?.classList.remove('hidden');
-    switchTab(tab);
-    loadState();
-  }
-
-  function closeModal() {
-    modal?.classList.add('hidden');
-  }
-
-  toggleBtn?.addEventListener('click', () => openModal('assistant'));
-  closeBtn?.addEventListener('click', closeModal);
-  backdrop?.addEventListener('click', closeModal);
-
-  // Tabs
-  function switchTab(tab: string) {
-    if (tab === 'assistant') {
-      tabAssistant?.classList.add('text-cyan-400', 'border-cyan-400', 'bg-cyan-950/20');
-      tabAssistant?.classList.remove('text-slate-400', 'border-transparent');
-      tabHistory?.classList.remove('text-cyan-400', 'border-cyan-400', 'bg-cyan-950/20');
-      tabHistory?.classList.add('text-slate-400', 'border-transparent');
-      viewAssistant?.classList.remove('hidden');
-      viewHistory?.classList.add('hidden');
-    } else {
-      tabHistory?.classList.add('text-cyan-400', 'border-cyan-400', 'bg-cyan-950/20');
-      tabHistory?.classList.remove('text-slate-400', 'border-transparent');
-      tabAssistant?.classList.remove('text-cyan-400', 'border-cyan-400', 'bg-cyan-950/20');
-      tabAssistant?.classList.add('text-slate-400', 'border-transparent');
-      viewHistory?.classList.remove('hidden');
-      viewAssistant?.classList.add('hidden');
-      renderSnapshots();
+  // Toggle Window
+  toggleBtn?.addEventListener('click', () => {
+    modal?.classList.toggle('hidden');
+    if (!modal?.classList.contains('hidden')) {
+      loadStateAndSnapshots();
     }
-  }
+  });
 
-  tabAssistant?.addEventListener('click', () => switchTab('assistant'));
-  tabHistory?.addEventListener('click', () => switchTab('history'));
+  closeBtn?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+  });
 
-  // Quick Chips
-  document.querySelectorAll('.suggestion-chip').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const text = (e.currentTarget as HTMLElement).textContent?.trim() || '';
-      if (promptInput) {
-        promptInput.value = text;
-        promptInput.focus();
+  // Switch Tabs
+  tabAssistant?.addEventListener('click', () => {
+    tabAssistant.classList.add('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
+    tabAssistant.classList.remove('border-transparent', 'text-slate-400');
+    tabHistory?.classList.remove('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
+    tabHistory?.classList.add('border-transparent', 'text-slate-400');
+
+    viewAssistant?.classList.remove('hidden');
+    viewHistory?.classList.add('hidden');
+  });
+
+  tabHistory?.addEventListener('click', () => {
+    tabHistory.classList.add('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
+    tabHistory.classList.remove('border-transparent', 'text-slate-400');
+    tabAssistant?.classList.remove('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
+    tabAssistant?.classList.add('border-transparent', 'text-slate-400');
+
+    viewHistory?.classList.remove('hidden');
+    viewAssistant?.classList.add('hidden');
+    loadStateAndSnapshots();
+  });
+
+  // Suggestion Chips
+  document.querySelectorAll('.suggestion-chip').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (userPrompt) {
+        userPrompt.value = (btn.textContent || '').trim();
+        userPrompt.focus();
       }
     });
   });
 
-  // Apply State to DOM
-  function applyStateToDOM(state: any) {
+  // Hydrate DOM with Active State
+  function applyLiveState(state: any) {
     if (!state) return;
-    currentSiteState = state;
 
-    // Apply Notice Banner
-    const bannerContainer = document.getElementById('dynamic-alpha-banner');
-    const bannerText = document.getElementById('dynamic-alpha-text');
-    if (state.notice_banner && bannerContainer && bannerText) {
-      bannerText.textContent = state.notice_banner;
-      bannerContainer.classList.remove('hidden');
+    // 1. Hero Title
+    const heroTitle = document.getElementById('dynamic-hero-title');
+    if (heroTitle && state.hero_title) {
+      heroTitle.textContent = state.hero_title;
     }
 
-    // Apply Hero Title
-    const heroTitleDynamic = document.getElementById('dynamic-hero-title');
-    if (heroTitleDynamic && state.hero_title) {
-      heroTitleDynamic.textContent = state.hero_title;
+    // 2. Hero Subtitle
+    const heroSubtitle = document.getElementById('dynamic-hero-subtitle');
+    if (heroSubtitle && state.hero_subtitle) {
+      heroSubtitle.textContent = state.hero_subtitle;
     }
 
-    // Apply Hero Subtitle
-    const heroSubDynamic = document.getElementById('dynamic-hero-subtitle');
-    if (heroSubDynamic && state.hero_subtitle) {
-      heroSubDynamic.textContent = state.hero_subtitle;
+    // 3. Alpha Banner
+    const banner = document.getElementById('dynamic-alpha-banner');
+    if (banner) {
+      if (state.banner_text && state.banner_visible) {
+        banner.innerHTML = `<div class="flex items-center gap-3">
+          <span class="text-xl">📢</span>
+          <div class="flex-1 font-semibold text-xs sm:text-sm leading-snug">${state.banner_text}</div>
+        </div>`;
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
     }
   }
 
-  // Load State from /api/state
-  async function loadState() {
+  // Fetch Current State & Snapshots from D1
+  async function loadStateAndSnapshots() {
     try {
       const res = await fetch('/api/state');
-      if (!res.ok) return;
       const data = await res.json();
+
       if (data.success) {
-        applyStateToDOM(data.state);
-        currentSnapshots = data.snapshots || [];
-        renderSnapshots();
+        applyLiveState(data.state);
+        renderSnapshots(data.snapshots);
       }
     } catch (e) {
-      console.warn("Alpha state load notice:", e);
+      console.warn('Live state sync error:', e);
     }
   }
 
-  // Render Snapshots List
-  function renderSnapshots() {
+  // Render Snapshots list
+  function renderSnapshots(snapshots: any[]) {
     if (!snapshotsList) return;
-    if (!currentSnapshots || currentSnapshots.length === 0) {
-      snapshotsList.innerHTML = `<div class="p-4 text-center mono text-xs text-slate-500">Keine vorherigen Snapshots gefunden.</div>`;
+    if (!snapshots || snapshots.length === 0) {
+      snapshotsList.innerHTML = `<div class="p-3 text-center text-slate-500">Keine Snapshots vorhanden.</div>`;
       return;
     }
 
-    snapshotsList.innerHTML = currentSnapshots.map((snap, index) => {
-      const date = new Date(snap.created_at);
-      const timeStr = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-      const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-      const isLatest = index === 0;
-
-      return `
-        <div class="p-3.5 rounded-xl border ${isLatest ? 'bg-cyan-950/30 border-cyan-500/50' : 'bg-slate-900/60 border-slate-800'} flex items-center justify-between gap-3">
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="px-2 py-0.5 rounded text-[10px] mono font-bold ${isLatest ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-slate-300'}">
-                ${isLatest ? 'AKTIV' : `${dateStr} ${timeStr}`}
-              </span>
-              <span class="text-xs text-slate-400 mono truncate">${snap.author || 'Maik'}</span>
-            </div>
-            <p class="text-xs text-white font-medium truncate">${snap.summary}</p>
-          </div>
-          <div>
-            ${isLatest ? `
-              <span class="text-[11px] mono text-cyan-400 font-bold px-2.5 py-1">Aktuell</span>
-            ` : `
-              <button data-snap-id="${snap.id}" data-summary="${snap.summary.replace(/"/g, '&quot;')}" class="rollback-btn px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 hover:text-white text-xs mono font-bold transition flex items-center gap-1.5 cursor-pointer">
-                <span>↺</span>
-                <span>Zurück</span>
-              </button>
-            `}
+    snapshotsList.innerHTML = snapshots
+      .map(
+        (s) => `
+      <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between gap-3">
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-white text-xs truncate">${s.label}</div>
+          <div class="text-[10px] mono text-slate-400 mt-0.5">
+            Snapshot #${s.id} &bull; ${new Date(s.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr
           </div>
         </div>
-      `;
-    }).join('');
+        <button 
+          data-id="${s.id}" 
+          data-label="${s.label}"
+          class="rollback-btn px-2.5 py-1.5 rounded-lg bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sky-300 text-[10px] font-bold transition shrink-0 cursor-pointer"
+        >
+          Wiederherstellen
+        </button>
+      </div>
+    `
+      )
+      .join('');
 
-    // Bind rollback buttons with "Are you sure?" confirmation
-    document.querySelectorAll('.rollback-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const snapId = target.getAttribute('data-snap-id');
-        const summary = target.getAttribute('data-summary');
-
-        // Direct confirmation modal as requested by user
-        const confirmed = window.confirm(`⚠️ Wollen Sie wirklich zu diesem Stand zurückkehren?\n\n"${summary}"\n\nAlle aktuellen Texte werden auf diesen Stand zurückgesetzt.`);
-        if (!confirmed || !snapId) return;
-
-        target.textContent = "Zurücksetzen...";
-        try {
-          const res = await fetch('/api/state', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'rollback', snapshot_id: snapId })
-          });
-          const result = await res.json();
-          if (result.success) {
-            applyStateToDOM(result.state);
-            await loadState();
-            alert(`✅ Erfolgreich zurückgesetzt auf: "${summary}"`);
-          } else {
-            alert(`Fehler beim Rollback: ${result.error}`);
-          }
-        } catch (err: any) {
-          alert(`Verbindungsfehler: ${err.message}`);
-        }
+    // Attach listeners to rollback buttons
+    document.querySelectorAll('.rollback-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = Number(btn.getAttribute('data-id'));
+        const label = btn.getAttribute('data-label') || '';
+        triggerRollbackDialog(id, label);
       });
     });
   }
 
-  // Submit Prompt
-  submitBtn?.addEventListener('click', async () => {
-    const prompt = promptInput?.value.trim();
+  // Trigger Rollback Dialog
+  function triggerRollbackDialog(id: number, label: string) {
+    activeSnapshotIdToRollback = id;
+    if (rollbackDetails) {
+      rollbackDetails.textContent = `Stand: "${label}" (ID #${id})`;
+    }
+    rollbackPrompt?.classList.remove('hidden');
+    rollbackStatus?.classList.add('hidden');
+  }
+
+  cancelRollbackBtn?.addEventListener('click', () => {
+    rollbackPrompt?.classList.add('hidden');
+    activeSnapshotIdToRollback = null;
+  });
+
+  // Confirm Rollback Action
+  confirmRollbackBtn?.addEventListener('click', async () => {
+    if (!activeSnapshotIdToRollback) return;
+
+    confirmRollbackBtn.textContent = 'Stelle her...';
+    try {
+      const res = await fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'rollback',
+          snapshotId: activeSnapshotIdToRollback,
+        }),
+      });
+
+      const result = await res.json();
+      rollbackPrompt?.classList.add('hidden');
+      confirmRollbackBtn.textContent = 'Ja, Stand laden';
+
+      if (result.success) {
+        if (rollbackStatus) {
+          rollbackStatus.className = 'p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs';
+          rollbackStatus.textContent = `✓ ${result.message}`;
+          rollbackStatus.classList.remove('hidden');
+        }
+        applyLiveState(result.state);
+        loadStateAndSnapshots();
+      }
+    } catch (e: any) {
+      confirmRollbackBtn.textContent = 'Ja, Stand laden';
+      if (rollbackStatus) {
+        rollbackStatus.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs';
+        rollbackStatus.textContent = 'Fehler beim Zurücksetzen.';
+        rollbackStatus.classList.remove('hidden');
+      }
+    }
+  });
+
+  // Form Submit (Assistant)
+  assistantForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const prompt = userPrompt.value.trim();
     if (!prompt) return;
 
-    submitBtn.setAttribute('disabled', 'true');
-    submitSpinner?.classList.remove('hidden');
-    if (submitText) submitText.textContent = "KI wendet Änderung an...";
-
-    if (statusBox) {
-      statusBox.classList.remove('hidden', 'bg-rose-950/40', 'border-rose-500/40', 'text-rose-300');
-      statusBox.classList.add('bg-cyan-950/40', 'border-cyan-500/40', 'text-cyan-300');
-      statusBox.innerHTML = `⚡ Verarbeite Eingabe und erstelle Sicherheits-Snapshot in D1...`;
-    }
+    btnSpinner?.classList.remove('hidden');
+    if (btnText) btnText.textContent = 'Wird verarbeitet...';
+    if (submitBtn) (submitBtn as HTMLButtonElement).disabled = true;
+    assistantStatus?.classList.add('hidden');
 
     try {
       const res = await fetch('/api/state', {
@@ -326,38 +355,41 @@
         body: JSON.stringify({
           action: 'update',
           prompt: prompt,
-          current_state: currentSiteState
-        })
+        }),
       });
 
-      const data = await res.json();
-      if (data.success) {
-        applyStateToDOM(data.state);
-        if (statusBox) {
-          statusBox.innerHTML = `✅ <strong>Änderung erfolgreich angewendet:</strong><br>${data.message}<br><span class="text-slate-400 mt-1 block">Snapshot in der Zeitmaschine gesichert.</span>`;
+      const result = await res.json();
+
+      btnSpinner?.classList.add('hidden');
+      if (btnText) btnText.textContent = 'Im Shop anwenden & Snapshot sichern';
+      if (submitBtn) (submitBtn as HTMLButtonElement).disabled = false;
+
+      if (result.success) {
+        if (assistantStatus) {
+          assistantStatus.className = 'p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs';
+          assistantStatus.textContent = `✓ ${result.message}`;
+          assistantStatus.classList.remove('hidden');
         }
-        if (promptInput) promptInput.value = '';
-        await loadState();
+        userPrompt.value = '';
+        applyLiveState(result.state);
       } else {
-        if (statusBox) {
-          statusBox.classList.add('bg-rose-950/40', 'border-rose-500/40', 'text-rose-300');
-          statusBox.innerHTML = `❌ Fehler: ${data.error || 'Aktion fehlgeschlagen'}`;
-        }
+        throw new Error(result.error || 'Fehler');
       }
     } catch (err: any) {
-      if (statusBox) {
-        statusBox.classList.add('bg-rose-950/40', 'border-rose-500/40', 'text-rose-300');
-        statusBox.innerHTML = `❌ Verbindungsfehler: ${err.message}`;
+      btnSpinner?.classList.add('hidden');
+      if (btnText) btnText.textContent = 'Im Shop anwenden & Snapshot sichern';
+      if (submitBtn) (submitBtn as HTMLButtonElement).disabled = false;
+
+      if (assistantStatus) {
+        assistantStatus.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs';
+        assistantStatus.textContent = `Fehler: ${err.message}`;
+        assistantStatus.classList.remove('hidden');
       }
-    } finally {
-      submitBtn.removeAttribute('disabled');
-      submitSpinner?.classList.add('hidden');
-      if (submitText) submitText.textContent = "Änderung live anwenden";
     }
   });
 
-  refreshBtn?.addEventListener('click', loadState);
+  refreshBtn?.addEventListener('click', () => loadStateAndSnapshots());
 
-  // Initial Load on Page Startup
-  document.addEventListener('DOMContentLoaded', loadState);
+  // Initial Load on page entry
+  loadStateAndSnapshots();
 </script>
