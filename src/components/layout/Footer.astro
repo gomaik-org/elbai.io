@@ -1,0 +1,96 @@
+---
+import { shopConfig } from '../../config/shop.config';
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-gray-900 text-gray-300 mt-20 border-t border-gray-800" aria-label="Fußbereich">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+      <!-- Col 1: Brand & Description -->
+      <div class="md:col-span-1">
+        <a href="/" class="flex items-center gap-2.5 group" aria-label={`Zur Startseite des ${shopConfig.brand.name}s`}>
+          <img
+            src={shopConfig.brand.logoUrl}
+            alt={`${shopConfig.brand.name} Logo`}
+            width="48"
+            height="36"
+            class="h-9 w-auto object-contain brightness-105"
+            loading="lazy"
+          />
+          <div class="flex flex-col">
+            <span class="text-lg font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">
+              {shopConfig.brand.name}
+            </span>
+            <span class="text-[10px] text-amber-400 font-semibold tracking-wider uppercase -mt-0.5">
+              {shopConfig.brand.tagline}
+            </span>
+          </div>
+        </a>
+        <p class="mt-4 text-xs text-gray-400 leading-relaxed">
+          {shopConfig.brand.description}
+        </p>
+      </div>
+
+      <!-- Col 2: Sortiment -->
+      <div>
+        <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Sortiment</h3>
+        <ul class="mt-4 space-y-2 text-xs">
+          <li><a href="/" class="hover:text-white transition-colors">Home</a></li>
+          <li><a href="/catalog/elbi-schreibhefte" class="hover:text-white transition-colors">Elbi Schreibhefte</a></li>
+          <li><a href="/catalog/elbi-lehrerstempel" class="hover:text-white transition-colors">Lehrerstempel</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Service & Hilfe -->
+      <div>
+        <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Service & Hilfe</h3>
+        <ul class="mt-4 space-y-2 text-xs">
+          <li><a href="/versand" class="hover:text-white transition-colors">Versandkosten & Lieferzeiten</a></li>
+          <li><a href="/widerruf" class="hover:text-white transition-colors">Widerrufsrecht & Musterformular</a></li>
+          <li><a href="/kontakt" class="hover:text-white transition-colors">Kundenservice & Kontakt</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Digitaler Widerruf (§ 356a BGB) -->
+      <div>
+        <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Verbraucherrechte</h3>
+        <p class="mt-4 text-xs text-gray-400 leading-relaxed">
+          Sie möchten Ihre Bestellung unkompliziert widerrufen? Nutzen Sie unseren gesetzlichen elektronischen Widerrufsservice (§ 356a BGB):
+        </p>
+        <div class="mt-4">
+          <a
+            href="/widerruf/formular"
+            data-testid="footer-withdrawal-btn"
+            class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 transition-colors w-full sm:w-auto"
+          >
+            Vertrag widerrufen
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Mandatory Permanent Legal Links & PAngV Disclaimer -->
+    <div class="pt-8 border-t border-gray-800 text-xs text-gray-400">
+      <p class="mb-4 text-center sm:text-left text-gray-400">
+        * Alle Preise verstehen sich inklusive der gesetzlichen Mehrwertsteuer, zuzüglich <a href="/versand" class="underline hover:text-white">Versandkosten</a>.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-gray-400">
+          &copy; {currentYear} {shopConfig.brand.companyName}. Alle Rechte vorbehalten.
+        </p>
+
+        <!-- Unobscured Statutory Legal Navigation -->
+        <nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium" aria-label="Rechtliche Hinweise" data-testid="footer-legal-nav">
+          <a href="/impressum" class="hover:text-white transition-colors">Impressum</a>
+          <a href="/datenschutz" class="hover:text-white transition-colors">Datenschutzerklärung</a>
+          <a href="/agb" class="hover:text-white transition-colors">AGB</a>
+          <a href="/widerruf" class="hover:text-white transition-colors">Widerrufsbelehrung</a>
+          <a href="/versand" class="hover:text-white transition-colors">Versand & Zahlung</a>
+          <a href="/widerruf/formular" data-testid="footer-withdrawal-link" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Widerruf einlegen (§ 356a BGB)</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</footer>

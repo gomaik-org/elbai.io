@@ -1,123 +1,272 @@
 ---
 import '../styles/global.css';
 import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
+import { getAllProducts } from '../data/catalog';
+
+const allProducts = getAllProducts();
+// Curated 47 active products with real images
+const products = allProducts.filter((p) => p.image_url && !p.image_url.includes('placeholder'));
+
+const schreibhefte = products.filter((p) => p.sku.startsWith('H') || p.title.toLowerCase().includes('heft') || p.title.toLowerCase().includes('schreib'));
+const stempel = products.filter((p) => p.sku.startsWith('S') || p.sku.startsWith('K') || p.title.toLowerCase().includes('stempel'));
+
+function formatPriceEur(cents: number): string {
+  return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+}
+
+function cleanTitle(title: string): string {
+  return title
+    .replace(/^Elbi Stempel aus Holz\s*-\s*/, '')
+    .replace(/^Stempel aus Holz\s*-\s*/, '')
+    .replace(/^Elbi Lehrerstempel\s*-\s*/, '')
+    .split(' - ')[0];
+}
 ---
 <!DOCTYPE html>
 <html lang="de" class="min-h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>elbAI.io // TECH LAB (ALPHA)</title>
+  <title>Elbi Verlag // Interaktiver Alpha-Shop & Live-Copilot</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Space Grotesk', sans-serif;
-      background-color: #08090e;
-      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
     }
     .mono { font-family: 'Fira Code', monospace; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+<body class="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
 
-  <!-- Header -->
-  <header class="w-full bg-[#0d0e14]/90 border-b border-sky-950/80 px-6 py-4 backdrop-blur z-30">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <a href="https://elbai.io" class="flex items-center space-x-3 group">
-          <img src="/favicon.svg" alt="elbAI Logo" class="w-8 h-8 rounded-lg shadow-md group-hover:scale-105 transition-transform duration-200">
-          <span class="text-xl font-extrabold tracking-tight">elb<span class="text-cyan-400">AI</span>.io</span>
-        </a>
-        <span class="px-2.5 py-0.5 rounded text-[10px] mono bg-purple-950/70 text-purple-300 border border-purple-800/60 font-bold uppercase">
-          🔒 ZERO TRUST ALPHA LAB
+  <!-- TOP BAR (Zero Trust Indicator + Navigation) -->
+  <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px] mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          ZERO TRUST AKTIV
         </span>
+        <span class="text-slate-400">Interaktive Test-Umgebung &bull; D1 Live-Speicher</span>
       </div>
-
-      <div class="flex items-center space-x-4 mono text-xs">
-        <a href="https://elbai.io/docs/" class="px-3.5 py-1.5 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-300 hover:text-white transition">
+      <div class="flex items-center gap-4 mono text-xs">
+        <a href="https://elbai.io/docs/" class="text-cyan-400 hover:text-cyan-300 underline font-semibold">
           📚 Dokumentation
         </a>
-        <a href="https://elbai.io" class="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition">
-          ← Zurück zu elbai.io
+        <a href="https://elbai.io" class="text-slate-400 hover:text-white">
+          ← Zu elbai.io
         </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORE HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <a href="/alpha" class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 flex items-center justify-center text-white font-black text-xl shadow-md">
+            E
+          </div>
+          <div>
+            <span class="text-2xl font-black tracking-tight text-slate-900">ELBI <span class="text-sky-600">Verlag</span></span>
+            <span class="block text-[10px] mono text-slate-400 font-semibold uppercase tracking-wider">Lehrmittel &amp; Schreibhefte</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Live Search / Trust Badges -->
+      <div class="hidden md:flex items-center space-x-6 text-sm text-slate-600">
+        <div class="flex items-center gap-2">
+          <span class="text-emerald-600 font-bold">✓</span>
+          <span>Kauf auf Rechnung</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-emerald-600 font-bold">✓</span>
+          <span>Praxiserprobt</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-emerald-600 font-bold">✓</span>
+          <span>Schnelle Lieferung</span>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="w-full max-w-5xl mx-auto px-4 py-12 flex-1 flex flex-col justify-center text-center">
-    
-    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-500/40 text-cyan-300 text-xs sm:text-sm mono mb-6 mx-auto shadow-[0_0_20px_rgba(6,182,212,0.25)]">
-      <span>🔒</span>
-      <span class="font-bold">Cloudflare Zero Trust Geschützt</span>
-      <span class="text-slate-500">•</span>
-      <span class="text-emerald-400">Autorisiertes Entwickler-Cockpit</span>
-    </div>
-
-    <!-- Live D1 Hero Showcase Title -->
-    <h1 class="text-4xl sm:text-6xl font-black uppercase tracking-tight text-white mb-4">
-      Next-Gen <span id="dynamic-hero-title" class="bg-gradient-to-r from-cyan-400 via-sky-300 to-fuchsia-400 bg-clip-text text-transparent">Tech Lab &amp; Sandbox</span>
-    </h1>
-
-    <p id="dynamic-hero-subtitle" class="mono text-sm sm:text-base text-slate-300 max-w-2xl mx-auto mb-8">
-      Hier testen Entwickler und Architekten autonome KI-Workflows, Cloudflare D1 Live-Mutationen und die Snapshot-Zeitmaschine in geschützter Umgebung.
-    </p>
-
-    <!-- Lab Feature Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-10">
+  <!-- STORE HERO (MUTABLE VIA COPILOT) -->
+  <section class="bg-gradient-to-b from-sky-50/50 via-white to-slate-50 border-b border-slate-200/80 py-10 sm:py-14 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <div class="p-6 rounded-2xl bg-slate-900/60 border border-cyan-500/30 shadow-xl">
-        <div class="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-2xl mb-4">
-          🤖
+      <!-- Live Dynamic Banner (Editable via Copilot) -->
+      <div id="dynamic-alpha-banner" class="hidden mb-6 p-4 rounded-2xl border border-sky-300 bg-sky-100 text-sky-950 shadow-md">
+        <!-- Injected via JavaScript from D1 state -->
+      </div>
+
+      <div class="max-w-3xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-sky-800 bg-sky-100/80 border border-sky-200 mb-4">
+          <span>★</span>
+          <span>Original Elbi Sortiment (ca. 50 Kern-Artikel)</span>
         </div>
-        <h3 class="font-bold text-white text-lg mb-2">KI-Copilot Sandbox</h3>
-        <p class="text-xs text-slate-400 leading-relaxed mono">
-          Texte und Zustände können via natürlicher Sprache angepasst und sofort im Edge-Speicher gesichert werden.
+
+        <!-- Hero Title (Editable via Copilot) -->
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-tight">
+          Schreiben lernen mit System &amp; <span id="dynamic-hero-title" class="text-sky-600">Freude</span>.
+        </h1>
+
+        <!-- Hero Subtitle (Editable via Copilot) -->
+        <p id="dynamic-hero-subtitle" class="mt-4 text-lg text-slate-600 leading-relaxed font-normal">
+          Willkommen beim Elbi Verlag. Wir entwickeln und fertigen praxiserprobte Schreiblernhefte für alle Ausgangsschriften und motivierende Holzstempel für Grund- und Förderschulen.
+        </p>
+
+        <!-- Quick Info Callout -->
+        <div class="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500">
+          <span class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
+            👉 <strong>Tipp für Tester:</strong> Änderungen am Shop rechts unten über den Copilot-Button testen.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT CATALOG SECTION -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
+    
+    <!-- Filter Controls & Count -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
+      <div>
+        <h2 class="text-2xl font-black text-slate-900">
+          Unser aktuelles Sortiment
+        </h2>
+        <p class="text-sm text-slate-500 mt-0.5">
+          {products.length} sofort lieferbare Original-Artikel
         </p>
       </div>
 
-      <div class="p-6 rounded-2xl bg-slate-900/60 border border-purple-500/30 shadow-xl">
-        <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-2xl mb-4">
-          ⏳
-        </div>
-        <h3 class="font-bold text-white text-lg mb-2">D1 Zeitmaschine</h3>
-        <p class="text-xs text-slate-400 leading-relaxed mono">
-          Jede Mutation erzeugt einen unveränderbaren Snapshot in Cloudflare D1. 1-Klick-Rollback stellt jeden Zustand sofort wieder her.
-        </p>
+      <!-- Filter Buttons -->
+      <div class="flex items-center gap-2 text-xs font-semibold">
+        <button id="filter-all-btn" class="filter-tab px-4 py-2 rounded-xl bg-slate-900 text-white shadow-sm transition">
+          Alle ({products.length})
+        </button>
+        <button id="filter-hefte-btn" class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition">
+          Schreibhefte ({schreibhefte.length})
+        </button>
+        <button id="filter-stempel-btn" class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition">
+          Lehrerstempel ({stempel.length})
+        </button>
       </div>
-
-      <div class="p-6 rounded-2xl bg-slate-900/60 border border-emerald-500/30 shadow-xl">
-        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-2xl mb-4">
-          🛡️
-        </div>
-        <h3 class="font-bold text-white text-lg mb-2">Zero Trust Perimeter</h3>
-        <p class="text-xs text-slate-400 leading-relaxed mono">
-          Vollständiger Schutz vor unbefugtem Zugriff. Nur autorisierte Teammitglieder können diese Labor-Ebene einsehen.
-        </p>
-      </div>
-
     </div>
 
-    <!-- Info Box -->
-    <div class="p-5 rounded-2xl bg-[#0d0f17] border border-slate-800 text-xs mono text-slate-400 max-w-2xl mx-auto">
-      👉 Nutzen Sie den Button <strong class="text-cyan-400">"Alpha Copilot &amp; Zeitmaschine"</strong> unten rechts, um das Cockpit zu öffnen.
+    <!-- Product Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="product-card-grid">
+      {products.map((p) => {
+        const isHeft = p.sku.startsWith('H') || p.title.toLowerCase().includes('heft') || p.title.toLowerCase().includes('schreib');
+        const isStempel = p.sku.startsWith('S') || p.sku.startsWith('K') || p.title.toLowerCase().includes('stempel');
+        const tag = isHeft ? 'hefte' : (isStempel ? 'stempel' : 'other');
+        const title = cleanTitle(p.title);
+
+        return (
+          <article 
+            class="product-card group flex flex-col justify-between rounded-2xl bg-white border border-slate-200/90 hover:border-sky-400 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            data-category={tag}
+          >
+            <div>
+              <!-- Image Area -->
+              <div class="aspect-square w-full rounded-xl bg-slate-50 p-4 flex items-center justify-center overflow-hidden mb-4 border border-slate-100 relative">
+                <img 
+                  src={p.image_url} 
+                  alt={p.title} 
+                  loading="lazy" 
+                  class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-xs"
+                  onerror="this.onerror=null; this.src='/images/placeholder.svg'"
+                />
+                <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] mono text-white font-bold">
+                  {p.sku}
+                </span>
+              </div>
+
+              <!-- Tags -->
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[10px] mono uppercase font-semibold text-slate-600 px-2 py-0.5 rounded bg-slate-100 border border-slate-200">
+                  {isHeft ? 'Schreibheft' : 'Holzstempel'}
+                </span>
+                <span class="text-[10px] font-semibold text-emerald-600">✓ Auf Lager</span>
+              </div>
+
+              <!-- Title & Desc -->
+              <h3 class="font-bold text-slate-900 text-base leading-snug group-hover:text-sky-600 transition-colors line-clamp-2">
+                {title}
+              </h3>
+              {p.short_description && (
+                <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                  {p.short_description}
+                </p>
+              )}
+            </div>
+
+            <!-- Price & Button -->
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] text-slate-400 block">inkl. MwSt.</span>
+                <span class="text-lg font-black text-slate-900 mono">
+                  {formatPriceEur(p.price_gross ?? p.price_net ?? 290)}
+                </span>
+              </div>
+              <span class="px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-700 text-xs font-bold group-hover:bg-sky-600 group-hover:text-white transition">
+                Details
+              </span>
+            </div>
+          </article>
+        );
+      })}
     </div>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="w-full border-t border-slate-900 bg-[#090a10] py-6 text-center text-xs mono text-slate-400">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <div>&copy; 2026 ELBI &bull; All Rights Reserved</div>
-      <div>Coded with 💖 <a href="https://emaik.io" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-cyan-300 transition-colors font-bold underline decoration-pink-500/50 underline-offset-2">emaik.io</a></div>
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-16">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>&copy; 2026 Elbi Verlag &bull; Schulbedarf &amp; Lehrmittel</div>
+      <div class="mono">
+        Coded with 💖 <a href="https://emaik.io" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-white underline">emaik.io</a>
+      </div>
     </div>
   </footer>
 
-  <!-- Floating Copilot & Zeitmaschine Widget -->
+  <!-- FLOATING COPILOT & TIME MACHINE WIDGET -->
   <AlphaSandboxWidget />
 
+  <script>
+    // Tab filter logic
+    const allBtn = document.getElementById('filter-all-btn');
+    const hefteBtn = document.getElementById('filter-hefte-btn');
+    const stempelBtn = document.getElementById('filter-stempel-btn');
+    const cards = document.querySelectorAll('.product-card');
+
+    function filterCategory(cat: string, activeBtn: HTMLElement) {
+      [allBtn, hefteBtn, stempelBtn].forEach(b => {
+        b?.classList.remove('bg-slate-900', 'text-white');
+        b?.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-200');
+      });
+      activeBtn.classList.add('bg-slate-900', 'text-white');
+      activeBtn.classList.remove('bg-white', 'text-slate-700', 'border');
+
+      cards.forEach(card => {
+        const c = card.getAttribute('data-category');
+        if (cat === 'all' || c === cat) {
+          (card as HTMLElement).style.display = 'flex';
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+    }
+
+    allBtn?.addEventListener('click', () => filterCategory('all', allBtn));
+    hefteBtn?.addEventListener('click', () => filterCategory('hefte', hefteBtn));
+    stempelBtn?.addEventListener('click', () => filterCategory('stempel', stempelBtn));
+  </script>
 </body>
 </html>

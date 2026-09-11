@@ -1,0 +1,594 @@
+---
+import CartTrigger from '../cart/CartTrigger';
+import InstantSearch from '../search/InstantSearch';
+import { shopConfig } from '../../config/shop.config';
+
+const pathname = Astro.url.pathname;
+const isHome = pathname === '/' || pathname === '';
+const isSchreibhefte = pathname.startsWith('/catalog/elbi-schreibhefte');
+const isLehrerstempel = pathname.startsWith('/catalog/elbi-lehrerstempel');
+---
+
+<header
+  id="global-header"
+  data-scrolled="false"
+  class="sticky top-0 z-40 w-full"
+>
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 gap-3 sm:gap-6">
+    <!-- Left: Mobile Menu Button + Official Elbi Logo (Starts large in authentic size, smoothly compacts on scroll) -->
+    <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 mr-4 sm:mr-8 lg:mr-12 min-w-[120px] sm:min-w-[150px] lg:min-w-[170px]">
+      <!-- Mobile Menu Toggle Button (visible on mobile only) -->
+      <button
+        id="mobile-menu-open-btn"
+        type="button"
+        class="md:hidden relative z-10 inline-flex items-center justify-center p-2 rounded-xl bg-slate-100/80 text-slate-700 hover:text-blue-600 hover:bg-slate-200/80 transition-colors shrink-0"
+        aria-label="Hauptmenü öffnen"
+        aria-controls="mobile-menu-drawer"
+        aria-expanded="false"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Official Logo: Crisp, authentic proportion & smooth shrink transition -->
+      <a
+        href="/"
+        class="flex items-center gap-2 group py-1"
+        aria-label={`${shopConfig.brand.name} – Zur Startseite`}
+      >
+        <img
+          id="header-logo-img"
+          src={shopConfig.brand.logoUrl}
+          alt="Elbi Verlag Logo"
+          width={shopConfig.brand.logoWidth}
+          height={shopConfig.brand.logoHeight}
+          class="w-auto object-contain transition-all duration-300 drop-shadow-2xs group-hover:scale-105"
+          fetchpriority="high"
+        />
+      </a>
+    </div>
+
+    <!-- Center/Right: Desktop Navigation (Shifted right for balance and breathing room) -->
+    <nav class="hidden md:flex items-center gap-1 lg:gap-2 font-sans shrink-0 ml-auto md:ml-0" aria-label="Hauptnavigation">
+      <a
+        href="/"
+        class={`whitespace-nowrap px-4 py-2 rounded-full text-[16px] lg:text-[17px] transition-all font-medium ${
+          isHome
+            ? 'bg-[#e8f0fe] text-[#0b57d0] font-semibold'
+            : 'text-slate-800 hover:text-slate-950 hover:bg-slate-100'
+        }`}
+        aria-current={isHome ? 'page' : undefined}
+      >
+        Home
+      </a>
+
+      <!-- Elbi Schreibhefte with Google Store Mega-Flyout Panel -->
+      <div class="relative group shrink-0">
+        <a
+          href="/catalog/elbi-schreibhefte"
+          class={`whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[16px] lg:text-[17px] transition-all font-medium ${
+            isSchreibhefte
+              ? 'bg-[#e8f0fe] text-[#0b57d0] font-semibold'
+              : 'text-slate-800 hover:text-slate-950 hover:bg-slate-100'
+          }`}
+          aria-haspopup="true"
+          aria-current={isSchreibhefte ? 'page' : undefined}
+        >
+          <span>Elbi Schreibhefte</span>
+          <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-800 transition-transform group-hover:rotate-180 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </a>
+
+        <!-- Clean Modern Dropdown Menu -->
+        <div class="absolute left-0 top-full pt-2 hidden group-hover:block group-focus-within:block z-50 w-[380px] sm:w-[410px] animate-in fade-in-0 duration-150">
+          <div class="rounded-2xl border border-slate-200/90 bg-white p-3 shadow-xl shadow-slate-900/8 font-sans">
+            <div class="px-3 pt-2 pb-1.5 text-[12px] font-semibold text-slate-400 uppercase tracking-wider">
+              Nach Lernstufe
+            </div>
+
+            <div class="space-y-1">
+              <!-- 1. Vorschule & Förderschule -->
+              <a
+                href="/catalog/elbi-schreibhefte/vorschule-und-foerderschule"
+                class="group/item flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                <div class="mt-1 w-2 h-2 rounded-full bg-blue-500 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[14px] font-semibold text-slate-900 group-hover/item:text-[#0b57d0] transition-colors leading-snug">
+                    Vorschule &amp; Förderschule
+                  </div>
+                  <div class="text-[12px] text-slate-500 mt-0.5 leading-normal">
+                    Schwungübungen &amp; Feinmotorik (H4, H44)
+                  </div>
+                </div>
+              </a>
+
+              <!-- 2. 1. Schulhalbjahr Klasse 1 -->
+              <a
+                href="/catalog/elbi-schreibhefte/1-schulhalbjahr-klasse-1"
+                class="group/item flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                <div class="mt-1 w-2 h-2 rounded-full bg-amber-500 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[14px] font-semibold text-slate-900 group-hover/item:text-amber-700 transition-colors leading-snug">
+                    1. Schulhalbjahr Klasse 1
+                  </div>
+                  <div class="text-[12px] text-slate-500 mt-0.5 leading-normal">
+                    Druckschrift, Schwung- &amp; Zahlenhefte (H31, H10)
+                  </div>
+                </div>
+              </a>
+
+              <!-- 3. 2. Schulhalbjahr Klasse 1 -->
+              <a
+                href="/catalog/elbi-schreibhefte/2-schulhalbjahr-klasse-1"
+                class="group/item flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                <div class="mt-1 w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[14px] font-semibold text-slate-900 group-hover/item:text-emerald-700 transition-colors leading-snug">
+                    2. Schulhalbjahr Klasse 1
+                  </div>
+                  <div class="text-[12px] text-slate-500 mt-0.5 leading-normal">
+                    Schreiblehrgänge VA, LA &amp; SAS (H12, H2, H5, H3)
+                  </div>
+                </div>
+              </a>
+
+              <!-- 4. Klasse 2 bis 4 -->
+              <a
+                href="/catalog/elbi-schreibhefte/klasse-2-bis-4"
+                class="group/item flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                <div class="mt-1 w-2 h-2 rounded-full bg-purple-500 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[14px] font-semibold text-slate-900 group-hover/item:text-purple-700 transition-colors leading-snug">
+                    Klasse 2 bis 4
+                  </div>
+                  <div class="text-[12px] text-slate-500 mt-0.5 leading-normal">
+                    Schönschreiben &amp; Schreibgeschichten (H25–H28)
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lehrerstempel with Google Store Mega-Flyout Panel -->
+      <div class="relative group shrink-0">
+        <a
+          href="/catalog/elbi-lehrerstempel"
+          class={`whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[16px] lg:text-[17px] transition-all font-medium ${
+            isLehrerstempel
+              ? 'bg-[#e8f0fe] text-[#0b57d0] font-semibold'
+              : 'text-slate-800 hover:text-slate-950 hover:bg-slate-100'
+          }`}
+          aria-haspopup="true"
+          aria-current={isLehrerstempel ? 'page' : undefined}
+        >
+          <span>Lehrerstempel</span>
+          <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-800 transition-transform group-hover:rotate-180 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </a>
+
+        <!-- Clean Modern Dropdown Menu for Lehrerstempel -->
+        <div class="absolute left-0 top-full pt-2 hidden group-hover:block group-focus-within:block z-50 w-[380px] sm:w-[410px] animate-in fade-in-0 duration-150">
+          <div class="rounded-2xl border border-slate-200/90 bg-white p-3 shadow-xl shadow-slate-900/8 font-sans">
+            <div class="px-3 pt-2 pb-1.5 text-[12px] font-semibold text-slate-400 uppercase tracking-wider">
+              Stempelkollektion
+            </div>
+
+            <div class="space-y-1">
+              <!-- 1. Beliebte Stempelsets -->
+              <a
+                href="/catalog/stempelsets"
+                class="group/item flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                <div class="mt-1 w-2 h-2 rounded-full bg-amber-500 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[14px] font-semibold text-slate-900 group-hover/item:text-[#0b57d0] transition-colors leading-snug">
+                    Stempelsets
+                  </div>
+                  <div class="text-[12px] text-slate-500 mt-0.5 leading-normal">
+                    Mehrteilige Motiv-Sets im praktischen Holzkasten (S88, S90 u.a.)
+                  </div>
+                </div>
+              </a>
+
+              <!-- 2. Einzelstempel -->
+              <a
+                href="/catalog/einzelstempel"
+                class="group/item flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                <div class="mt-1 w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[14px] font-semibold text-slate-900 group-hover/item:text-[#0b57d0] transition-colors leading-snug">
+                    Einzelstempel
+                  </div>
+                  <div class="text-[12px] text-slate-500 mt-0.5 leading-normal">
+                    Lob-, Motiv- &amp; Belobigungsstempel aus Buchenholz
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Center-Right: Instant Search -->
+    <div class="flex-1 max-w-[200px] md:max-w-[240px] lg:max-w-[270px]">
+      <InstantSearch client:idle />
+    </div>
+
+    <!-- Right: Actions (Cart & Google-Style Account Pill) -->
+    <div class="flex items-center gap-2 shrink-0">
+      <CartTrigger client:load />
+      <a
+        href="/konto"
+        class="inline-flex items-center gap-1.5 h-10 px-4.5 py-2 text-[14px] sm:text-[15px] font-medium text-white bg-[#0b57d0] hover:bg-[#0842a0] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b57d0] rounded-full transition-all shrink-0 shadow-xs"
+        title="Kundenkonto"
+      >
+        <svg class="w-4 h-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <span>Konto</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Drawer Overlay -->
+  <div
+    id="mobile-menu-drawer"
+    class="fixed inset-0 z-50 hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="mobile-menu-title"
+  >
+    <!-- Backdrop -->
+    <div
+      id="mobile-menu-backdrop"
+      class="fixed inset-0 bg-gray-900/60 backdrop-blur-xs transition-opacity"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Drawer Panel -->
+    <div class="fixed inset-y-0 left-0 w-full max-w-xs bg-white shadow-2xl flex flex-col z-10">
+      <!-- Drawer Header -->
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <a href="/" class="flex items-center gap-3" aria-label="Zur Startseite">
+          <img
+            src="/images/branding/elbiLogo.png"
+            alt="Elbi Verlag Logo"
+            width="52"
+            height="40"
+            class="h-10 w-auto object-contain"
+          />
+          <div class="flex flex-col">
+            <span id="mobile-menu-title" class="text-lg font-bold text-gray-900 leading-tight">Elbi Verlag</span>
+            <span class="text-[10px] font-semibold text-[#0b57d0] tracking-wide uppercase">Schreibhefte &amp; Stempel</span>
+          </div>
+        </a>
+        <button
+          id="mobile-menu-close-btn"
+          type="button"
+          class="rounded-full p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#0b57d0]"
+          aria-label="Menü schließen"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Search Input -->
+      <div class="p-4 border-b border-gray-100">
+        <InstantSearch client:idle isMobileDrawer={true} placeholder="Stempel, Hefte, Art.-Nr. suchen..." />
+      </div>
+
+      <!-- Categories & Links List -->
+      <div class="flex-1 overflow-y-auto px-4 py-3 space-y-1">
+        <p class="px-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Kategorien</p>
+        <a
+          href="/"
+          class={`flex items-center gap-3 px-3 py-2.5 rounded-full text-[15px] font-medium transition-colors ${
+            isHome
+              ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+              : 'text-slate-800 hover:bg-slate-100 hover:text-slate-950'
+          }`}
+        >
+          <span>Home</span>
+        </a>
+
+        <!-- Elbi Schreibhefte Nested Section in Mobile Drawer -->
+        <div class="space-y-0.5">
+          <a
+            href="/catalog/elbi-schreibhefte"
+            class={`flex items-center justify-between px-3 py-2.5 rounded-full text-[15px] font-medium transition-colors ${
+              isSchreibhefte
+                ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                : 'text-slate-800 hover:bg-slate-100 hover:text-slate-950'
+            }`}
+          >
+            <span>Elbi Schreibhefte</span>
+            <span class="text-xs text-[#0b57d0] font-semibold">Alle &rarr;</span>
+          </a>
+          <div class="pl-4 pr-2 space-y-1 border-l-2 border-slate-100 ml-4 my-1">
+            <a
+              href="/catalog/elbi-schreibhefte/vorschule-und-foerderschule"
+              class={`block px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname.includes('vorschule-und-foerderschule')
+                  ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
+              }`}
+            >
+              Vorschule &amp; Förderschule
+            </a>
+            <a
+              href="/catalog/elbi-schreibhefte/1-schulhalbjahr-klasse-1"
+              class={`block px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname.includes('1-schulhalbjahr-klasse-1')
+                  ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
+              }`}
+            >
+              1. Schulhalbjahr Klasse 1
+            </a>
+            <a
+              href="/catalog/elbi-schreibhefte/2-schulhalbjahr-klasse-1"
+              class={`block px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname.includes('2-schulhalbjahr-klasse-1')
+                  ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
+              }`}
+            >
+              2. Schulhalbjahr Klasse 1
+            </a>
+            <a
+              href="/catalog/elbi-schreibhefte/klasse-2-bis-4"
+              class={`block px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname.includes('klasse-2-bis-4')
+                  ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
+              }`}
+            >
+              Klasse 2 bis 4
+            </a>
+          </div>
+        </div>
+
+        <!-- Elbi Lehrerstempel Nested Section in Mobile Drawer -->
+        <div class="space-y-0.5">
+          <a
+            href="/catalog/elbi-lehrerstempel"
+            class={`flex items-center justify-between px-3 py-2.5 rounded-full text-[15px] font-medium transition-colors ${
+              isLehrerstempel
+                ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                : 'text-slate-800 hover:bg-slate-100 hover:text-slate-950'
+            }`}
+          >
+            <span>Lehrerstempel</span>
+            <span class="text-xs text-[#0b57d0] font-semibold">Alle &rarr;</span>
+          </a>
+          <div class="pl-4 pr-2 space-y-1 border-l-2 border-slate-100 ml-4 my-1">
+            <a
+              href="/catalog/stempelsets"
+              class={`block px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname.includes('/stempelsets')
+                  ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
+              }`}
+            >
+              Stempelsets
+            </a>
+            <a
+              href="/catalog/einzelstempel"
+              class={`block px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname.includes('/einzelstempel')
+                  ? 'text-[#0b57d0] bg-[#e8f0fe] font-semibold'
+                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
+              }`}
+            >
+              Einzelstempel
+            </a>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100 space-y-1">
+          <p class="px-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Service &amp; Rechtliches</p>
+          <a
+            href="/konto"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-100"
+          >
+            <span>👤</span>
+            <span>Kundenkonto</span>
+          </a>
+          <a
+            href="/widerruf/formular"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-100"
+          >
+            <span>↩️</span>
+            <span>Vertrag widerrufen (§ 356a BGB)</span>
+          </a>
+          <a
+            href="/versand"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-100"
+          >
+            <span>🚚</span>
+            <span>Versand & Zahlungsarten</span>
+          </a>
+          <a
+            href="/impressum"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-100"
+          >
+            <span>⚖️</span>
+            <span>Impressum</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="p-4 border-t border-gray-100 text-center bg-gray-50/50">
+        <p class="text-[11px] text-gray-500">
+          elbi.de &mdash; Lehrmittelverlag
+        </p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  #global-header {
+    /* Smooth, hardware-accelerated transition for all header state changes */
+    transition: padding 0.4s cubic-bezier(0.2, 0, 0, 1),
+                background-color 0.4s cubic-bezier(0.2, 0, 0, 1),
+                border-color 0.4s cubic-bezier(0.2, 0, 0, 1),
+                box-shadow 0.4s cubic-bezier(0.2, 0, 0, 1);
+    will-change: padding, background-color, box-shadow;
+  }
+
+  /* Unscrolled state: Prominent and spacious publisher branding */
+  #global-header[data-scrolled="false"] {
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  }
+
+  /* Scrolled state: Sleek sticky bar */
+  #global-header[data-scrolled="true"] {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+    background-color: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
+  }
+
+  /*
+   * Logo scaling uses CSS transform: scale() and origin-left so it stays on the GPU raster pipeline.
+   * Modifying transform instead of physical height prevents document reflow/layout jitter completely!
+   */
+  #header-logo-img {
+    height: 3.25rem; /* Base native height on desktop: 52px */
+    width: auto;
+    transform-origin: left center;
+    transition: transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+    will-change: transform;
+  }
+
+  /* Large unscrolled states: scale up smoothly via transform (GPU accelerated, 0 layout shifts) */
+  #global-header[data-scrolled="false"] #header-logo-img {
+    transform: scale(1.35); /* ~70px visual height on mobile */
+  }
+
+  @media (min-width: 640px) {
+    #global-header[data-scrolled="false"] {
+      padding-top: 1.15rem;
+      padding-bottom: 1.15rem;
+    }
+    #global-header[data-scrolled="false"] #header-logo-img {
+      transform: scale(1.6); /* ~83px visual height on tablet */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    #global-header[data-scrolled="false"] {
+      padding-top: 1.35rem;
+      padding-bottom: 1.35rem;
+    }
+    #global-header[data-scrolled="false"] #header-logo-img {
+      transform: scale(1.85); /* ~96px visual height on desktop: prominent, crystal clear */
+    }
+  }
+
+  /* Scrolled state: returns to 1:1 scale (52px) with zero jump */
+  #global-header[data-scrolled="true"] #header-logo-img {
+    transform: scale(1);
+  }
+</style>
+
+<script>
+  function setupDynamicHeader() {
+    const header = document.getElementById('global-header');
+    if (!header) return;
+    const el = header as HTMLElement;
+
+    // Hysteresis thresholds to eliminate boundary stuttering/jumping:
+    // When scrolling DOWN: trigger compact mode after 45px
+    // When scrolling UP: expand back only when near the top (< 15px)
+    let isCurrentlyScrolled = false;
+    let ticking = false;
+
+    function updateScroll() {
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (!isCurrentlyScrolled && scrollY > 45) {
+        isCurrentlyScrolled = true;
+        el.dataset.scrolled = 'true';
+      } else if (isCurrentlyScrolled && scrollY < 15) {
+        isCurrentlyScrolled = false;
+        el.dataset.scrolled = 'false';
+      }
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScroll);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Initial check
+    updateScroll();
+  }
+
+  function setupMobileMenu() {
+    const openBtn = document.getElementById('mobile-menu-open-btn');
+    const closeBtn = document.getElementById('mobile-menu-close-btn');
+    const drawer = document.getElementById('mobile-menu-drawer');
+    const backdrop = document.getElementById('mobile-menu-backdrop');
+
+    if (!openBtn || !closeBtn || !drawer || !backdrop) return;
+
+    function open() {
+      drawer?.classList.remove('hidden');
+      openBtn?.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      drawer?.classList.add('hidden');
+      openBtn?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    openBtn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !drawer.classList.contains('hidden')) {
+        close();
+      }
+    });
+  }
+
+  function initHeader() {
+    setupDynamicHeader();
+    setupMobileMenu();
+  }
+
+  // Setup on initial load and view transitions
+  initHeader();
+  document.addEventListener('astro:after-swap', initHeader);
+</script>

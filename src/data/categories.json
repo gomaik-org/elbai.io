@@ -1,0 +1,312 @@
+[
+  {
+    "id": "17b96b11da24b3914512740375e2ae24",
+    "parent_id": "17b863f6cf4063ad9c5dd617268deb03",
+    "title": "1. Schulhalbjahr Klasse 1",
+    "slug": "elbi-schreibhefte/1-schulhalbjahr-klasse-1",
+    "short_desc": "Vorbereitung zum Schreiben lernen 1. Schulhalbjahr Klasse 1 Grundschule",
+    "description": "Vorbereitung zum Schreiben lernen 1. Schulhalbjahr Klasse 1 Grundschule",
+    "sort_order": 10,
+    "product_count": 6
+  },
+  {
+    "id": "17b863f6cf4063ad9c5dd617268deb03",
+    "parent_id": null,
+    "title": "Elbi Schreibhefte",
+    "slug": "elbi-schreibhefte",
+    "short_desc": "Mit Elbi Schreiben lernen - ABC, Buchstaben und Zahlen üben in der Grundschule",
+    "description": "Mit Elbi Schreiben lernen - ABC, Buchstaben und Zahlen üben in der Grundschule",
+    "sort_order": 10,
+    "product_count": 12
+  },
+  {
+    "id": "ff8f53e46961536e2f271576ddb2ab48",
+    "parent_id": "19886fca09eb15650f159cd4af0ebe44",
+    "title": "Klasse 3",
+    "slug": "kopiervorlagen/deutsch-grundschule/klasse-3",
+    "short_desc": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 3",
+    "description": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 3",
+    "sort_order": 30,
+    "product_count": 0
+  },
+  {
+    "id": "ff8ea7d4aec02ff2c7063dfb8cdedf4a",
+    "parent_id": "198d77bfb1bffa0b83ea36a6e0eea05d",
+    "title": "Klasse 2",
+    "slug": "kopiervorlagen/mathematik-grundschule/klasse-2",
+    "short_desc": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 2",
+    "description": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 2",
+    "sort_order": 20,
+    "product_count": 0
+  },
+  {
+    "id": "ff80052b4c280e9eb886a67ebc775582",
+    "parent_id": "1985367a1adc44156409fa6cd1f65f26",
+    "title": "Klasse 3",
+    "slug": "kopiervorlagen/englisch-grundschule/klasse-3",
+    "short_desc": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 3",
+    "description": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 3",
+    "sort_order": 30,
+    "product_count": 0
+  },
+  {
+    "id": "ff8b5a337510e99d6d6ffbb8c6589aed",
+    "parent_id": "198b15275dc91bf7b4f23168ce14f1de",
+    "title": "Klasse 2",
+    "slug": "kopiervorlagen/sachunterricht-natur/klasse-2",
+    "short_desc": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 2",
+    "description": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 2",
+    "sort_order": 20,
+    "product_count": 0
+  },
+  {
+    "id": "ff884f6bb4d14a49a7473f581d8cee4c",
+    "parent_id": "198d77bfb1bffa0b83ea36a6e0eea05d",
+    "title": "Klasse 1",
+    "slug": "kopiervorlagen/mathematik-grundschule/klasse-1",
+    "short_desc": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 1",
+    "description": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 1",
+    "sort_order": 10,
+    "product_count": 0
+  },
+  {
+    "id": "ff84bd0cdef42e389f086752b127ecfb",
+    "parent_id": "198b15275dc91bf7b4f23168ce14f1de",
+    "title": "Klasse 4",
+    "slug": "kopiervorlagen/sachunterricht-natur/klasse-4",
+    "short_desc": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 4",
+    "description": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 4",
+    "sort_order": 40,
+    "product_count": 0
+  },
+  {
+    "id": "22cf2f5a90485486c47a96778546e8e1",
+    "parent_id": "22c3beee759f7095424074bec60152d5",
+    "title": "Stempelsets",
+    "slug": "stempelsets",
+    "short_desc": "Elbi Stempelsets - Lehrerstempel mit Motiven aus Holz für den Schulunterricht",
+    "description": "Elbi Stempelsets - Lehrerstempel mit Motiven aus Holz für den Schulunterricht",
+    "sort_order": 2,
+    "product_count": 8
+  },
+  {
+    "id": "61ea31613ad0196b69c3be9b1af09bbc",
+    "parent_id": "89d0ddbd3b205bb6f5dc6af9f6816404",
+    "title": "Kopiervorlagen",
+    "slug": "kopiervorlagen",
+    "short_desc": "Kopiervorlagen, Unterrichtsentwürfe, Arbeitsblätter Grundschule Klasse 1 bis 4",
+    "description": "Kopiervorlagen, Unterrichtsentwürfe, Arbeitsblätter Grundschule Klasse 1 bis 4",
+    "sort_order": 10,
+    "product_count": 0
+  },
+  {
+    "id": "ff8844212086a1a8058a1127b339bb42",
+    "parent_id": "19886fca09eb15650f159cd4af0ebe44",
+    "title": "Klasse 1",
+    "slug": "kopiervorlagen/deutsch-grundschule/klasse-1",
+    "short_desc": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 1",
+    "description": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 1",
+    "sort_order": 10,
+    "product_count": 0
+  },
+  {
+    "id": "22c068680a16e6e7b278043b65a8be0c",
+    "parent_id": "22c3beee759f7095424074bec60152d5",
+    "title": "Einzelstempel",
+    "slug": "einzelstempel",
+    "short_desc": "Elbi Lehrerstempel und Holzstempel mit Motiven aus Holz für Kinder zur Motivation",
+    "description": "Elbi Lehrerstempel und Holzstempel mit Motiven aus Holz für Kinder zur Motivation",
+    "sort_order": 1,
+    "product_count": 28
+  },
+  {
+    "id": "ff88a671ec442bf83d40b74f30407b54",
+    "parent_id": "19886fca09eb15650f159cd4af0ebe44",
+    "title": "Klasse 2",
+    "slug": "kopiervorlagen/deutsch-grundschule/klasse-2",
+    "short_desc": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 2",
+    "description": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 2",
+    "sort_order": 20,
+    "product_count": 0
+  },
+  {
+    "id": "ff838b26fe016c9c1906845389cd77e5",
+    "parent_id": "19886fca09eb15650f159cd4af0ebe44",
+    "title": "Klasse 4",
+    "slug": "kopiervorlagen/deutsch-grundschule/klasse-4",
+    "short_desc": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 4",
+    "description": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 4",
+    "sort_order": 40,
+    "product_count": 0
+  },
+  {
+    "id": "ff8da3f1b533071c5b79ae1e752e4ace",
+    "parent_id": "198d77bfb1bffa0b83ea36a6e0eea05d",
+    "title": "Klasse 4",
+    "slug": "kopiervorlagen/mathematik-grundschule/klasse-4",
+    "short_desc": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 4",
+    "description": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 4",
+    "sort_order": 40,
+    "product_count": 0
+  },
+  {
+    "id": "h2lca14401b4f448e29f1adade441a50",
+    "parent_id": "17b863f6cf4063ad9c5dd617268deb03",
+    "title": "Vorschule und Förderschule",
+    "slug": "elbi-schreibhefte/vorschule-und-foerderschule",
+    "short_desc": "Schwungübungen, Entwicklung der Feinmotorik",
+    "description": "Schwungübungen, Entwicklung der Feinmotorik",
+    "sort_order": 5,
+    "product_count": 2
+  },
+  {
+    "id": "1985367a1adc44156409fa6cd1f65f26",
+    "parent_id": "61ea31613ad0196b69c3be9b1af09bbc",
+    "title": "Englisch Grundschule",
+    "slug": "kopiervorlagen/englisch-grundschule",
+    "short_desc": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 2 bis 4",
+    "description": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 2 bis 4",
+    "sort_order": 4,
+    "product_count": 0
+  },
+  {
+    "id": "17bb57b87fe4a41b680529b1ec5a3fbc",
+    "parent_id": "17b863f6cf4063ad9c5dd617268deb03",
+    "title": "Klasse 2 bis 4",
+    "slug": "elbi-schreibhefte/klasse-2-bis-4",
+    "short_desc": "Jahreshefte - schön Schreiben lernen Grundschule Klasse 2 bis 4 Deutschunterricht",
+    "description": "Jahreshefte - schön Schreiben lernen Grundschule Klasse 2 bis 4 Deutschunterricht",
+    "sort_order": 30,
+    "product_count": 4
+  },
+  {
+    "id": "17b18a79f99a3f62bb52204093f1fbcb",
+    "parent_id": "17b863f6cf4063ad9c5dd617268deb03",
+    "title": "2. Schulhalbjahr Klasse 1",
+    "slug": "elbi-schreibhefte/2-schulhalbjahr-klasse-1",
+    "short_desc": "Elbi Schreiblehrgänge und Schulhefte 2. Schulhalbjahr Klasse 1 Deutschunterricht",
+    "description": "Elbi Schreiblehrgänge und Schulhefte 2. Schulhalbjahr Klasse 1 Deutschunterricht",
+    "sort_order": 20,
+    "product_count": 6
+  },
+  {
+    "id": "0f2407c4f8679096e48cabf2a7ed734a",
+    "parent_id": "89d0ddbd3b205bb6f5dc6af9f6816404",
+    "title": "Schulzubehör",
+    "slug": "schulzubehoer",
+    "short_desc": "Schulzubehör - Zweifarbstift, Stempelfarbe und Stempelkissen",
+    "description": "Schulzubehör - Zweifarbstift, Stempelfarbe und Stempelkissen",
+    "sort_order": 30,
+    "product_count": 0
+  },
+  {
+    "id": "ff82e345a929fe89fdd9d3edb4dda75d",
+    "parent_id": "198b15275dc91bf7b4f23168ce14f1de",
+    "title": "Klasse 1",
+    "slug": "kopiervorlagen/sachunterricht-natur/klasse-1",
+    "short_desc": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 1",
+    "description": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 1",
+    "sort_order": 10,
+    "product_count": 0
+  },
+  {
+    "id": "ff81afac77f59aa45dca2d00daa14ccc",
+    "parent_id": "198d77bfb1bffa0b83ea36a6e0eea05d",
+    "title": "Klasse 3",
+    "slug": "kopiervorlagen/mathematik-grundschule/klasse-3",
+    "short_desc": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 3",
+    "description": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 3",
+    "sort_order": 30,
+    "product_count": 0
+  },
+  {
+    "id": "ff8b7e1b62c07ed33bf6e6d9367dbf28",
+    "parent_id": "1985367a1adc44156409fa6cd1f65f26",
+    "title": "Klasse 2",
+    "slug": "kopiervorlagen/englisch-grundschule/klasse-2",
+    "short_desc": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 2",
+    "description": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 2",
+    "sort_order": 20,
+    "product_count": 0
+  },
+  {
+    "id": "ff8200e3337621ff0c435827917fa7ad",
+    "parent_id": "1985367a1adc44156409fa6cd1f65f26",
+    "title": "Klasse 4",
+    "slug": "kopiervorlagen/englisch-grundschule/klasse-4",
+    "short_desc": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 4",
+    "description": "Kopiervorlagen Englischunterricht - Arbeitsblätter Grundschule Klasse 4",
+    "sort_order": 40,
+    "product_count": 0
+  },
+  {
+    "id": "22cb2a0bf890191c1239ed27f9b34e8b",
+    "parent_id": "22cb12d9580bff8c97a54615597f63e0",
+    "title": "Einzelstempel",
+    "slug": "einzelstempel-22cb2a",
+    "short_desc": "Elbi Lehrerstempel und Motivstempel aus Holz für Kinder zur Belobigung",
+    "description": "[{* Aktionen Beschreibung *}]\r\n[{ assign var=\"oCont\" value=$oView->getContentByIdent(\"elbiAktionen\") }]\r\n[{if $oCont->oxcontents__oxactive->value == 1}]\r\n  <br>\r\n  [{ $oCont->oxcontents__oxcontent->value }]\r\n[{/if}]",
+    "sort_order": 1,
+    "product_count": 27
+  },
+  {
+    "id": "198d77bfb1bffa0b83ea36a6e0eea05d",
+    "parent_id": "61ea31613ad0196b69c3be9b1af09bbc",
+    "title": "Mathematik Grundschule",
+    "slug": "kopiervorlagen/mathematik-grundschule",
+    "short_desc": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 1 bis 4",
+    "description": "Kopiervorlagen Mathematikunterricht - Arbeitsblätter Grundschule Klasse 1 bis 4",
+    "sort_order": 3,
+    "product_count": 0
+  },
+  {
+    "id": "22c7bb0bd00fd247fc130fee47d9123a",
+    "parent_id": "22cb12d9580bff8c97a54615597f63e0",
+    "title": "Stempelsets",
+    "slug": "stempelsets-22c7bb",
+    "short_desc": "Elbi Stempelsets - Lehrerstempel aus Holz für Kinder zur Motivation und Belobigung",
+    "description": "[{* Aktionen Beschreibung *}]\r\n[{ assign var=\"oCont\" value=$oView->getContentByIdent(\"elbiAktionen\") }]\r\n[{if $oCont->oxcontents__oxactive->value == 1}]\r\n  <br>\r\n  [{ $oCont->oxcontents__oxcontent->value }]\r\n[{/if}]",
+    "sort_order": 2,
+    "product_count": 8
+  },
+  {
+    "id": "198b15275dc91bf7b4f23168ce14f1de",
+    "parent_id": "61ea31613ad0196b69c3be9b1af09bbc",
+    "title": "Sachunterricht / Natur",
+    "slug": "kopiervorlagen/sachunterricht-natur",
+    "short_desc": "Arbeitsblätter Grundschule - Kopiervorlagen Sachunterricht und Natur Klasse 1 bis 4",
+    "description": "Arbeitsblätter Grundschule - Kopiervorlagen Sachunterricht und Natur Klasse 1 bis 4",
+    "sort_order": 1,
+    "product_count": 0
+  },
+  {
+    "id": "19886fca09eb15650f159cd4af0ebe44",
+    "parent_id": "61ea31613ad0196b69c3be9b1af09bbc",
+    "title": "Deutsch Grundschule",
+    "slug": "kopiervorlagen/deutsch-grundschule",
+    "short_desc": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 1 bis 4",
+    "description": "Kopiervorlagen Deutschunterricht - Arbeitsblätter Grundschule Klasse 1 bis 4",
+    "sort_order": 2,
+    "product_count": 0
+  },
+  {
+    "id": "ff88b50dce87d2dae3cd9858fad899cd",
+    "parent_id": "198b15275dc91bf7b4f23168ce14f1de",
+    "title": "Klasse 3",
+    "slug": "kopiervorlagen/sachunterricht-natur/klasse-3",
+    "short_desc": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 3",
+    "description": "Kopiervorlagen Sachunterricht und Natur - Arbeitsblätter Grundschule Klasse 3",
+    "sort_order": 30,
+    "product_count": 0
+  },
+  {
+    "id": "bebfcb8866d37359b94808fca9b1f576",
+    "parent_id": null,
+    "title": "Elbi Lehrerstempel",
+    "slug": "elbi-lehrerstempel",
+    "short_desc": "Elbi Lehrerstempel und Stempelsets zur Motivation",
+    "description": "Elbi Lehrerstempel und Stempelsets zur Motivation",
+    "sort_order": 50,
+    "product_count": 35
+  }
+]
