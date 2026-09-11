@@ -1,0 +1,15 @@
+# Python & MkDocs
+__pycache__/
+*.py[cod]
+.venv/
+site/
+dist/
+
+# System & IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Node
+node_modules/
+.wrangler/

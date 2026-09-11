@@ -1,0 +1,76 @@
+site_name: "elbAI Docs"
+site_description: "Living Architecture Documentation & Tech Improvements for elbAI.io & ELBI"
+repo_url: "https://github.com/maikcli/elbai.io"
+repo_name: "maikcli/elbai.io"
+site_url: "https://elbai.io/docs/"
+use_directory_urls: false
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: cyan
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: In den hellen Modus wechseln
+    - scheme: default
+      primary: cyan
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: In den dunklen Modus wechseln
+  font:
+    text: Space Grotesk
+    code: Fira Code
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.instant
+    - navigation.top
+    - navigation.path
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+
+plugins:
+  - search
+
+markdown_extensions:
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Home: index.md
+  - 1. Cloudflare Edge:
+      - Übersicht: edge/overview.md
+      - elbi.de Storefront & D1: edge/elbi-storefront.md
+      - elbai.io Hardening: edge/elbai-security.md
+  - 2. AI & Automatisierung:
+      - Überblick: ai/overview.md
+      - Inventar-Sync (PG): ai/inventory-sync.md
+      - Gemini Sentinel Guard: ai/gemini-guard.md
+  - 3. Next-Gen Tech Lab:
+      - Vision & Roadmap: lab/roadmap.md
+      - Wiz-Blitz Synergien: lab/wiz-blitz.md
