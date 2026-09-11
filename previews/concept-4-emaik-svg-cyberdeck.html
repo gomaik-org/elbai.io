@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>elbAI.io // CYBER-WORKSTATION TAKEOVER</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Space Grotesk', sans-serif; background: #07080c; color: #f3f4f6; }
+    .mono { font-family: 'Fira Code', monospace; }
+
+    /* Scanlines & CRT */
+    .crt-screen {
+      background: linear-gradient(rgba(18, 16, 26, 0.2) 50%, rgba(0, 0, 0, 0.45) 50%),
+                  radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, rgba(0, 0, 0, 0.6) 100%);
+      background-size: 100% 4px, 100% 100%;
+    }
+    .neon-border {
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 35px -5px rgba(14, 165, 233, 0.25);
+    }
+    .neon-border-pink {
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      box-shadow: 0 0 35px -5px rgba(244, 63, 94, 0.25);
+    }
+    
+    /* Interactive SVG Animation Keyframes */
+    @keyframes draw-writing-loop {
+      0% { stroke-dashoffset: 1200; }
+      50% { stroke-dashoffset: 0; }
+      90% { stroke-dashoffset: 0; opacity: 1; }
+      100% { stroke-dashoffset: -1200; opacity: 0; }
+    }
+    .writing-curve {
+      stroke-dasharray: 1200;
+      animation: draw-writing-loop 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes pulse-pen {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-4px) rotate(3deg); }
+      75% { transform: translateY(3px) rotate(-3deg); }
+    }
+    .ai-pen {
+      animation: pulse-pen 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    @keyframes data-flow {
+      0% { transform: translateY(0px); opacity: 0.1; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-60px); opacity: 0; }
+    }
+    .particle { animation: data-flow 2.5s linear infinite; }
+  </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between selection:bg-cyan-500 selection:text-black overflow-x-hidden">
+
+  <!-- Background Animated Tech Mesh -->
+  <div class="fixed inset-0 pointer-events-none -z-10 opacity-30">
+    <div class="absolute inset-0" style="background-image: radial-gradient(rgba(56, 189, 248, 0.2) 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <div class="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-cyan-600/15 rounded-full blur-[140px]"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-fuchsia-600/15 rounded-full blur-[140px]"></div>
+  </div>
+
+  <!-- Header HUD -->
+  <header class="border-b border-sky-950/80 bg-slate-950/80 backdrop-blur-md px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <img src="favicon.svg" alt="elbAI Logo" class="w-9 h-9 rounded-lg shadow-lg hover:scale-105 transition-transform duration-200">
+        <div>
+          <span class="text-xl font-extrabold tracking-tight">elb<span class="text-cyan-400">AI</span>.io</span>
+          <span class="hidden sm:inline-block ml-3 px-2 py-0.5 rounded text-[11px] mono bg-sky-950/80 text-sky-300 border border-sky-800/60 font-semibold">
+            ELLERBROCK &amp; BIERINGEN TAKEOVER
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4 mono text-xs">
+        <span class="hidden md:flex items-center space-x-2 text-slate-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>EDGE: 100% OPERATIONAL</span>
+        </span>
+        <a href="#terminal" class="px-3.5 py-1.5 rounded bg-sky-950/70 hover:bg-sky-900 text-sky-300 border border-sky-800/80 transition">
+          TELEMETRY //
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero Stage -->
+  <main class="max-w-6xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center">
+
+    <!-- Top Headline & Punchline -->
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs mono text-slate-300 mb-6 shadow-sm">
+        <span>🤖</span>
+        <span>Elbi + AI = elbai.io ✨ Next Gen Takeover 💫</span>
+      </div>
+
+      <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] uppercase mb-6">
+        PAPA DRUCKT HEFTE.<br>
+        <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-fuchsia-400 bg-clip-text text-transparent">
+          SOHN BAUT KI.
+        </span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
+        Seit über 30 Jahren ist <span class="text-white font-bold underline decoration-cyan-400 underline-offset-4">Ellerbrock & Bieringen</span> die Instanz für Schreibhefte &amp; Grundschulmaterial. Jetzt transformieren wir das Erbe in die AI-Ära.
+      </p>
+    </div>
+
+    <!-- CENTERPIECE: Interactive SVG Dual-Chamber Cyberdeck (Inspired by emaik.io) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch mb-12">
+      
+      <!-- Left Chamber: The Heritage Paper & Lineatur (Vater) -->
+      <div class="lg:col-span-5 bg-slate-950/90 rounded-2xl neon-border-pink p-6 flex flex-col justify-between crt-screen relative overflow-hidden">
+        <div class="flex items-center justify-between pb-3 border-b border-rose-950/60 mb-4 text-xs mono text-rose-400">
+          <span class="font-bold">CHAMBER_01: DIE TRADITION (PAPA)</span>
+          <span class="text-rose-300/80">EST. 1990s</span>
+        </div>
+
+        <!-- SVG Lineatur Notebook & Paper Illustration -->
+        <div class="h-56 w-full flex items-center justify-center my-auto relative">
+          <svg viewBox="0 0 320 180" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="paperGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fff1f2" />
+                <stop offset="100%" stop-color="#ffe4e6" />
+              </linearGradient>
+            </defs>
+            <!-- Notebook Shadow & Base -->
+            <rect x="25" y="20" width="270" height="145" rx="8" fill="#1e1017" />
+            <rect x="20" y="15" width="270" height="145" rx="8" fill="#fda4af" opacity="0.3" />
+            <rect x="18" y="12" width="270" height="145" rx="8" fill="url(#paperGrad)" />
+            
+            <!-- Traditional Grundschule Lineatur (4 lines system) -->
+            <line x1="35" y1="45" x2="270" y2="45" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4 3" />
+            <line x1="35" y1="65" x2="270" y2="65" stroke="#f43f5e" stroke-width="2" />
+            <line x1="35" y1="85" x2="270" y2="85" stroke="#f43f5e" stroke-width="2" />
+            <line x1="35" y1="105" x2="270" y2="105" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4 3" />
+
+            <!-- Handwritten ink loop animation (Classic Pen stroke) -->
+            <path d="M 45 85 C 65 50, 75 105, 95 65 S 120 100, 145 70 S 175 100, 205 65 S 235 95, 260 75" 
+                  fill="none" stroke="#be123c" stroke-width="3" stroke-linecap="round" class="writing-curve" />
+
+            <!-- Heritage Tag -->
+            <rect x="35" y="125" width="130" height="22" rx="4" fill="#881337" />
+            <text x="45" y="140" fill="#fecdd3" font-family="'Fira Code', monospace" font-size="10" font-weight="bold">
+              HEFT LINEATUR 1-4
+            </text>
+          </svg>
+        </div>
+
+        <div class="mono text-xs text-rose-300/90 pt-3 border-t border-rose-950/60 flex justify-between">
+          <span>// ANALOG VALUE: HOHE WERTSCHÖPFUNG</span>
+          <span>100% PAPIER</span>
+        </div>
+      </div>
+
+      <!-- Center Connector Arrow: The Takeover Bridge -->
+      <div class="lg:col-span-2 flex flex-col items-center justify-center py-4">
+        <div class="w-12 h-12 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center shadow-lg text-cyan-400 font-bold mono text-sm mb-2 animate-pulse">
+          ⚡
+        </div>
+        <div class="mono text-[10px] text-slate-500 text-center uppercase tracking-widest">
+          BRIDGE_TAKEOVER<br>
+          <span class="text-cyan-400 font-bold">1995 ➔ 2026</span>
+        </div>
+      </div>
+
+      <!-- Right Chamber: The Neural Edge Engine (Sohn) -->
+      <div class="lg:col-span-5 bg-slate-950/90 rounded-2xl neon-border p-6 flex flex-col justify-between crt-screen relative overflow-hidden">
+        <div class="flex items-center justify-between pb-3 border-b border-sky-950/60 mb-4 text-xs mono text-cyan-400">
+          <span class="font-bold">CHAMBER_02: DIE ZUKUNFT (SOHN)</span>
+          <span class="text-emerald-400 font-bold">● CLOUDFLARE EDGE</span>
+        </div>
+
+        <!-- SVG Interactive AI Core Illustration -->
+        <div class="h-56 w-full flex items-center justify-center my-auto relative">
+          <svg viewBox="0 0 320 180" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cyberGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0284c7" />
+                <stop offset="100%" stop-color="#06b6d4" />
+              </linearGradient>
+            </defs>
+
+            <!-- Holographic Grid Backplane -->
+            <rect x="20" y="15" width="280" height="150" rx="8" fill="#030712" stroke="#0369a1" stroke-width="1.5" />
+            <path d="M 20 50 L 300 50 M 20 85 L 300 85 M 20 120 L 300 120 M 70 15 L 70 165 M 160 15 L 160 165 M 250 15 L 250 165" stroke="#082f49" stroke-width="1" />
+
+            <!-- Neural Nodes Network -->
+            <g class="ai-pen">
+              <!-- Central AI Transformer Orb -->
+              <circle cx="160" cy="85" r="28" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2" />
+              <circle cx="160" cy="85" r="18" fill="url(#cyberGrad)" class="animate-pulse" />
+              <circle cx="160" cy="85" r="8" fill="#ffffff" />
+            </g>
+
+            <!-- Synapse Data Links -->
+            <line x1="80" y1="50" x2="160" y2="85" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4 2" />
+            <line x1="80" y1="120" x2="160" y2="85" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4 2" />
+            <line x1="240" y1="50" x2="160" y2="85" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 2" />
+            <line x1="240" y1="120" x2="160" y2="85" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 2" />
+
+            <!-- Edge Nodes -->
+            <circle cx="80" cy="50" r="10" fill="#082f49" stroke="#38bdf8" stroke-width="2" />
+            <circle cx="80" cy="120" r="10" fill="#082f49" stroke="#38bdf8" stroke-width="2" />
+            <circle cx="240" cy="50" r="10" fill="#082f49" stroke="#38bdf8" stroke-width="2" />
+            <circle cx="240" cy="120" r="10" fill="#082f49" stroke="#38bdf8" stroke-width="2" />
+
+            <!-- Node Labels -->
+            <text x="63" y="32" fill="#38bdf8" font-family="'Fira Code', monospace" font-size="9">OCR.sys</text>
+            <text x="50" y="148" fill="#38bdf8" font-family="'Fira Code', monospace" font-size="9">Motorik.ai</text>
+            <text x="215" y="32" fill="#38bdf8" font-family="'Fira Code', monospace" font-size="9">D1_State</text>
+            <text x="215" y="148" fill="#38bdf8" font-family="'Fira Code', monospace" font-size="9">Gemini.bot</text>
+          </svg>
+        </div>
+
+        <div class="mono text-xs text-cyan-300 pt-3 border-t border-sky-950/60 flex justify-between">
+          <span>// ZERO-LATENCY EDGE ENGINE</span>
+          <span class="text-emerald-400">AUTONOMOUS</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Terminal Dialogue Log -->
+    <div id="terminal" class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 sm:p-6 mono text-xs sm:text-sm text-slate-300 shadow-xl relative max-w-4xl mx-auto w-full">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 text-xs text-slate-500">
+        <div class="flex space-x-2">
+          <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+          <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+          <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+        </div>
+        <span>CONSOLE: takeover_session_v1.log</span>
+        <span class="text-cyan-400 font-bold">2026.09.11-DEV</span>
+      </div>
+
+      <div class="space-y-2">
+        <p><span class="text-rose-400 font-bold">👴 PATER FAMILIAS [CEO]:</span> "Maik, die Schulen fragen nach digitalen Schreibübungen. Kannst du mal nach dem Server gucken?"</p>
+        <p><span class="text-cyan-400 font-bold">👨‍💻 SOHN [ARCHITECT]:</span> "Keine Sorge Papa. Der Server ist jetzt ein dezentrales Cloudflare-Edge-Netzwerk mit D1-Datenbank, sub-50ms Latenz und autonomer Gemini-Security. Die Schreibhefte lernen jetzt mit."</p>
+        <p class="text-slate-500 pt-1">// SYSTEM: 18.783 Produkte verifiziert. Zero Trust aktiv. Das Lebenswerk ist in sicheren Händen.</p>
+      </div>
+    </div>
+
+    <!-- Coming Soon Docs Note -->
+    <div class="mt-10 text-center mono text-xs text-slate-500">
+      <span class="text-slate-400 font-bold">elbai.io/docs</span> &bull; 
+      <span>Living MkDocs for Material (Protected by Cloudflare Zero Trust)</span>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-900 bg-slate-950/90 py-6 text-center text-xs mono text-slate-500">
+    &copy; 2026 Ellerbrock &amp; Bieringen GmbH &bull; Built with pride &bull; elbai.io
+  </footer>
+
+</body>
+</html>

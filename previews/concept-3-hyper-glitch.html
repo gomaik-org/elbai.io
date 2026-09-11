@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ELBAI.IO // GENERATION 2.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Space Mono', monospace; background: #000; color: #fff; }
+    .hero-title { font-family: 'Syne', sans-serif; }
+    .retro-grid {
+      background-image: linear-gradient(to right, #18181b 1px, transparent 1px),
+                        linear-gradient(to bottom, #18181b 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .neon-glow {
+      text-shadow: 0 0 25px rgba(236, 72, 153, 0.6), 0 0 50px rgba(168, 85, 247, 0.4);
+    }
+    .badge-glitch {
+      box-shadow: 4px 4px 0px #ec4899;
+    }
+  </style>
+</head>
+<body class="retro-grid min-h-screen flex flex-col justify-between selection:bg-pink-500 selection:text-white">
+  
+  <!-- Navigation / Marquee -->
+  <div class="bg-zinc-950 border-b border-zinc-800 py-2 overflow-hidden whitespace-nowrap text-xs text-zinc-400">
+    <div class="inline-block animate-marquee uppercase tracking-widest">
+      ⚡ ELLERBROCK & BIERINGEN &bull; ELBI + AI = ELBAI.IO &bull; NEXT GEN TAKEOVER &bull; FROM PEN & PAPER TO NEURAL NETS &bull; DAD'S LEGACY &bull; SON'S CODE &bull;
+    </div>
+  </div>
+
+  <!-- Hero Center -->
+  <main class="max-w-4xl mx-auto px-6 py-12 text-center my-auto">
+    
+    <div class="inline-block bg-pink-500/10 border border-pink-500/40 text-pink-400 text-xs px-4 py-1.5 rounded-full mb-8 font-bold">
+      ✨ NEXT GEN TAKEOVER // ELBI ➔ ELBAI.IO
+    </div>
+
+    <h1 class="hero-title text-6xl sm:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-none mb-6">
+      ELBI <span class="text-pink-500">+</span> AI<br>
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400 neon-glow">
+        elbai.io
+      </span>
+    </h1>
+
+    <div class="max-w-2xl mx-auto mb-10 space-y-4">
+      <p class="text-lg sm:text-2xl text-zinc-200 font-bold leading-tight">
+        "Mein Vater gründete Ellerbrock & Bieringen.<br>
+        Ich war schon immer der Admin im Hintergrund.<br>
+        Jetzt bringen wir die KI."
+      </p>
+      <p class="text-xs sm:text-sm text-zinc-400">
+        Jahrzehntelange Erfahrung im Grundschulbedarf trifft auf High-End Edge Cloud, autonome Security Guards und modernste KI-Workflows.
+      </p>
+    </div>
+
+    <!-- Retro Terminal Dialogue Card -->
+    <div class="max-w-xl mx-auto bg-zinc-900 border-2 border-zinc-700 rounded-none p-6 text-left badge-glitch mb-12">
+      <div class="text-xs text-zinc-500 uppercase tracking-widest mb-4 pb-2 border-b border-zinc-800 flex justify-between items-center">
+        <span>Family Tech Sync Session</span>
+        <span class="text-emerald-400 font-bold">● CONNECTED</span>
+      </div>
+      <div class="space-y-3 text-xs sm:text-sm">
+        <div>
+          <span class="text-amber-400 font-bold">[VATER / GF]:</span>
+          <span class="text-zinc-300"> "Du Junge, das mit der Webseite und dem Netzwerk machst du ja schon immer super... aber was genau ist jetzt dieses 'AI'?"</span>
+        </div>
+        <div>
+          <span class="text-cyan-400 font-bold">[SOHN / DEV]:</span>
+          <span class="text-zinc-300"> "Ganz einfach Papa: Deine Schreibhefte bleiben die besten in Deutschland. Aber die Technik dahinter läuft jetzt schneller als das Licht."</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Badges -->
+    <div class="flex flex-wrap justify-center gap-3 text-xs">
+      <span class="bg-zinc-900 text-zinc-300 border border-zinc-800 px-3 py-1.5">⚡ Cloudflare Workers</span>
+      <span class="bg-zinc-900 text-zinc-300 border border-zinc-800 px-3 py-1.5">🛡️ Wiz + Gemini Guard</span>
+      <span class="bg-zinc-900 text-zinc-300 border border-zinc-800 px-3 py-1.5">📖 Ellerbrock & Bieringen</span>
+      <span class="bg-zinc-900 text-pink-400 border border-pink-900/60 px-3 py-1.5 font-bold">🤖 elbai.io/docs Soon</span>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-900 py-6 text-center text-xs text-zinc-600">
+    Ellerbrock & Bieringen GmbH &bull; Die Zukunft des Lernens &bull; elbai.io
+  </footer>
+</body>
+</html>
