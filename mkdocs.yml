@@ -74,6 +74,7 @@ nav:
   - 3. Betrieb & Go-Live:
       - Go-Live Roadmap & Cutover: operations/go-live-roadmap.md
       - Tester-Leitfaden (Vater): operations/tester-guide-dad.md
+      - Alpha-Werkstatt & Zeitmaschine: operations/alpha-timemachine-guide.md
       - D1 & R2 Backup-Strategie: operations/backup.md
   - 4. Compliance & Recht:
       - Deutsches E-Commerce Recht: compliance/german-ecommerce.md
