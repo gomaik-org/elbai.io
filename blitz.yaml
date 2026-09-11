@@ -1,0 +1,27 @@
+# elbAI.io Workspace Manifest
+# Schema: blitz.yaml v1.0.0
+version: "1.0.0"
+name: "elbai-io"
+description: "Astro Edge Showcase & Living Architecture Documentation on Cloudflare"
+
+engine:
+  go_version: "1.27.1"
+  log_level: "info"
+  strict_mode: true
+
+plugins:
+  - name: "backlog"
+    type: "mcp"
+    command: "bin/mcp-backlog"
+    args: []
+    env:
+      DB_PATH: "local/backlog.sqlite"
+    description: "Task state machine and CGo-free SQLite backlog tracker"
+    enabled: true
+  - name: "cloudflare"
+    type: "mcp"
+    command: "bin/mcp-cloudflare"
+    args: []
+    env: {}
+    description: "Cloudflare zone auditor, DNS hygiene, and email security inspector"
+    enabled: true

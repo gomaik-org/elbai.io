@@ -1,0 +1,56 @@
+# https://taskfile.dev
+version: '3'
+
+vars:
+  DIST_DIR: dist
+  SITE_DIR: site
+
+tasks:
+  default:
+    desc: List all available tasks
+    cmds:
+      - task --list
+
+  dev:
+    desc: Run Astro dev server for local live testing
+    cmds:
+      - npm run dev
+
+  build:astro:
+    desc: Build Astro static pages into dist/
+    cmds:
+      - npm run build:astro
+
+  build:docs:
+    desc: Build living documentation with MkDocs for Material into site/
+    cmds:
+      - uv run --with mkdocs-material mkdocs build -d {{.SITE_DIR}}
+
+  build:
+    desc: Unified build of Astro landing page and living MkDocs
+    deps: [build:astro, build:docs]
+    cmds:
+      - mkdir -p {{.DIST_DIR}}/docs
+      - cp -r {{.SITE_DIR}}/* {{.DIST_DIR}}/docs/
+      - echo "Build completed successfully in {{.DIST_DIR}}/"
+
+  docs:serve:
+    desc: Serve MkDocs documentation locally with live-reload
+    cmds:
+      - uv run --with mkdocs-material mkdocs serve -a localhost:8000
+
+  backlog:list:
+    desc: List all backlog tasks from local SQLite ledger
+    cmds:
+      - ./bin/blitz backlog list
+
+  backlog:sync:
+    desc: Sync SQLite backlog to local/backlog.md
+    cmds:
+      - ./bin/blitz sync
+
+  deploy:check:
+    desc: Pre-deployment dry-run and verification
+    cmds:
+      - task: build
+      - echo "Ready for Cloudflare Pages deployment."

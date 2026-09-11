@@ -1,13 +1,27 @@
-# Changelog — ELBI Ecosystem & elbAI.io
+# Comprehensive Changelog — ELBI Ecosystem & elbAI.io
 
 All notable technical changes, architectural decisions, and milestones across the **ELBI** and **elbAI.io** ecosystem are documented here.  
 This project adheres to [Semantic Versioning](https://semver.org/) and follows [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-## [0.1.0] — 2026-09-11
+## [0.2.0] — 2026-09-11 (`elbai.io`)
 
-### 🚀 elbAI.io Edge Foundation & Workstation
+### 📚 Living Documentation Architecture & Operations Center
+- **feat(docs):** Integrated comprehensive operational, compliance, and strategy documentation from `local/` into **MkDocs for Material**:
+  - `operations/go-live-roadmap.md`: Pre-cutover checklist, DNS routing, and Profihost LAMP teardown.
+  - `operations/tester-guide-dad.md`: Plain-language guide for shop administration, test purchases, and A4 packing slip printing.
+  - `operations/backup.md`: Automated daily 03:00 AM D1 SQLite & R2 media snapshot architecture for local NAS.
+  - `compliance/german-ecommerce.md`: § 356a BGB digital withdrawal button, § 312j BGB Button-Lösung, PAngV pricing, GPSR product safety, and BFSG accessibility standards.
+  - `strategy/domains.md`: Domain roadmap for future autonomous AI agent platforms (`agentops.dev`, `meshai.dev`, `synapse.run`, `ctxflow.dev`).
+  - `tooling/token-optimization.md`: Token compression toolchain specification (`rtk`, `repomix`, `ast-grep`, `code2prompt`) reducing context overhead by 60–90%.
+- **feat(engine):** Full integration with Astro 5 / 7+ static builder and unified build pipeline.
+
+---
+
+## [0.1.0] — 2026-09-11 (`elbai.io`)
+
+### 🚀 elbAI.io Edge Foundation & Interactive Workstation
 - **feat(landing):** Launched interactive SVG Cyberdeck Workstation inspired by `emaik.io` with 3-monitor CRT architecture, animated mechanical arms, pulsating neural core, and live handwriting curve.
 - **feat(docs):** Initialized living documentation engine using **MkDocs for Material** under `elbai.io/docs` with Mermaid diagrams, code highlighting, and structured pillars.
 - **sec(cloudflare):** Audited and hardened Cloudflare Zone `elbai.io` via `cloudflare-optimiser` (Health Score jumped from **28/100 Grade F** to **89/100 Grade B**):

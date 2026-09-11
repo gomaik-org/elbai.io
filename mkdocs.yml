@@ -64,13 +64,21 @@ markdown_extensions:
 nav:
   - Home: index.md
   - 1. Cloudflare Edge:
-      - Übersicht: edge/overview.md
+      - Übersicht & Caching: edge/overview.md
       - elbi.de Storefront & D1: edge/elbi-storefront.md
-      - elbai.io Hardening: edge/elbai-security.md
+      - elbai.io Hardening & Audit: edge/elbai-security.md
   - 2. AI & Automatisierung:
       - Überblick: ai/overview.md
-      - Inventar-Sync (PG): ai/inventory-sync.md
+      - PG-Inventar-Sync: ai/inventory-sync.md
       - Gemini Sentinel Guard: ai/gemini-guard.md
-  - 3. Next-Gen Tech Lab:
+  - 3. Betrieb & Go-Live:
+      - Go-Live Roadmap & Cutover: operations/go-live-roadmap.md
+      - Tester-Leitfaden (Vater): operations/tester-guide-dad.md
+      - D1 & R2 Backup-Strategie: operations/backup.md
+  - 4. Compliance & Recht:
+      - Deutsches E-Commerce Recht: compliance/german-ecommerce.md
+  - 5. Tech Lab & Strategie:
       - Vision & Roadmap: lab/roadmap.md
       - Wiz-Blitz Synergien: lab/wiz-blitz.md
+      - Domain- & Cloud-Strategie: strategy/domains.md
+      - Token-Optimierung & Toolchain: tooling/token-optimization.md
