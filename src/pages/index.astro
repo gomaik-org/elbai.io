@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
+import CuratedProductGrid from '../components/CuratedProductGrid.astro';
 ---
 <!DOCTYPE html>
 <html lang="de" class="min-h-full">
@@ -260,7 +261,7 @@ import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
               <!-- Screen Footer -->
               <div class="pt-1.5 border-t border-rose-950/60 text-[9px] mono text-slate-400 flex justify-between z-10">
                 <span>HEFT 1-4 TRADITION</span>
-                <span class="text-rose-400 font-bold">18.783 SKUs</span>
+                <span class="text-rose-400 font-bold">Klassiker</span>
               </div>
             </div>
             <!-- Monitor Bezel Details -->
@@ -439,6 +440,9 @@ import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
         <p class="text-slate-500 pt-1">// STATUS: Fundament steht. Weitere coole Ideen werden kontinuierlich kompiliert und deployed.</p>
       </div>
     </div>
+
+    <!-- Curated Active Products Section (Ca. 50 Original Elbi Items) -->
+    <CuratedProductGrid />
 
     <!-- Prominent High-Visibility Docs Action Portal for Testers -->
     <div class="mt-10 mb-4 max-w-4xl mx-auto w-full">

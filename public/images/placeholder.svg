@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <rect width="400" height="400" fill="#f3f4f6"/>
+  <circle cx="200" cy="180" r="50" fill="#e5e7eb"/>
+  <path d="M120 320c0-44.183 35.817-80 80-80s80 35.817 80 80" fill="#d1d5db"/>
+  <text x="200" y="360" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#9ca3af" text-anchor="middle">ELBI VERLAG</text>
+</svg>
