@@ -13,10 +13,15 @@ permissions:
   issues: write
   id-token: write # Required for Google Cloud Workload Identity Federation OIDC
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   triage:
     name: Autonomous Gemini Vertex AI Triage
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: ${{ github.event.workflow_run.conclusion == 'failure' || contains(github.event.comment.body, '@gemini') }}
     steps:
       - name: Checkout Code
