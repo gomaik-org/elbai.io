@@ -1,7 +1,52 @@
 @import "tailwindcss";
 
 @theme {
+  --font-serif: 'Merriweather', Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Fira Code', monospace;
   --font-pixel: 'Press Start 2P', monospace;
   --font-display: 'Space Grotesk', sans-serif;
+
+  /* Semantic Theme Tokens */
+  --color-primary: #0b57d0;
+  --color-primary-hover: #0842a0;
+  --color-primary-light: #e8f0fe;
+  --color-accent: #ff9e00;
+  --color-accent-hover: #e08b00;
+  --color-accent-light: #fff8eb;
+  --color-surface-muted: #f8fafc;
+
+  /* Brand Specific Aliases */
+  --color-elbi-blue: #3395d1;
+  --color-elbi-blue-hover: #267eb3;
+  --color-elbi-blue-light: #eef7fc;
+  --color-elbi-orange: #ff9e00;
+  --color-elbi-orange-hover: #e08b00;
+  --color-elbi-orange-light: #fff8eb;
+  --color-elbi-gray-surface: #f8fafc;
+  --color-elbi-gray-border: #e2e8f0;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  .prose-desc a {
+    color: #1f6f9f;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s ease;
+  }
+
+  .prose-desc a:hover {
+    color: #ff9e00;
+  }
 }

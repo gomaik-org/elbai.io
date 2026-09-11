@@ -1,7 +1,5 @@
 ---
 import type { Product } from '../../types/shop';
-import { formatPriceEur } from '../../stores/cart';
-import QuickAddToCart from './QuickAddToCart';
 
 interface Props {
   product: Product;
@@ -29,20 +27,28 @@ function formatCardTitle(title: string): string {
   return t.split(' - ')[0];
 }
 
+function formatPriceEur(cents: number): string {
+  return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+}
+
 const displayTitle = formatCardTitle(product.title);
 const displaySubtitle = product.short_description || (product.title.replace(displayTitle, '').replace(/^[\s\-]+/, ''));
 
 const vatPercent = product.vat_percent ?? product.vat_rate ?? 19;
 const stockCount = product.stock ?? product.stock_quantity ?? 0;
 const isAvailable = stockCount > 0;
+const isHeft = product.sku.startsWith('H') || product.title.toLowerCase().includes('heft') || product.title.toLowerCase().includes('schreib');
+const isStempel = product.sku.startsWith('S') || product.sku.startsWith('K') || product.title.toLowerCase().includes('stempel');
+const categoryTag = isHeft ? 'hefte' : (isStempel ? 'stempel' : 'other');
 ---
 
 <article
   class="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-all duration-300 hover:shadow-xl hover:border-slate-300 hover:-translate-y-1 product-catalog-item"
   data-sku={product.sku}
+  data-category={categoryTag}
 >
-  <!-- Product Image Container (Spacious soft neutral surface for workbook packshots) -->
-  <div class="aspect-[4/3] w-full overflow-hidden bg-[#f8f9fa] p-4 sm:p-5 group-hover:opacity-95 transition-opacity flex items-center justify-center border-b border-slate-100 rounded-t-3xl">
+  <!-- Product Image Container -->
+  <div class="aspect-[4/3] w-full overflow-hidden bg-[#f8f9fa] p-4 sm:p-5 group-hover:opacity-95 transition-opacity flex items-center justify-center border-b border-slate-100 rounded-t-3xl relative">
     {product.image_url ? (
       <img
         src={product.image_url}
@@ -69,7 +75,7 @@ const isAvailable = stockCount > 0;
     </div>
 
     <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#3395d1] transition-colors leading-snug font-sans tracking-tight">
-      <a href={`/products/${product.slug}`}>
+      <a href={`/products/${product.slug}`} class="block">
         <span aria-hidden="true" class="absolute inset-0"></span>
         {displayTitle}
       </a>
@@ -101,11 +107,34 @@ const isAvailable = stockCount > 0;
       <div class="flex items-center justify-between gap-2 pt-0.5">
         <!-- Statutory Price Transparency Notice (PAngV) -->
         <p class="text-[11px] text-slate-500 leading-tight">
-          inkl. {vatPercent}% MwSt., zzgl. <a href="/versand" class="underline hover:text-blue-600 relative z-10">Versand</a>
+          inkl. {vatPercent}% MwSt., zzgl. <a href="https://dev.elbi.de/versand" class="underline hover:text-blue-600 relative z-10">Versand</a>
         </p>
 
-        <!-- Direct Quick Add To Basket Button Island -->
-        <QuickAddToCart product={product} client:visible />
+        <!-- Direct Quick Add To Basket Button with Authentic Cart Icon -->
+        <button
+          type="button"
+          disabled={!isAvailable}
+          data-sku={product.sku}
+          data-title={displayTitle}
+          data-price={product.price_cents}
+          data-image={product.image_url}
+          aria-label={!isAvailable ? `${displayTitle} (Derzeit vergriffen)` : `${displayTitle} in den Warenkorb legen`}
+          title={!isAvailable ? `${displayTitle} (Derzeit vergriffen)` : `${displayTitle} in den Warenkorb legen`}
+          class={`quick-cart-add-btn relative z-10 inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full transition-all shadow-2xs border focus:outline-none focus:ring-2 focus:ring-[#0b57d0] focus:ring-offset-1 shrink-0 ${
+            !isAvailable
+              ? 'bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed opacity-50'
+              : 'bg-slate-100/90 hover:bg-slate-200/90 border-slate-300/80 text-slate-700 hover:text-[#0b57d0] hover:border-[#0b57d0]/50 active:scale-95 cursor-pointer'
+          }`}
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13M9 20a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2zM12 7v4m-2-2h4"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   </div>

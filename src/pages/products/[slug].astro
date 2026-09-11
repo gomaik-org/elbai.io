@@ -1,0 +1,848 @@
+---
+import '../../styles/global.css';
+import AlphaSandboxWidget from '../../components/AlphaSandboxWidget.astro';
+import { getAllProducts, getCategoryBySlug } from '../../data/catalog';
+import { shopConfig } from '../../config/shop.config';
+import type { Product } from '../../types/shop';
+
+export function getStaticPaths() {
+  const products = getAllProducts();
+  return products.map((product) => ({
+    params: { slug: product.slug },
+    props: { product },
+  }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const category = product.category_slug ? getCategoryBySlug(product.category_slug) : undefined;
+const allProducts = getAllProducts();
+
+function formatPriceEur(cents: number): string {
+  return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+}
+
+function resolveDescriptionContent(html: string | undefined): string {
+  if (!html) return '';
+  let content = html.replace(/href=["']([^"']+)["']/g, (match, rawHref: string) => {
+    if (!rawHref.endsWith('.html')) return match;
+    const clean = rawHref.split('?')[0].replace(/\.html$/, '');
+    const slugPart = clean.split('/').pop()?.toLowerCase() || '';
+
+    let matched = allProducts.find((p) => p.slug.toLowerCase() === slugPart);
+    if (!matched) {
+      matched = allProducts.find((p) => {
+        const baseSlug = p.slug.replace(/-[a-z0-9]+$/, '').toLowerCase();
+        return baseSlug === slugPart || slugPart.startsWith(baseSlug) || baseSlug.startsWith(slugPart);
+      });
+    }
+
+    if (!matched) {
+      if (slugPart.includes('mimikstempel-smiley-ergaenzungsset') || slugPart.includes('s89')) {
+        matched = allProducts.find((p) => p.sku === 'S89/3');
+      } else if (slugPart.includes('gesamtset-6-smileys') || slugPart.includes('s90')) {
+        matched = allProducts.find((p) => p.sku === 'S90');
+      } else if (slugPart.includes('holzstempel-erfolgsstempel') || slugPart.includes('erfolgsstempel-6-smileys') || slugPart.includes('erfolgsstempel')) {
+        if (slugPart.includes('6-smileys')) {
+          matched = allProducts.find((p) => p.sku === 'S89/3');
+        } else {
+          matched = allProducts.find((p) => p.sku === 'S88/5');
+        }
+      } else if (slugPart.includes('4-universalstempel-smileys') || slugPart.includes('smileys-lob-und-tadel')) {
+        matched = allProducts.find((p) => p.sku === 'S88');
+      } else if (slugPart.includes('schwunguebungen-mit-elbi')) {
+        matched = allProducts.find((p) => p.sku === 'H4');
+      } else if (slugPart.includes('schwungheft-klasse-1')) {
+        matched = allProducts.find((p) => p.sku === 'H44');
+      } else if (slugPart.includes('mein-erstes-elbi-schreibheft')) {
+        matched = allProducts.find((p) => p.sku === 'H31');
+      } else if (slugPart.includes('zahlenuebungsheft')) {
+        matched = allProducts.find((p) => p.sku === 'H10');
+      } else if (slugPart.includes('druckschrift')) {
+        matched = allProducts.find((p) => p.sku === 'H12');
+      } else if (slugPart.includes('lateinische-ausgangsschrift')) {
+        matched = allProducts.find((p) => p.sku === 'H2');
+      } else if (slugPart.includes('vereinfachte-ausgangsschrift')) {
+        matched = allProducts.find((p) => p.sku === 'H5');
+      } else if (slugPart.includes('schulausgangsschrift')) {
+        return 'href="/alpha#katalog"';
+      } else if (slugPart.includes('mit-elbi-schreiben-lernen')) {
+        matched = allProducts.find((p) => p.sku === 'H3');
+      } else if (slugPart.includes('klasse-1-2') || slugPart.includes('klasse-1-und-2')) {
+        matched = allProducts.find((p) => p.sku === 'H25');
+      } else if (slugPart.includes('klasse-2') || slugPart.includes('klasse-2-und')) {
+        matched = allProducts.find((p) => p.sku === 'H26');
+      } else if (slugPart.includes('klasse-3')) {
+        matched = allProducts.find((p) => p.sku === 'H27');
+      } else if (slugPart.includes('klasse-4')) {
+        matched = allProducts.find((p) => p.sku === 'H28');
+      }
+    }
+
+    if (matched) {
+      return `href="/products/${matched.slug}"`;
+    }
+    return `href="/alpha#katalog"`;
+  });
+
+  content = content.replace(/src=["']\/out\/elbi\/img\/right\/S88\.5[^"']*["']/gi, 'src="/images/products/s88-5/main.jpg" class="rounded-xl border border-slate-200/80 shadow-2xs max-w-xs my-3 block"');
+  content = content.replace(/\[\{\*[\s\S]*?\*\}\]/g, '');
+  content = content.replace(/src=["']\/out\/[^"']+["']/gi, 'src="/images/placeholder.svg" class="hidden"');
+
+  return content;
+}
+
+const resolvedDescription = resolveDescriptionContent(product.description);
+
+function extractProductBadges(p: Product): string[] {
+  const badges: string[] = [];
+  const text = `${p.title} ${p.short_description || ''} ${p.description || ''}`;
+
+  if (/DIN\s*A4\s*quer/i.test(text)) badges.push('DIN A4 Querformat');
+  else if (/DIN\s*A5\s*hoch/i.test(text)) badges.push('DIN A5 Hochformat');
+  else if (/DIN\s*A4/i.test(text)) badges.push('DIN A4');
+  else if (/DIN\s*A5/i.test(text)) badges.push('DIN A5');
+
+  const pagesMatch = text.match(/(\d+)\s*Seiten/i);
+  if (pagesMatch) badges.push(`${pagesMatch[1]} Seiten`);
+
+  if (/Vorschule/i.test(text)) badges.push('Vorschule & Förderschule');
+  else if (/Klasse\s*1/i.test(text) || /1\.\s*Klasse/i.test(text) || /1\.\s*Schulhalbjahr/i.test(text)) badges.push('1. Schuljahr');
+  else if (/Klasse\s*2/i.test(text) || /2\.\s*Klasse/i.test(text)) badges.push('2. Schuljahr');
+  else if (/Klasse\s*3/i.test(text) || /4\.\s*Klasse/i.test(text)) badges.push('Klasse 2–4');
+
+  if (/Lineaturverkleinerung/i.test(text)) badges.push('Lineaturverkleinerung');
+  if (/durchschreibfest/i.test(text)) badges.push('Durchschreibfest');
+  if (/Druckschrift/i.test(text)) badges.push('Druckschrift');
+  if (/Schreibschrift/i.test(text) || /Schönschrift/i.test(text)) badges.push('Schreibschrift');
+  if (/Holzstempel/i.test(text) || /Buchenholz/i.test(text)) badges.push('Echtes Buchenholz');
+  if (/Stempelset/i.test(text)) badges.push('Stempelset');
+
+  if (badges.length === 0) {
+    if (p.category_slug?.includes('schreibhefte')) {
+      badges.push('Schulheft', 'Praxiserprobt');
+    } else if (p.category_slug?.includes('stempel')) {
+      badges.push('Lehrerstempel', 'Präziser Abdruck');
+    }
+  }
+
+  return badges.slice(0, 4);
+}
+
+const featureBadges = extractProductBadges(product);
+const stockCount = product.stock ?? product.stock_quantity ?? 0;
+const isAvailable = stockCount > 0;
+
+const allImages: string[] = [];
+if (product.gallery_images && product.gallery_images.length > 0) {
+  for (const img of product.gallery_images) {
+    if (!allImages.includes(img)) allImages.push(img);
+  }
+}
+if (product.image_url && !allImages.includes(product.image_url)) {
+  if (allImages.length === 0) {
+    allImages.push(product.image_url);
+  } else {
+    const hasGallery1 = allImages.some((img) => img.includes('gallery-1.'));
+    if (!hasGallery1) allImages.unshift(product.image_url);
+  }
+}
+const primaryImage = allImages[0] || product.image_url || '/images/placeholder.svg';
+
+const relatedProducts: Product[] = allProducts
+  .filter((p) => p.id !== product.id && p.is_active)
+  .filter((p) => {
+    if (product.category_slug?.includes('schreibhefte')) {
+      return p.sku === 'H44' || p.sku === 'H12' || p.sku === 'S88' || p.category_slug === product.category_slug;
+    }
+    return p.sku === 'S88' || p.sku === 'H4' || p.sku === 'S90' || p.category_slug === product.category_slug;
+  })
+  .slice(0, 3);
+---
+
+<!doctype html>
+<html lang="de" class="h-full bg-slate-50 text-slate-900 antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{product.title} – ELBI Verlag</title>
+    <meta name="description" content={product.short_description || `Kaufen Sie ${product.title} (Art.-Nr. ${product.sku}) direkt beim Elbi Verlag.`} />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="min-h-full flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px] font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            ZERO TRUST GESCHÜTZT
+          </span>
+          <span class="text-slate-400">Interaktive Test-Umgebung &bull; D1 Live-Speicher</span>
+        </div>
+        <div class="flex items-center gap-4 font-mono text-xs">
+          <a href="https://elbai.io/docs/" class="text-cyan-400 hover:text-cyan-300 underline font-semibold">
+            📚 Dokumentation
+          </a>
+          <a href="/alpha" class="text-slate-400 hover:text-white">
+            ← Zurück zur Shop-Übersicht
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTHENTIC ELBI STORE HEADER -->
+    <header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3.5 gap-4">
+        
+        <!-- Logo -->
+        <div class="flex items-center gap-3 shrink-0">
+          <a href="/alpha" class="flex items-center gap-3 group">
+            <img
+              src="/images/branding/elbiLogo.png"
+              alt="Elbi Verlag Logo"
+              width="140"
+              height="106"
+              class="w-auto h-12 object-contain drop-shadow-2xs group-hover:scale-102 transition-transform duration-200"
+            />
+          </a>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="hidden md:flex items-center gap-1.5 text-slate-800 font-medium text-sm">
+          <a href="/alpha" class="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-950 transition">
+            Startseite
+          </a>
+          <a href="/alpha#katalog" class="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-950 transition">
+            Elbi Schreibhefte
+          </a>
+          <a href="/alpha#katalog" class="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-950 transition">
+            Lehrerstempel
+          </a>
+          <a href="https://elbai.io/docs/" class="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-950 transition">
+            Dokumentation
+          </a>
+        </nav>
+
+        <!-- Right Side: Trust & Cart -->
+        <div class="flex items-center gap-3 shrink-0">
+          <div class="hidden lg:flex items-center gap-2 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+            <span class="text-emerald-600 font-bold">✓</span>
+            <span class="font-semibold">Kauf auf Rechnung für Schulen</span>
+          </div>
+
+          <button
+            type="button"
+            id="header-cart-btn"
+            class="relative inline-flex items-center gap-2 h-10 px-3.5 py-2 text-[15px] font-medium text-slate-800 hover:text-slate-950 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b57d0] rounded-full transition-all shrink-0 cursor-pointer"
+            aria-label="Warenkorb öffnen"
+          >
+            <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <span class="hidden sm:inline font-sans text-slate-800 font-medium">Warenkorb</span>
+            <span id="header-cart-count" class="hidden items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-[#0b57d0] rounded-full">
+              0
+            </span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- MAIN PRODUCT DETAIL CONTENT -->
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex-1 w-full">
+      
+      <!-- Breadcrumb Navigation -->
+      <nav class="flex items-center flex-wrap gap-2 text-sm font-medium text-slate-500 mb-7" aria-label="Breadcrumb">
+        <a href="/alpha" class="hover:text-[#3395d1] transition-colors">Startseite</a>
+        <span class="text-slate-300">/</span>
+        <a href="/alpha#katalog" class="hover:text-[#3395d1] transition-colors">Katalog</a>
+        <span class="text-slate-300">/</span>
+        {category && (
+          <>
+            <a href="/alpha#katalog" class="hover:text-[#3395d1] transition-colors">
+              {category.title}
+            </a>
+            <span class="text-slate-300">/</span>
+          </>
+        )}
+        <span class="text-slate-900 font-semibold truncate max-w-sm">{product.title}</span>
+      </nav>
+
+      <div class="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-start">
+        
+        <!-- Product Image Gallery Column -->
+        <div class="flex flex-col">
+          <div
+            id="product-gallery-container"
+            data-images={JSON.stringify(allImages)}
+            class="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-50/70 p-4 sm:p-6 shadow-xs group/gallery flex items-center justify-center select-none"
+          >
+            {primaryImage ? (
+              <img
+                id="main-product-image"
+                src={primaryImage}
+                alt={product.title}
+                class="h-full w-full object-contain p-2 sm:p-4 transition-all duration-200"
+                onerror="this.onerror=null; this.src='/images/placeholder.svg'"
+              />
+            ) : (
+              <div class="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400 font-bold">
+                ELBI Verlag
+              </div>
+            )}
+
+            {allImages.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  id="gallery-prev-btn"
+                  class="absolute left-3 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-800 shadow-md border border-slate-200 flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 z-10 opacity-90 hover:opacity-100"
+                  aria-label="Vorheriges Bild"
+                >
+                  <svg class="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  id="gallery-next-btn"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-800 shadow-md border border-slate-200 flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 z-10 opacity-90 hover:opacity-100"
+                  aria-label="Nächstes Bild"
+                >
+                  <svg class="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                <div
+                  id="gallery-counter-badge"
+                  class="absolute bottom-3 right-3 rounded-full bg-slate-900/80 backdrop-blur-xs px-3 py-1 text-xs font-semibold text-white tracking-wide shadow-md pointer-events-none"
+                >
+                  1 / {allImages.length}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        <!-- Product Information Column -->
+        <div class="mt-8 lg:mt-0">
+          <div class="flex items-center justify-between gap-3 mb-3">
+            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#3395d1]">
+              <span class="h-2 w-2 rounded-full bg-[#ff9e00]"></span>
+              <span>{category ? category.title : 'Schulbedarf'}</span>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold font-mono text-slate-800 bg-slate-100 border border-slate-200/80 shadow-2xs">
+              Art.-Nr. {product.sku}
+            </span>
+          </div>
+
+          <h1 class="font-sans text-2xl sm:text-3xl lg:text-[34px] font-extrabold tracking-tight text-slate-900 leading-tight">
+            {product.title}
+          </h1>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            {featureBadges.map((badge) => (
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100/90 text-slate-700 border border-slate-200/80 shadow-2xs">
+                {badge}
+              </span>
+            ))}
+          </div>
+
+          <!-- Price & Stock Box -->
+          <div class="mt-6 p-6 rounded-3xl bg-slate-50/80 border border-slate-200/80 shadow-2xs">
+            <div class="flex items-baseline gap-3 flex-wrap">
+              <span class="text-3xl sm:text-4xl font-black text-slate-900 font-sans tracking-tight">
+                {formatPriceEur(product.price_cents)}
+              </span>
+              {isAvailable ? (
+                <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                  ● Sofort lieferbar (ca. 2–4 Werktage)
+                </span>
+              ) : (
+                <span class="inline-flex items-center rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700 ring-1 ring-inset ring-rose-600/20">
+                  ● Derzeit vergriffen (Lieferzeit auf Anfrage)
+                </span>
+              )}
+            </div>
+
+            <p class="mt-2.5 text-xs text-slate-500 font-medium leading-relaxed">
+              inkl. {product.vat_percent ?? product.vat_rate ?? 19}% MwSt., zzgl. <a href="https://dev.elbi.de/versand" class="text-[#0b57d0] underline hover:text-[#0842a0] transition-colors">Versandkosten</a> (3,90 € zzgl. MwSt.). Mindestbestellwert 10,00 €. Bequemer Kauf auf Rechnung.
+            </p>
+          </div>
+
+          <!-- Direct Add to Cart Button -->
+          <div class="mt-6">
+            <button
+              type="button"
+              id="pdp-add-to-cart-btn"
+              disabled={!isAvailable}
+              data-sku={product.sku}
+              data-title={product.title}
+              data-price={product.price_cents}
+              data-image={product.image_url}
+              class="w-full inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white text-base font-bold transition shadow-md hover:shadow-lg active:scale-98 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <span>In den Warenkorb legen</span>
+            </button>
+          </div>
+
+          <!-- Description -->
+          <div class="mt-8 border-t border-slate-200/80 pt-6">
+            <h2 class="font-sans text-xl sm:text-2xl font-extrabold text-slate-900 mb-4 tracking-tight">
+              Produktbeschreibung
+            </h2>
+            <div class="text-base sm:text-lg text-slate-700 leading-relaxed space-y-4 prose-desc font-sans" set:html={resolvedDescription} />
+          </div>
+
+          <!-- Info Accordions -->
+          <div class="mt-8 space-y-3">
+            <details class="group rounded-2xl border border-slate-200/90 bg-slate-50/60 transition-all open:bg-white open:shadow-xs">
+              <summary class="flex cursor-pointer items-center justify-between p-4 sm:p-5 font-sans text-sm sm:text-base font-bold text-slate-900 select-none">
+                <span class="flex items-center gap-2.5">
+                  <svg class="h-5 w-5 text-[#3395d1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  Produktsicherheit &amp; Herstellerangaben (GPSR)
+                </span>
+                <span class="ml-4 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 group-hover:bg-slate-200 group-open:rotate-180 transition-transform duration-200 shrink-0">
+                  <svg class="h-4 w-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </span>
+              </summary>
+              <div class="px-4 pb-5 sm:px-5 text-xs text-slate-600 leading-relaxed space-y-2 border-t border-slate-100 pt-3">
+                <p>
+                  <strong>Hersteller / Inverkehrbringer in der EU:</strong><br />
+                  ELBI Verlag GmbH, Deutschland &bull; Kontakt: info@elbi.de
+                </p>
+                <p>
+                  <strong>Produktidentifikation:</strong> SKU / Artikel-Nr. <span class="font-mono font-medium">{product.sku}</span>
+                </p>
+                <p>
+                  <strong>Sicherheitshinweise:</strong> Für den bestimmungsgemäßen Gebrauch im Schul- und Büroalltag.
+                </p>
+              </div>
+            </details>
+
+            <details class="group rounded-2xl border border-slate-200/90 bg-slate-50/60 transition-all open:bg-white open:shadow-xs">
+              <summary class="flex cursor-pointer items-center justify-between p-4 sm:p-5 font-sans text-sm sm:text-base font-bold text-slate-900 select-none">
+                <span class="flex items-center gap-2.5">
+                  <svg class="h-5 w-5 text-[#3395d1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                  </svg>
+                  Versand &amp; Kauf auf Rechnung
+                </span>
+                <span class="ml-4 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 group-hover:bg-slate-200 group-open:rotate-180 transition-transform duration-200 shrink-0">
+                  <svg class="h-4 w-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </span>
+              </summary>
+              <div class="px-4 pb-5 sm:px-5 text-xs text-slate-600 leading-relaxed space-y-2 border-t border-slate-100 pt-3">
+                <p>
+                  <strong>Zahlung:</strong> Bequemer <strong>Kauf auf Rechnung</strong> mit 14 Tagen Zahlungsziel für Schulen und Lehrkräfte.
+                </p>
+                <p>
+                  <strong>Versanddienstleister:</strong> Schneller und zuverlässiger Post- und Paketversand (3,90 € zzgl. MwSt.).
+                </p>
+              </div>
+            </details>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Complementary Products -->
+      {relatedProducts.length > 0 && (
+        <div class="mt-16 sm:mt-20 pt-12 border-t border-slate-200/80">
+          <div class="flex items-center justify-between mb-8">
+            <div>
+              <h2 class="font-sans text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Passt perfekt dazu
+              </h2>
+              <p class="mt-1 text-sm text-slate-600">
+                Passende Folgebände, Schreiblehrgänge und Lehrerstempel für den Unterricht
+              </p>
+            </div>
+            <a href="/alpha#katalog" class="hidden sm:inline-flex items-center gap-1 text-sm font-bold text-[#3395d1] hover:text-[#267eb3] transition-colors">
+              Alle anzeigen &rarr;
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {relatedProducts.map((rel) => (
+              <div class="bg-white rounded-3xl border border-slate-200/80 p-5 flex flex-col justify-between shadow-2xs hover:shadow-sm hover:border-[#3395d1]/40 transition-all group">
+                <div>
+                  <a href={`/products/${rel.slug}`} class="block relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-50/70 p-3 mb-4 flex items-center justify-center">
+                    <img
+                      src={rel.image_url || '/images/placeholder.svg'}
+                      alt={rel.title}
+                      loading="lazy"
+                      class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
+                      onerror="this.onerror=null; this.src='/images/placeholder.svg'"
+                    />
+                  </a>
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="font-mono text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
+                      {rel.sku}
+                    </span>
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                      Sofort lieferbar
+                    </span>
+                  </div>
+                  <a href={`/products/${rel.slug}`} class="block">
+                    <h3 class="font-sans text-sm sm:text-base font-bold text-slate-900 leading-snug group-hover:text-[#3395d1] transition-colors line-clamp-2">
+                      {rel.title.split(' - ')[0]}
+                    </h3>
+                  </a>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                  <span class="text-base sm:text-lg font-extrabold text-slate-900 font-sans">
+                    {formatPriceEur(rel.price_cents)}
+                  </span>
+                  <a href={`/products/${rel.slug}`} class="text-xs font-bold text-[#0b57d0] hover:underline">
+                    Ansehen &rarr;
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+    </main>
+
+    <!-- AUTHENTIC ELBI FOOTER -->
+    <footer class="bg-slate-900 text-slate-300 mt-20 border-t border-slate-800" aria-label="Fußbereich">
+      <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          
+          <div class="md:col-span-1">
+            <div class="flex items-center gap-2.5 group">
+              <img
+                src="/images/branding/elbiLogo.png"
+                alt="Elbi Verlag Logo"
+                width="48"
+                height="36"
+                class="h-9 w-auto object-contain brightness-110"
+                loading="lazy"
+              />
+              <div class="flex flex-col">
+                <span class="text-lg font-bold tracking-tight text-white">ELBI Verlag</span>
+                <span class="text-[10px] text-amber-400 font-semibold tracking-wider uppercase -mt-0.5">Hersteller für Schulen</span>
+              </div>
+            </div>
+            <p class="mt-4 text-xs text-slate-400 leading-relaxed">
+              Hersteller für praxiserprobte Schreibhefte, Schreiblehrgänge und Lehrerstempel für Grundschulen und Förderschulen seit über 30 Jahren.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Sortiment</h3>
+            <ul class="mt-4 space-y-2 text-xs">
+              <li><a href="/alpha#katalog" class="hover:text-white transition-colors">Elbi Schreibhefte</a></li>
+              <li><a href="/alpha#katalog" class="hover:text-white transition-colors">Lehrerstempel</a></li>
+              <li><a href="/alpha#katalog" class="hover:text-white transition-colors">Vorschule &amp; Förderschule</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Service &amp; Hilfe</h3>
+            <ul class="mt-4 space-y-2 text-xs">
+              <li><span class="text-slate-400">Versandkosten: 3,90 €</span></li>
+              <li><span class="text-slate-400">Lieferzeit: 1–3 Werktage</span></li>
+              <li><span class="text-slate-400">Kauf auf Rechnung für Schulen</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Verbraucherrechte</h3>
+            <p class="mt-4 text-xs text-slate-400 leading-relaxed">
+              Gesetzlicher elektronischer Widerrufsservice (§ 356a BGB) und vollständige Button-Lösung im Checkout (§ 312j BGB).
+            </p>
+          </div>
+
+        </div>
+
+        <div class="pt-8 border-t border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>&copy; {new Date().getFullYear()} ELBI Verlag GmbH. Alle Rechte vorbehalten.</p>
+          <div class="flex items-center gap-6">
+            <a href="https://dev.elbi.de/impressum" class="hover:text-white">Impressum</a>
+            <a href="https://dev.elbi.de/datenschutz" class="hover:text-white">Datenschutz</a>
+            <a href="https://dev.elbi.de/agb" class="hover:text-white">AGB</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- INTERACTIVE CART DRAWER -->
+    <div id="cart-drawer-dialog" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="cart-drawer-title" role="dialog" aria-modal="true">
+      <div id="cart-drawer-backdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity cursor-pointer"></div>
+      <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+        <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between">
+          
+          <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <svg class="w-6 h-6 text-[#0b57d0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <h2 id="cart-drawer-title" class="text-lg font-bold text-slate-900">Ihr Warenkorb</h2>
+            </div>
+            <button id="cart-drawer-close-btn" type="button" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+          <div id="cart-drawer-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Dynamic Cart Items -->
+          </div>
+
+          <div class="p-6 border-t border-slate-200 bg-slate-50 space-y-4">
+            <div class="space-y-1.5 text-sm text-slate-600">
+              <div class="flex justify-between">
+                <span>Zwischensumme:</span>
+                <span id="cart-drawer-subtotal" class="font-bold text-slate-900">0,00 €</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span>inkl. MwSt.:</span>
+                <span id="cart-drawer-vat">0,00 €</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span>Versand:</span>
+                <span id="cart-drawer-shipping">3,90 €</span>
+              </div>
+              <div class="border-t border-slate-200 pt-2 flex justify-between text-base font-extrabold text-slate-900">
+                <span>Gesamtsumme:</span>
+                <span id="cart-drawer-total" class="text-[#0b57d0]">0,00 €</span>
+              </div>
+            </div>
+
+            <a
+              href="https://dev.elbi.de/checkout"
+              class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white text-base font-bold shadow-md hover:shadow-lg transition cursor-pointer"
+            >
+              <span>Zur Kasse gehen</span>
+              <span>&rarr;</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- COPILOT & SANDBOX COMPONENT -->
+    <AlphaSandboxWidget />
+
+    <!-- CLIENT SCRIPT -->
+    <script is:inline>
+      (function() {
+        const CART_STORAGE_KEY = 'elbi_alpha_cart_v1';
+
+        function getCart() {
+          try {
+            return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+          } catch {
+            return [];
+          }
+        }
+
+        function saveCart(items) {
+          localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+          updateCartBadge();
+          renderCartDrawer();
+        }
+
+        function updateCartBadge() {
+          const items = getCart();
+          const totalCount = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+          const badge = document.getElementById('header-cart-count');
+          if (badge) {
+            if (totalCount > 0) {
+              badge.textContent = String(totalCount);
+              badge.classList.remove('hidden');
+              badge.classList.add('inline-flex');
+            } else {
+              badge.classList.add('hidden');
+              badge.classList.remove('inline-flex');
+            }
+          }
+        }
+
+        function openDrawer() {
+          const drawer = document.getElementById('cart-drawer-dialog');
+          if (drawer) {
+            renderCartDrawer();
+            drawer.classList.remove('hidden');
+          }
+        }
+
+        function closeDrawer() {
+          const drawer = document.getElementById('cart-drawer-dialog');
+          if (drawer) drawer.classList.add('hidden');
+        }
+
+        function renderCartDrawer() {
+          const container = document.getElementById('cart-drawer-items');
+          if (!container) return;
+
+          const items = getCart();
+          if (items.length === 0) {
+            container.innerHTML = '<div class="text-center py-12 text-slate-500 text-sm"><p>Ihr Warenkorb ist derzeit leer.</p></div>';
+            document.getElementById('cart-drawer-subtotal').textContent = '0,00 €';
+            document.getElementById('cart-drawer-vat').textContent = '0,00 €';
+            document.getElementById('cart-drawer-total').textContent = '0,00 €';
+            return;
+          }
+
+          let subtotalCents = 0;
+          let html = '';
+
+          items.forEach((it, idx) => {
+            const price = Number(it.price_cents) || 0;
+            const lineTotal = price * it.quantity;
+            subtotalCents += lineTotal;
+
+            html += `
+              <div class="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-200">
+                <img src="${it.image_url || '/images/placeholder.svg'}" alt="${it.title}" class="w-14 h-14 object-contain rounded-lg bg-slate-50 p-1 border border-slate-100" />
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs font-mono text-slate-500 font-bold">${it.sku}</div>
+                  <div class="text-sm font-bold text-slate-900 truncate">${it.title}</div>
+                  <div class="text-xs text-slate-600">${(price / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center border border-slate-200 rounded-lg">
+                    <button type="button" class="drawer-qty-minus px-2 py-1 text-slate-600 hover:bg-slate-100" data-idx="${idx}">-</button>
+                    <span class="px-2 text-xs font-bold text-slate-900">${it.quantity}</span>
+                    <button type="button" class="drawer-qty-plus px-2 py-1 text-slate-600 hover:bg-slate-100" data-idx="${idx}">+</button>
+                  </div>
+                  <button type="button" class="drawer-item-del text-red-500 hover:text-red-700 p-1" data-idx="${idx}">✕</button>
+                </div>
+              </div>
+            `;
+          });
+
+          container.innerHTML = html;
+
+          const vatCents = Math.round(subtotalCents * 0.19 / 1.19);
+          const shippingCents = subtotalCents >= 5000 ? 0 : 390;
+          const totalCents = subtotalCents + shippingCents;
+
+          document.getElementById('cart-drawer-subtotal').textContent = (subtotalCents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+          document.getElementById('cart-drawer-vat').textContent = (vatCents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+          document.getElementById('cart-drawer-shipping').textContent = shippingCents === 0 ? 'Kostenlos' : '3,90 €';
+          document.getElementById('cart-drawer-total').textContent = (totalCents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+
+          container.querySelectorAll('.drawer-qty-plus').forEach((btn) => {
+            btn.onclick = () => {
+              const idx = Number(btn.getAttribute('data-idx'));
+              const c = getCart();
+              if (c[idx]) {
+                c[idx].quantity += 1;
+                saveCart(c);
+              }
+            };
+          });
+
+          container.querySelectorAll('.drawer-qty-minus').forEach((btn) => {
+            btn.onclick = () => {
+              const idx = Number(btn.getAttribute('data-idx'));
+              const c = getCart();
+              if (c[idx]) {
+                if (c[idx].quantity > 1) {
+                  c[idx].quantity -= 1;
+                } else {
+                  c.splice(idx, 1);
+                }
+                saveCart(c);
+              }
+            };
+          });
+
+          container.querySelectorAll('.drawer-item-del').forEach((btn) => {
+            btn.onclick = () => {
+              const idx = Number(btn.getAttribute('data-idx'));
+              const c = getCart();
+              c.splice(idx, 1);
+              saveCart(c);
+            };
+          });
+        }
+
+        const pdpAddBtn = document.getElementById('pdp-add-to-cart-btn');
+        if (pdpAddBtn) {
+          pdpAddBtn.onclick = function() {
+            const sku = pdpAddBtn.getAttribute('data-sku');
+            const title = pdpAddBtn.getAttribute('data-title');
+            const price = Number(pdpAddBtn.getAttribute('data-price')) || 290;
+            const img = pdpAddBtn.getAttribute('data-image');
+
+            const cart = getCart();
+            const existing = cart.find((x) => x.sku === sku);
+            if (existing) {
+              existing.quantity += 1;
+            } else {
+              cart.push({ sku, title, price_cents: price, image_url: img, quantity: 1 });
+            }
+            saveCart(cart);
+            openDrawer();
+          };
+        }
+
+        const headerCart = document.getElementById('header-cart-btn');
+        if (headerCart) {
+          headerCart.onclick = openDrawer;
+        }
+
+        const drawerClose = document.getElementById('cart-drawer-close-btn');
+        if (drawerClose) drawerClose.onclick = closeDrawer;
+
+        const backdrop = document.getElementById('cart-drawer-backdrop');
+        if (backdrop) backdrop.onclick = closeDrawer;
+
+        // Image Gallery
+        const galleryContainer = document.getElementById('product-gallery-container');
+        const mainImg = document.getElementById('main-product-image');
+        const prevBtn = document.getElementById('gallery-prev-btn');
+        const nextBtn = document.getElementById('gallery-next-btn');
+        const counterBadge = document.getElementById('gallery-counter-badge');
+
+        if (galleryContainer && mainImg) {
+          let images = [];
+          try {
+            images = JSON.parse(galleryContainer.getAttribute('data-images') || '[]');
+          } catch {}
+
+          if (images.length > 1) {
+            let activeIdx = 0;
+            function updateImage(idx) {
+              activeIdx = (idx + images.length) % images.length;
+              mainImg.src = images[activeIdx];
+              if (counterBadge) counterBadge.textContent = (activeIdx + 1) + ' / ' + images.length;
+            }
+
+            if (prevBtn) prevBtn.onclick = () => updateImage(activeIdx - 1);
+            if (nextBtn) nextBtn.onclick = () => updateImage(activeIdx + 1);
+          }
+        }
+
+        updateCartBadge();
+      })();
+    </script>
+  </body>
+</html>

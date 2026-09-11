@@ -1,24 +1,13 @@
 ---
 import '../styles/global.css';
 import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
+import ProductCard from '../components/product/ProductCard.astro';
 import { getAllProducts } from '../data/catalog';
 import { shopConfig } from '../config/shop.config';
 
 const allProducts = getAllProducts();
 // Curated active products with valid images
 const validProducts = allProducts.filter((p) => p.image_url && !p.image_url.includes('placeholder'));
-
-function formatPriceEur(cents: number): string {
-  return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
-}
-
-function cleanTitle(title: string): string {
-  return title
-    .replace(/^Elbi Stempel aus Holz\s*-\s*/, '')
-    .replace(/^Stempel aus Holz\s*-\s*/, '')
-    .replace(/^Elbi Lehrerstempel\s*-\s*/, '')
-    .split(' - ')[0];
-}
 ---
 <!doctype html>
 <html lang="de" class="h-full bg-slate-50 text-slate-900 antialiased">
@@ -158,145 +147,268 @@ function cleanTitle(title: string): string {
         
         <!-- Live Dynamic Banner (Editable via Copilot) -->
         <div id="dynamic-alpha-banner" class="hidden mb-6 p-4 rounded-2xl border border-sky-300 bg-sky-100 text-sky-950 shadow-sm">
-          <!-- Injected via JavaScript from D1 state -->
+          <div class="flex items-center gap-3">
+            <span class="text-xl">📢</span>
+            <div class="flex-1">
+              <p id="dynamic-alpha-banner-text" class="text-sm font-bold leading-snug"></p>
+            </div>
+            <button id="close-dynamic-banner" class="text-xs text-sky-700 hover:text-sky-900 font-bold px-2 py-1 rounded">✕</button>
+          </div>
         </div>
 
-        <div class="lg:grid lg:grid-cols-12 lg:gap-10 xl:gap-14 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          <!-- Left Column: Google Store Headline & Value Proposition -->
-          <div class="lg:col-span-7 text-left flex flex-col justify-between">
-            <div>
-              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-700 bg-white border border-slate-200 shadow-2xs mb-4">
-                <span class="text-amber-500 font-bold">★</span>
-                <span>Praxiserprobte Lehrmittel seit über 30 Jahren</span>
+          <!-- Left: Hero Headline & Value Props -->
+          <div class="lg:col-span-7 flex flex-col justify-center">
+            
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/80 text-[#0b57d0] text-xs font-bold tracking-wide mb-4 w-fit shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-[#ff9e00]"></span>
+              <span>Offizielle Schulhefte &bull; Lineatur-Originale</span>
+            </div>
+
+            <!-- Dynamic Headline editable by Copilot -->
+            <h1 id="shop-hero-headline" class="font-sans font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 tracking-tight leading-[1.12]">
+              Schreiben lernen mit System &amp; Freude.
+            </h1>
+
+            <!-- Dynamic Subtitle editable by Copilot -->
+            <p id="shop-hero-subtitle" class="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed font-sans max-w-2xl">
+              Seit über 30 Jahren vertrauen Grundschulen und Förderschulen auf die bewährte Elbi-Lineaturverkleinerung. Entdecken Sie praxiserprobte Hefte, Schreiblehrgänge und Buchenholz-Lehrerstempel.
+            </p>
+
+            <!-- Trust Bar / Key USPs -->
+            <div class="mt-6 flex flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm text-slate-700 font-medium">
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>Kauf auf Rechnung für Schulen</span>
               </div>
-
-              <!-- Main Hero Headline (Dynamically Editable) -->
-              <h1 class="font-extrabold text-4xl sm:text-5xl lg:text-[48px] xl:text-[52px] text-slate-900 tracking-tight leading-[1.14]">
-                Schreiben lernen mit System &amp; <span id="dynamic-hero-title" class="text-[#3395d1]">Freude</span>.
-              </h1>
-
-              <!-- Subtitle (Dynamically Editable) -->
-              <p id="dynamic-hero-subtitle" class="mt-4 text-base sm:text-lg lg:text-xl text-slate-600 font-normal leading-relaxed max-w-2xl">
-                Willkommen beim Elbi Verlag. Wir entwickeln und fertigen praxiserprobte Schreiblernhefte für alle Ausgangsschriften und motivierende Holzstempel für Grund- und Förderschulen.
-              </p>
-
-              <!-- Primary Actions Buttons -->
-              <div class="mt-6 sm:mt-7 flex flex-wrap items-center gap-3.5">
-                <a
-                  href="#katalog"
-                  class="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-slate-900 text-white text-base font-semibold hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-sm"
-                >
-                  <span>Schreibhefte entdecken</span>
-                  <span class="ml-2 font-bold">&rarr;</span>
-                </a>
-                <a
-                  href="#katalog"
-                  class="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-white text-slate-800 text-base font-semibold border border-slate-300 hover:bg-slate-50 hover:border-slate-400 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-2xs"
-                >
-                  Lehrerstempel ansehen
-                </a>
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>Lieferung in 1–3 Werktagen</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>100% holzfreies Spezialpapier</span>
               </div>
             </div>
 
-            <!-- Trust Reassurance Bar -->
-            <div class="mt-7 pt-5 border-t border-slate-200/70 flex flex-wrap items-center gap-y-2 gap-x-5 text-xs sm:text-sm text-slate-600 font-medium">
-              <div class="flex items-center gap-2">
-                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span>
-                <span>Kauf auf Rechnung</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[#3395d1] text-xs font-bold">⚡</span>
-                <span>Schneller Direktversand</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xs font-bold">★</span>
-                <span>100% Verlag &amp; Druck in Deutschland</span>
-              </div>
+            <!-- Action Buttons -->
+            <div class="mt-8 flex flex-wrap items-center gap-4">
+              <a
+                href="#katalog"
+                class="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white font-bold text-sm shadow-md hover:shadow-lg transition cursor-pointer"
+              >
+                Sortiment ansehen &darr;
+              </a>
+              <a
+                href="#stufensystem"
+                class="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-white hover:bg-slate-100 text-slate-800 font-bold text-sm border border-slate-300 shadow-2xs transition"
+              >
+                Das Stufensystem entdecken
+              </a>
             </div>
+
           </div>
 
-          <!-- Right Column: Interactive Educational Showcase with DER ELBI Mascot & Vorschule Navigation -->
-          <div class="mt-8 lg:mt-0 lg:col-span-5 flex justify-center lg:justify-end">
-            <div class="w-full max-w-md rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <!-- Right: Authentic "Vorschule bis Klasse 4" Box & Mascot Card -->
+          <div class="lg:col-span-5">
+            <div class="relative rounded-3xl bg-gradient-to-br from-white via-slate-50 to-blue-50/50 p-6 sm:p-7 border border-slate-200/90 shadow-xl overflow-hidden">
               
-              <!-- Mascot Greeting Card -->
-              <div class="flex items-center gap-3.5 bg-gradient-to-br from-amber-50/90 to-orange-50/70 rounded-2xl p-3.5 border border-amber-200/60 mb-3.5">
-                <img
-                  src="/images/branding/der-elbi.png"
-                  alt="Der Elbi – Maskottchen des Elbi Verlags"
-                  width="88"
-                  height="148"
-                  class="h-16 sm:h-18 w-auto object-contain shrink-0 drop-shadow-sm"
-                  fetchpriority="high"
-                />
+              <!-- Top Badge -->
+              <div class="flex items-center justify-between mb-4">
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#1f6f9f] bg-blue-100/70">
+                  Pädagogisches Stufenmodell
+                </span>
+                <span class="text-xs font-mono font-bold text-slate-400">H1–H44</span>
+              </div>
+
+              <!-- Mascot + Heading -->
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-16 h-16 rounded-2xl bg-white border border-blue-200/80 p-1 shadow-sm flex items-center justify-center shrink-0">
+                  <img
+                    src="/images/branding/elbiLogo.png"
+                    alt="Der Elbi"
+                    class="w-full h-full object-contain"
+                  />
+                </div>
                 <div>
-                  <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 uppercase tracking-wider">
-                    <span>★</span> Hallo, ich bin der Elbi!
-                  </div>
-                  <p class="text-xs sm:text-sm text-slate-700 mt-0.5 leading-relaxed">
-                    Seit über 30 Jahren begleite ich Kinder beim Schreibenlernen – vom ersten Schwung bis zum flüssigen Aufsatz.
+                  <h2 class="text-lg font-extrabold text-slate-900 leading-tight">
+                    „Der Elbi“ führt durch alle Lernstufen
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Vom Schwungübungsheft bis zur freien Schönschrift
                   </p>
                 </div>
               </div>
 
-              <!-- Lernstufen Schnellnavigation (4 Stufen: Vorschule bis Kl. 4) -->
-              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 mb-3.5">
-                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Schreibhefte nach Lernstufe
-                </div>
-                <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm font-semibold text-slate-800">
-                  <a
-                    href="#katalog"
-                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-[#0b57d0] hover:bg-blue-50/50 hover:shadow-xs transition-all"
-                    title="Schreibhefte für Vorschule & Förderschule anzeigen"
-                  >
-                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-[#0b57d0] transition-colors">
-                      <span class="text-blue-500">●</span> Vorschule / Förder
-                    </span>
-                    <span class="text-xs text-slate-400 group-hover/font:text-[#0b57d0] transition-colors">&rarr;</span>
-                  </a>
-                  <a
-                    href="#katalog"
-                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-amber-600 hover:bg-amber-50/40 hover:shadow-xs transition-all"
-                    title="Schreibhefte für 1. Halbjahr Klasse 1 anzeigen"
-                  >
-                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-amber-800 transition-colors">
-                      <span class="text-amber-500">●</span> 1. Halbjahr Kl. 1
-                    </span>
-                    <span class="text-xs text-slate-400 group-hover/font:text-amber-600 transition-colors">&rarr;</span>
-                  </a>
-                  <a
-                    href="#katalog"
-                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-emerald-600 hover:bg-emerald-50/40 hover:shadow-xs transition-all"
-                    title="Schreibhefte für 2. Halbjahr Klasse 1 anzeigen"
-                  >
-                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-emerald-800 transition-colors">
-                      <span class="text-emerald-500">●</span> 2. Halbjahr Kl. 1
-                    </span>
-                    <span class="text-xs text-slate-400 group-hover/font:text-emerald-600 transition-colors">&rarr;</span>
-                  </a>
-                  <a
-                    href="#katalog"
-                    class="group/font inline-flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-purple-600 hover:bg-purple-50/40 hover:shadow-xs transition-all"
-                    title="Schreibhefte für Klasse 2 bis 4 anzeigen"
-                  >
-                    <span class="inline-flex items-center gap-1.5 group-hover/font:text-purple-800 transition-colors">
-                      <span class="text-purple-500">●</span> Klasse 2 bis 4
-                    </span>
-                    <span class="text-xs text-slate-400 group-hover/font:text-purple-600 transition-colors">&rarr;</span>
-                  </a>
-                </div>
+              <!-- 4-Stage Mini Overview matching live store -->
+              <div class="space-y-2 mt-4">
+                <a href="#stufensystem" class="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-blue-50/80 border border-slate-200/70 transition group">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-blue-100 text-[#0b57d0] text-xs font-bold flex items-center justify-center">1</span>
+                    <span class="text-xs font-bold text-slate-800 group-hover:text-[#0b57d0]">Vorschule &amp; Förderschule</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 font-mono">H4, H44 &rarr;</span>
+                </a>
+                
+                <a href="#stufensystem" class="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-amber-50/80 border border-slate-200/70 transition group">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold flex items-center justify-center">2</span>
+                    <span class="text-xs font-bold text-slate-800 group-hover:text-amber-800">1. Halbjahr Klasse 1</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 font-mono">H31, H10 &rarr;</span>
+                </a>
+
+                <a href="#stufensystem" class="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-emerald-50/80 border border-slate-200/70 transition group">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center">3</span>
+                    <span class="text-xs font-bold text-slate-800 group-hover:text-emerald-800">2. Halbjahr Klasse 1</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 font-mono">H2, H5, H12 &rarr;</span>
+                </a>
+
+                <a href="#stufensystem" class="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-purple-50/80 border border-slate-200/70 transition group">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-800 text-xs font-bold flex items-center justify-center">4</span>
+                    <span class="text-xs font-bold text-slate-800 group-hover:text-purple-800">Klasse 2 bis 4</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 font-mono">H25–H28 &rarr;</span>
+                </a>
               </div>
 
-              <!-- Quick Info Note -->
-              <div class="text-[11px] text-slate-500 text-center">
-                Direktlieferung an Schulen und Behörden &bull; Auf offene Rechnung
+              <!-- Extra Note -->
+              <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
+                <span>Patentierte Lineaturverkleinerung</span>
+                <span class="font-semibold text-emerald-600">Sofort lieferbar</span>
               </div>
 
             </div>
           </div>
 
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATIONAL JOURNEY: DAS ELBI-STUFENSYSTEM (AUTHENTIC TO REAL STORE) -->
+    <section id="stufensystem" class="py-12 sm:py-16 bg-[#f8f9fa] border-b border-slate-200/60">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mb-10">
+          <span class="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#0b57d0] bg-blue-50 border border-blue-200/80 mb-2.5">
+            Pädagogischer Aufbau
+          </span>
+          <h2 class="font-sans font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
+            Das Elbi-Stufensystem
+          </h2>
+          <p class="mt-2 text-base sm:text-lg text-slate-600 leading-relaxed font-sans">
+            In vier aufeinander aufbauenden Lernstufen führen unsere Schreibhefte Kinder behutsam von den ersten Schwungübungen bis zur freien Textgestaltung.
+          </p>
+        </div>
+
+        <!-- 4 Spacious Stage Cards with Soft Pastel Surfaces -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          <!-- Stage 1 -->
+          <div class="group flex flex-col justify-between rounded-3xl p-7 sm:p-8 bg-[#f0f7fc] border border-blue-100/90 shadow-2xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-[#1f6f9f] bg-white border border-blue-200/60 shadow-2xs">
+                  Stufe 1
+                </span>
+                <span class="text-2xl">🎨</span>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 group-hover:text-[#3395d1] transition-colors font-sans tracking-tight">
+                Vorschule &amp; Förderschule
+              </h3>
+              <p class="mt-3 text-base text-slate-600 leading-relaxed font-sans">
+                Schwungübungen, Auge-Hand-Koordination und gezielte Vorübungen zur Entwicklung der Feinmotorik.
+              </p>
+              <div class="mt-5 pt-4 border-t border-blue-200/50">
+                <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Klassiker:</span>
+                <span class="block text-sm font-bold text-[#0b57d0] mt-0.5">Schwungheft H4 &amp; H44</span>
+              </div>
+            </div>
+            <a href="#katalog" class="mt-6 flex items-center gap-1.5 text-sm font-bold text-[#0b57d0] group-hover:text-[#ff9e00] transition-colors">
+              <span>Hefte im Katalog ansehen</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </a>
+          </div>
+
+          <!-- Stage 2 -->
+          <div class="group flex flex-col justify-between rounded-3xl p-7 sm:p-8 bg-[#fef9ee] border border-amber-100/90 shadow-2xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-amber-800 bg-white border border-amber-200/60 shadow-2xs">
+                  Stufe 2
+                </span>
+                <span class="text-2xl">✏️</span>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 group-hover:text-amber-700 transition-colors font-sans tracking-tight">
+                1. Halbjahr Klasse 1
+              </h3>
+              <p class="mt-3 text-base text-slate-600 leading-relaxed font-sans">
+                Druckschrift, Buchstabeneinführung und die ersten eigenen Wörter mit breiten Hilfslinien.
+              </p>
+              <div class="mt-5 pt-4 border-t border-amber-200/50">
+                <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Klassiker:</span>
+                <span class="block text-sm font-bold text-amber-900 mt-0.5">Schreibheft H31 &amp; Zahlenheft H10</span>
+              </div>
+            </div>
+            <a href="#katalog" class="mt-6 flex items-center gap-1.5 text-sm font-bold text-amber-800 group-hover:text-amber-600 transition-colors">
+              <span>Hefte im Katalog ansehen</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </a>
+          </div>
+
+          <!-- Stage 3 -->
+          <div class="group flex flex-col justify-between rounded-3xl p-7 sm:p-8 bg-[#f3f9f4] border border-emerald-100/90 shadow-2xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-emerald-800 bg-white border border-emerald-200/60 shadow-2xs">
+                  Stufe 3
+                </span>
+                <span class="text-2xl">✒️</span>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors font-sans tracking-tight">
+                2. Halbjahr Klasse 1
+              </h3>
+              <p class="mt-3 text-base text-slate-600 leading-relaxed font-sans">
+                Sanfter Übergang zur verbundenen Handschrift für alle Ausgangsschriften (VA, LA oder SAS).
+              </p>
+              <div class="mt-5 pt-4 border-t border-emerald-200/50">
+                <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Klassiker:</span>
+                <span class="block text-sm font-bold text-emerald-900 mt-0.5">Schreiblehrgänge H2, H5, H12</span>
+              </div>
+            </div>
+            <a href="#katalog" class="mt-6 flex items-center gap-1.5 text-sm font-bold text-emerald-800 group-hover:text-emerald-600 transition-colors">
+              <span>Hefte im Katalog ansehen</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </a>
+          </div>
+
+          <!-- Stage 4 -->
+          <div class="group flex flex-col justify-between rounded-3xl p-7 sm:p-8 bg-[#f8f4fb] border border-purple-100/90 shadow-2xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-purple-800 bg-white border border-purple-200/60 shadow-2xs">
+                  Stufe 4
+                </span>
+                <span class="text-2xl">📖</span>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 group-hover:text-purple-700 transition-colors font-sans tracking-tight">
+                Klasse 2 bis 4
+              </h3>
+              <p class="mt-3 text-base text-slate-600 leading-relaxed font-sans">
+                Schönschrift, Verfeinerung des Schriftbilds und erste zusammenhängende Geschichten &amp; Aufsätze.
+              </p>
+              <div class="mt-5 pt-4 border-t border-purple-200/50">
+                <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Klassiker:</span>
+                <span class="block text-sm font-bold text-purple-900 mt-0.5">Schönschreibhefte H25–H28</span>
+              </div>
+            </div>
+            <a href="#katalog" class="mt-6 flex items-center gap-1.5 text-sm font-bold text-purple-800 group-hover:text-purple-600 transition-colors">
+              <span>Hefte im Katalog ansehen</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -316,109 +428,23 @@ function cleanTitle(title: string): string {
 
         <!-- Filter Controls -->
         <div class="flex items-center gap-2 text-xs font-semibold">
-          <button id="filter-all-btn" class="filter-tab px-4 py-2 rounded-full bg-slate-900 text-white shadow-xs transition">
+          <button id="filter-all-btn" class="filter-tab px-4 py-2 rounded-full bg-slate-900 text-white shadow-xs transition cursor-pointer">
             Alle ({validProducts.length})
           </button>
-          <button id="filter-hefte-btn" class="filter-tab px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition">
+          <button id="filter-hefte-btn" class="filter-tab px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition cursor-pointer">
             Schreibhefte
           </button>
-          <button id="filter-stempel-btn" class="filter-tab px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition">
+          <button id="filter-stempel-btn" class="filter-tab px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition cursor-pointer">
             Lehrerstempel
           </button>
         </div>
       </div>
 
-      <!-- Grid -->
+      <!-- Grid with Authentic Product Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="product-card-grid">
-        {validProducts.map((p) => {
-          const isHeft = p.sku.startsWith('H') || p.title.toLowerCase().includes('heft') || p.title.toLowerCase().includes('schreib');
-          const isStempel = p.sku.startsWith('S') || p.sku.startsWith('K') || p.title.toLowerCase().includes('stempel');
-          const tag = isHeft ? 'hefte' : (isStempel ? 'stempel' : 'other');
-          const title = cleanTitle(p.title);
-          const priceFormatted = formatPriceEur(p.price_gross ?? p.price_net ?? 290);
-          const subtitle = p.short_description || (p.title.replace(title, '').replace(/^[\s\-]+/, ''));
-
-          return (
-            <article 
-              class="product-card group relative flex flex-col justify-between rounded-3xl bg-white border border-slate-200/90 hover:border-slate-300 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-              data-category={tag}
-              data-sku={p.sku}
-              data-title={title}
-              data-image={p.image_url}
-              data-price={priceFormatted}
-              data-description={p.description || p.short_description || ''}
-            >
-              <div>
-                <!-- Packshot Container with Quick Detail Trigger Link -->
-                <div 
-                  class="aspect-[4/3] w-full rounded-2xl bg-[#f8f9fa] p-4 flex items-center justify-center overflow-hidden mb-4 border border-slate-100 relative cursor-pointer group-hover:bg-slate-50 transition-colors open-detail-card"
-                  title={`${title} ansehen`}
-                >
-                  <img 
-                    src={p.image_url} 
-                    alt={p.title} 
-                    loading="lazy" 
-                    class="h-full w-full object-contain group-hover:scale-103 transition-transform duration-300 drop-shadow-xs"
-                    onerror="this.onerror=null; this.src='/images/placeholder.svg'"
-                  />
-                  <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-white/95 backdrop-blur-xs text-[10px] mono text-slate-700 font-bold border border-slate-200/80 shadow-2xs">
-                    {p.sku}
-                  </span>
-                </div>
-
-                <!-- Tags -->
-                <div class="flex items-center gap-2 mb-2">
-                  <span class="text-[10px] font-semibold text-slate-600 px-2.5 py-0.5 rounded-full bg-slate-100">
-                    {isHeft ? 'Schreibheft' : 'Holzstempel'}
-                  </span>
-                  <span class="text-[10px] font-semibold text-emerald-700">✓ Auf Lager</span>
-                </div>
-
-                <!-- Title & Desc (Clickable) -->
-                <h3 class="font-bold text-slate-900 text-base leading-snug group-hover:text-[#0b57d0] transition-colors line-clamp-2 cursor-pointer open-detail-card" title={`${title} Details ansehen`}>
-                  {title}
-                </h3>
-                {subtitle && (
-                  <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed cursor-pointer open-detail-card">
-                    {subtitle}
-                  </p>
-                )}
-              </div>
-
-              <!-- Price & Add Action -->
-              <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between gap-2">
-                <div>
-                  <span class="text-[10px] text-slate-400 block font-medium">inkl. MwSt.</span>
-                  <span class="text-lg font-black text-slate-900 mono">
-                    {priceFormatted}
-                  </span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <button 
-                    type="button"
-                    class="open-detail-btn px-3 py-1.5 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
-                    title="Details ansehen"
-                  >
-                    Details
-                  </button>
-                  <button 
-                    type="button"
-                    class="add-to-cart-btn px-3.5 py-2 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-bold transition shadow-2xs hover:shadow-md cursor-pointer flex items-center gap-1 active:scale-95"
-                    data-sku={p.sku}
-                    data-title={title}
-                    data-price={p.price_gross ?? p.price_net ?? 290}
-                    data-image={p.image_url}
-                  >
-                    <svg class="w-3.5 h-3.5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Korb</span>
-                  </button>
-                </div>
-              </div>
-            </article>
-          );
-        })}
+        {validProducts.map((p) => (
+          <ProductCard product={p} />
+        ))}
       </div>
     </section>
 
@@ -454,7 +480,7 @@ function cleanTitle(title: string): string {
             <ul class="mt-4 space-y-2 text-xs">
               <li><a href="#katalog" class="hover:text-white transition-colors">Elbi Schreibhefte</a></li>
               <li><a href="#katalog" class="hover:text-white transition-colors">Lehrerstempel</a></li>
-              <li><a href="#katalog" class="hover:text-white transition-colors">Vorschule &amp; Förderschule</a></li>
+              <li><a href="#stufensystem" class="hover:text-white transition-colors">Das Stufensystem</a></li>
             </ul>
           </div>
 
@@ -462,9 +488,9 @@ function cleanTitle(title: string): string {
           <div>
             <h3 class="text-xs font-semibold text-white tracking-wider uppercase">Service &amp; Hilfe</h3>
             <ul class="mt-4 space-y-2 text-xs">
-              <li><span class="text-slate-400">Versandkosten: 4,90 € (ab 50 € versandkostenfrei)</span></li>
+              <li><span class="text-slate-400">Versandkosten: 3,90 € (ab 50 € versandkostenfrei)</span></li>
               <li><span class="text-slate-400">Lieferzeit: 1–3 Werktage</span></li>
-              <li><span class="text-slate-400">Telefon: +49 (0) 40 / 656 00 01</span></li>
+              <li><span class="text-slate-400">Kauf auf Rechnung für Schulen</span></li>
             </ul>
           </div>
 
@@ -480,105 +506,22 @@ function cleanTitle(title: string): string {
 
         <div class="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>&copy; {new Date().getFullYear()} ELBI Verlag GmbH &bull; Alle Rechte vorbehalten.</p>
-          <p class="mono">Coded with 💖 <a href="https://emaik.io" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-white underline">emaik.io</a></p>
+          <div class="flex items-center gap-6">
+            <a href="https://dev.elbi.de/impressum" class="hover:text-white">Impressum</a>
+            <a href="https://dev.elbi.de/datenschutz" class="hover:text-white">Datenschutz</a>
+            <a href="https://dev.elbi.de/agb" class="hover:text-white">AGB</a>
+          </div>
         </div>
       </div>
     </footer>
 
-    <!-- PRODUCT DETAIL VIEW MODAL (PURE ASTRO / VANILLA JS) -->
-    <div id="product-detail-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
-      <div id="product-detail-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity cursor-pointer"></div>
-      
-      <div class="min-h-full flex items-center justify-center p-4 sm:p-6 text-center">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-2xl border border-slate-200">
-          
-          <!-- Close Button -->
-          <button 
-            type="button" 
-            id="close-detail-modal-btn"
-            class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm transition cursor-pointer"
-            aria-label="Schließen"
-          >
-            ✕
-          </button>
-
-          <div class="p-6 sm:p-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-              
-              <!-- Image Card -->
-              <div class="aspect-square w-full rounded-2xl bg-[#f8f9fa] p-6 flex items-center justify-center border border-slate-100 relative">
-                <img 
-                  id="detail-modal-image" 
-                  src="" 
-                  alt="" 
-                  class="max-h-full max-w-full object-contain drop-shadow-xs"
-                />
-                <span id="detail-modal-sku-badge" class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-white/95 text-[11px] mono text-slate-800 font-bold border border-slate-200 shadow-2xs">
-                </span>
-              </div>
-
-              <!-- Product Info -->
-              <div class="flex flex-col justify-between h-full">
-                <div>
-                  <div class="flex items-center gap-2 mb-2">
-                    <span id="detail-modal-tag" class="text-[11px] font-semibold text-slate-600 px-2.5 py-0.5 rounded-full bg-slate-100">
-                      Original ELBI
-                    </span>
-                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-                      ✓ Sofort lieferbar
-                    </span>
-                  </div>
-
-                  <h2 id="detail-modal-title" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight font-sans">
-                  </h2>
-
-                  <p id="detail-modal-desc" class="text-xs text-slate-600 mt-3 leading-relaxed">
-                  </p>
-                </div>
-
-                <!-- Price and CTA -->
-                <div class="mt-6 pt-5 border-t border-slate-100">
-                  <div class="flex items-baseline justify-between mb-3">
-                    <div>
-                      <span class="text-[10px] text-slate-400 block font-medium">inkl. MwSt. zzgl. Versand</span>
-                      <span id="detail-modal-price" class="text-2xl font-black text-slate-900 mono">
-                      </span>
-                    </div>
-                  </div>
-
-                  <button 
-                    type="button" 
-                    id="detail-modal-add-btn"
-                    class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white font-bold text-sm shadow-md hover:shadow-lg transition cursor-pointer active:scale-98"
-                  >
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>In den Warenkorb legen</span>
-                  </button>
-
-                  <p class="text-[11px] text-slate-400 text-center mt-3">
-                    Bequemer Kauf auf Rechnung für Schulen &amp; Lehrkräfte
-                  </p>
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CART SLIDEOVER DRAWER (PURE ASTRO / VANILLA JS) -->
+    <!-- CART SLIDEOVER DRAWER -->
     <div id="cart-drawer-dialog" class="fixed inset-0 z-50 hidden overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-      <!-- Backdrop -->
       <div id="cart-drawer-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity cursor-pointer"></div>
 
       <div class="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+        <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between">
           
-          <!-- Header -->
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
             <h2 id="cart-title" class="text-lg font-bold text-slate-900 flex items-center gap-2">
               <span>Warenkorb</span>
@@ -596,12 +539,10 @@ function cleanTitle(title: string): string {
             </button>
           </div>
 
-          <!-- Items list -->
           <div id="cart-drawer-items" class="flex-1 overflow-y-auto p-6 space-y-4">
-            <!-- Dynamic Items or Empty State -->
+            <!-- Dynamic Items -->
           </div>
 
-          <!-- Summary & Checkout CTA -->
           <div id="cart-drawer-summary" class="border-t border-slate-200 p-6 space-y-3 bg-slate-50">
             <div class="flex justify-between text-xs text-slate-600">
               <span>Zwischensumme</span>
@@ -613,7 +554,7 @@ function cleanTitle(title: string): string {
             </div>
             <div class="flex justify-between text-xs text-slate-600">
               <span>Versandkosten</span>
-              <span id="cart-shipping-val" class="mono font-semibold">4,64 €</span>
+              <span id="cart-shipping-val" class="mono font-semibold">3,90 €</span>
             </div>
             <div class="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
               <span>Gesamtsumme</span>
@@ -641,13 +582,11 @@ function cleanTitle(title: string): string {
     <AlphaSandboxWidget />
 
     <script>
-      // ==========================================
       // 1. Category Filtering
-      // ==========================================
       const allBtn = document.getElementById('filter-all-btn');
       const hefteBtn = document.getElementById('filter-hefte-btn');
       const stempelBtn = document.getElementById('filter-stempel-btn');
-      const cards = document.querySelectorAll('.product-card');
+      const cards = document.querySelectorAll('.product-catalog-item');
 
       function filterCategory(cat: string, activeBtn: HTMLElement) {
         [allBtn, hefteBtn, stempelBtn].forEach(b => {
@@ -671,9 +610,7 @@ function cleanTitle(title: string): string {
       hefteBtn?.addEventListener('click', () => filterCategory('hefte', hefteBtn));
       stempelBtn?.addEventListener('click', () => filterCategory('stempel', stempelBtn));
 
-      // ==========================================
-      // 2. Client-Side Cart Engine (Local Storage)
-      // ==========================================
+      // 2. Client-Side Cart Engine
       interface CartItemData {
         sku: string;
         title: string;
@@ -731,13 +668,11 @@ function cleanTitle(title: string): string {
         saveCart(cart);
       }
 
-      // Render Cart UI
       function renderCartUI() {
         const cart = loadCart();
         const items = Object.values(cart);
         const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-        // Header Count Badge
         const headerCountBadge = document.getElementById('header-cart-count');
         if (headerCountBadge) {
           if (totalCount > 0) {
@@ -750,11 +685,9 @@ function cleanTitle(title: string): string {
           }
         }
 
-        // Cart Drawer Title Count
         const titleCount = document.getElementById('cart-drawer-title-count');
         if (titleCount) titleCount.textContent = `(${totalCount})`;
 
-        // Items Container
         const container = document.getElementById('cart-drawer-items');
         if (!container) return;
 
@@ -765,7 +698,7 @@ function cleanTitle(title: string): string {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               <p class="mt-4 text-sm font-bold text-slate-900">Ihr Warenkorb ist noch leer.</p>
-              <p class="mt-1 text-xs text-slate-500">Klicken Sie bei einem Artikel auf „Korb“ oder „Details“.</p>
+              <p class="mt-1 text-xs text-slate-500">Klicken Sie beim Artikel auf das Einkaufswagen-Symbol.</p>
             </div>
           `;
           const summary = document.getElementById('cart-drawer-summary');
@@ -799,7 +732,6 @@ function cleanTitle(title: string): string {
             `;
           }).join('');
 
-          // Bind qty buttons
           container.querySelectorAll('.cart-qty-minus').forEach(btn => {
             btn.addEventListener('click', () => {
               const sku = btn.getAttribute('data-sku');
@@ -819,8 +751,7 @@ function cleanTitle(title: string): string {
             });
           });
 
-          // Summary amounts
-          const shippingCents = 464; // 3.90 + 19%
+          const shippingCents = subtotalCents >= 5000 ? 0 : 390;
           const vatEstimate = Math.round((subtotalCents * 19) / 119);
           const totalCents = subtotalCents + shippingCents;
 
@@ -831,7 +762,7 @@ function cleanTitle(title: string): string {
 
           if (subtotalEl) subtotalEl.textContent = formatPrice(subtotalCents);
           if (vatEl) vatEl.textContent = formatPrice(vatEstimate);
-          if (shippingEl) shippingEl.textContent = formatPrice(shippingCents);
+          if (shippingEl) shippingEl.textContent = shippingCents === 0 ? 'Kostenlos' : formatPrice(shippingCents);
           if (totalEl) totalEl.textContent = formatPrice(totalCents);
         }
       }
@@ -855,77 +786,8 @@ function cleanTitle(title: string): string {
       closeCartBtn?.addEventListener('click', closeCartDrawer);
       cartBackdrop?.addEventListener('click', closeCartDrawer);
 
-      // ==========================================
-      // 3. Product Detail Modal Logic
-      // ==========================================
-      const detailModal = document.getElementById('product-detail-modal');
-      const detailBackdrop = document.getElementById('product-detail-backdrop');
-      const closeDetailBtn = document.getElementById('close-detail-modal-btn');
-      const detailImage = document.getElementById('detail-modal-image') as HTMLImageElement;
-      const detailTitle = document.getElementById('detail-modal-title');
-      const detailSku = document.getElementById('detail-modal-sku-badge');
-      const detailDesc = document.getElementById('detail-modal-desc');
-      const detailPrice = document.getElementById('detail-modal-price');
-      const detailAddBtn = document.getElementById('detail-modal-add-btn');
-
-      let currentActiveProduct: any = null;
-
-      function openDetailModal(articleEl: HTMLElement) {
-        const sku = articleEl.getAttribute('data-sku') || '';
-        const title = articleEl.getAttribute('data-title') || '';
-        const image = articleEl.getAttribute('data-image') || '';
-        const price = articleEl.getAttribute('data-price') || '';
-        const desc = articleEl.getAttribute('data-description') || 'Praxiserprobtes Lehrmaterial direkt vom ELBI Verlag.';
-
-        currentActiveProduct = {
-          sku,
-          title,
-          image,
-          priceCents: sku.startsWith('H') ? 290 : 890,
-        };
-
-        if (detailImage) {
-          detailImage.src = image;
-          detailImage.alt = title;
-        }
-        if (detailTitle) detailTitle.textContent = title;
-        if (detailSku) detailSku.textContent = `Art.-Nr. ${sku}`;
-        if (detailDesc) detailDesc.textContent = desc;
-        if (detailPrice) detailPrice.textContent = price;
-
-        detailModal?.classList.remove('hidden');
-      }
-
-      function closeDetailModal() {
-        detailModal?.classList.add('hidden');
-      }
-
-      closeDetailBtn?.addEventListener('click', closeDetailModal);
-      detailBackdrop?.addEventListener('click', closeDetailModal);
-
-      detailAddBtn?.addEventListener('click', () => {
-        if (currentActiveProduct) {
-          addToCart(
-            currentActiveProduct.sku,
-            currentActiveProduct.title,
-            currentActiveProduct.priceCents,
-            currentActiveProduct.image
-          );
-          closeDetailModal();
-        }
-      });
-
-      // Bind all product card clicks to open detail
-      document.querySelectorAll('.open-detail-card, .open-detail-btn').forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const card = (trigger as HTMLElement).closest('.product-card');
-          if (card) openDetailModal(card as HTMLElement);
-        });
-      });
-
-      // Bind "Korb" Quick-Add buttons on each card
-      document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      // Quick Cart Button Event Listener (Circular Cart Icon on each card)
+      document.querySelectorAll('.quick-cart-add-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const sku = btn.getAttribute('data-sku') || '';
@@ -936,15 +798,12 @@ function cleanTitle(title: string): string {
         });
       });
 
-      // Escape key closes modals
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-          closeDetailModal();
           closeCartDrawer();
         }
       });
 
-      // Initial Cart UI sync
       renderCartUI();
     </script>
   </body>
