@@ -37,7 +37,7 @@ jobs:
           chmod +x bin/elbai
 
       - name: Set up Python for MkDocs
-        uses: actions/setup-python@a269c8e8789fed5e90d0b0b8c66e9a03dd4d95b2 # v6.2.0
+        uses: actions/setup-python@v5 # v6.2.0
         with:
           python-version: '3.12'
 
