@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
 ---
 <!DOCTYPE html>
 <html lang="de" class="min-h-full">
@@ -128,6 +129,14 @@ import '../styles/global.css';
     
     <!-- Title Callout -->
     <div class="text-center mb-8">
+      <!-- Dynamic Alpha Notice Banner -->
+      <div id="dynamic-alpha-banner" class="hidden max-w-3xl mx-auto mb-4 p-3.5 rounded-xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/70 via-slate-900/90 to-purple-950/70 shadow-[0_0_20px_rgba(6,182,212,0.25)]">
+        <div class="flex items-center justify-center gap-3 text-xs sm:text-sm mono text-cyan-200">
+          <span class="animate-pulse">✨</span>
+          <span id="dynamic-alpha-text" class="font-semibold text-white">Lade Live-Status...</span>
+        </div>
+      </div>
+
       <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-500/40 text-cyan-300 text-xs sm:text-sm mono mb-4 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
         <span>🤖</span>
         <span class="font-bold">elba.io</span>
@@ -135,9 +144,9 @@ import '../styles/global.css';
         <span>✨ Next Gen Elbi 💫</span>
       </div>
       <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight text-white mb-3">
-        Elbi + AI = <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-fuchsia-400 bg-clip-text text-transparent">elbai.io</span>
+        Elbi + AI = <span id="dynamic-hero-title" class="bg-gradient-to-r from-cyan-400 via-sky-300 to-fuchsia-400 bg-clip-text text-transparent">elbai.io</span>
       </h1>
-      <p class="mono text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
+      <p id="dynamic-hero-subtitle" class="mono text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
         1. elbi.de auf Cloudflare Edge &bull; 2. Erste Automatisierungen mit AI &bull; 3. Next-Gen Tech Lab
       </p>
     </div>
@@ -488,6 +497,9 @@ import '../styles/global.css';
       </div>
     </div>
   </footer>
+
+  <!-- ALPHA SANDBOX INTERACTIVE TIME MACHINE & COPILOT -->
+  <AlphaSandboxWidget />
 
 </body>
 </html>
