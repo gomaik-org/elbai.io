@@ -2,14 +2,27 @@
 // Alpha Sandbox Interactive Floating Widget (Non-modal, draggable/docked floating card)
 ---
 <div id="alpha-sandbox-container">
-  <!-- Floating Launcher Button Bottom-Right -->
-  <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
-    <button id="sandbox-toggle-btn" class="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-900/90 hover:bg-slate-950 text-white font-semibold text-xs tracking-wide shadow-xl border border-sky-400/30 backdrop-blur-md hover:scale-102 active:scale-98 transition-all cursor-pointer">
-      <span class="text-base group-hover:rotate-12 transition-transform">🤖</span>
-      <span class="tracking-normal font-sans font-bold">Copilot &amp; Zeitmaschine</span>
-      <span class="relative flex h-2 w-2">
+  <!-- Floating Launcher Button Bottom-Right with Glowing Beacon & Tooltip -->
+  <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
+    
+    <!-- Animated Callout Badge ("Hier klicken & Shop anpassen!") -->
+    <div id="copilot-hint-badge" class="animate-bounce flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500 text-white text-[11px] font-bold shadow-lg border border-sky-300">
+      <span>✨</span>
+      <span>Hier klicken &amp; Shop anpassen!</span>
+      <span class="text-sky-200">👇</span>
+    </div>
+
+    <!-- Glowing Pill Button with Cyan Aura Pulse -->
+    <button 
+      id="sandbox-toggle-btn" 
+      class="group relative flex items-center gap-2.5 px-5 py-3 rounded-full bg-slate-900/95 hover:bg-black text-white font-bold text-xs tracking-wide shadow-[0_0_25px_rgba(14,165,233,0.6)] hover:shadow-[0_0_35px_rgba(14,165,233,0.9)] border-2 border-sky-400 hover:border-sky-300 backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer ring-4 ring-sky-400/20"
+      aria-label="Alpha Copilot & Zeitmaschine öffnen"
+    >
+      <span class="text-lg group-hover:rotate-12 transition-transform">🤖</span>
+      <span class="tracking-normal font-sans text-sm font-extrabold text-white">Copilot &amp; Zeitmaschine</span>
+      <span class="relative flex h-2.5 w-2.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-400"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-400"></span>
       </span>
     </button>
   </div>
@@ -155,9 +168,11 @@
   const rollbackStatus = document.getElementById('rollback-status');
 
   // Toggle Window
+  const hintBadge = document.getElementById('copilot-hint-badge');
   toggleBtn?.addEventListener('click', () => {
     modal?.classList.toggle('hidden');
     if (!modal?.classList.contains('hidden')) {
+      hintBadge?.classList.add('hidden');
       loadStateAndSnapshots();
     }
   });
