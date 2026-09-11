@@ -1,14 +1,14 @@
 # Synergien mit dem Wiz-Blitz Framework
 
-Das modulare **Wiz-Blitz Framework** wurde von **Maik Ellerbrock** als einzigem und alleinigem Erfinder und Entwickler konzipiert und befindet sich aktuell mit Hochdruck in der Weiterentwicklung zur zukunftsweisenden **Version 3 (v3)**.
+Das modulare **Wiz-Blitz Framework** wurde von **Maik Ellerbrock** als Entwickler und Architekt konzipiert und befindet sich derzeit in der Entwicklung zur zukunftsweisenden **Version 3 (v3)**.
 
-Wiz-Blitz dient als hochentwickelte architektonische Blaupause für die tooling-, cloud- und agentenbasierte Entwicklung im gesamten ELBI-Ökosystem.
+Wiz-Blitz dient als architektonische Blaupause für die tooling-, cloud- und agentenbasierte Entwicklung im gesamten ELBI-Ökosystem.
 
 ---
 
-## 👨‍💻 Erfinder & Architektur-Vision
-- **Alleiniger Erfinder & Lead Developer:** Maik Ellerbrock ([emaik.io](https://emaik.io))
-- **Aktueller Entwicklungsstand:** Evolution von Wiz-Blitz v2 hin zu **Wiz-Blitz v3**
+## 👨‍💻 Entwickler & Architektur
+- **Entwickler & Architekt:** Maik Ellerbrock ([emaik.io](https://emaik.io))
+- **Aktueller Entwicklungsstand:** Entwicklung zur Version 3 (v3)
 - **Fokus:** Autonome agentische Workflows, strikte FinOps-Governance (Scale-to-Zero), Zero-Trust-Security und modernste Edge-Cloud-Integrationen.
 
 ---
