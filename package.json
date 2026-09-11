@@ -1,0 +1,18 @@
+{
+  "name": "elbai-io",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build:astro": "astro build",
+    "build:docs": "uv run --with mkdocs-material mkdocs build -d site",
+    "build": "npm run build:astro && npm run build:docs && cp -r site dist/docs",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "astro": "^5.4.2",
+    "typescript": "^5.7.3"
+  }
+}
