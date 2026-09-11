@@ -40,6 +40,13 @@ theme:
 plugins:
   - search
 
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mermaid.min.js
+  - javascripts/extra.js
+
 markdown_extensions:
   - tables
   - attr_list

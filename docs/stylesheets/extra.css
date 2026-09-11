@@ -1,0 +1,349 @@
+/* Hide the banner image on the website (preserved in raw markdown files) */
+img[alt="Wiz⚡Blitz Banner"] {
+  display: none !important;
+}
+
+/* Customizing Mermaid diagram styles to align with Deep Purple palette */
+:root {
+  --md-mermaid-node-bg: #ede7f6;       /* Very Light Purple 50 */
+  --md-mermaid-node-border: #673ab7;   /* Deep Purple 500 */
+  --md-mermaid-edge-color: #7e57c2;    /* Deep Purple 400 */
+  --md-mermaid-label-bg: #ffffff;
+  --wb-purple-primary: #673ab7;
+  --wb-purple-accent: #00e5ff;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-mermaid-node-bg: #211235;       /* Extremely Dark Slate Purple */
+  --md-mermaid-node-border: #9575cd;   /* Deep Purple 300 */
+  --md-mermaid-edge-color: #b39ddb;    /* Deep Purple 200 */
+  --md-mermaid-label-bg: #1e1e24;
+}
+
+.mermaid {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  background-color: transparent;
+  padding: 1.25rem;
+  border-radius: 10px;
+  cursor: zoom-in !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1px solid rgba(103, 58, 183, 0.15);
+}
+
+.mermaid * {
+  cursor: zoom-in !important;
+}
+
+.mermaid:hover {
+  border-color: rgba(103, 58, 183, 0.5);
+  box-shadow: 0 4px 20px rgba(103, 58, 183, 0.12);
+  filter: brightness(1.03);
+}
+
+[data-md-color-scheme="slate"] .mermaid:hover {
+  box-shadow: 0 4px 20px rgba(156, 39, 176, 0.25);
+  border-color: rgba(156, 39, 176, 0.6);
+}
+
+/* Hover Badge: "🔍 Click to expand" */
+.wb-diagram-zoom-badge {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: rgba(103, 58, 183, 0.85);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(-2px);
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-md-color-scheme="slate"] .wb-diagram-zoom-badge {
+  background: rgba(149, 117, 205, 0.9);
+  color: #120d20;
+  font-weight: 600;
+}
+
+.mermaid:hover .wb-diagram-zoom-badge {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==============================================================================
+   Interactive Diagram Lightbox Modal (.wb-lightbox-modal)
+   ============================================================================== */
+
+body.wb-lightbox-open {
+  overflow: hidden !important;
+}
+
+.wb-lightbox-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+}
+
+.wb-lightbox-modal.is-active {
+  display: flex;
+}
+
+.wb-lightbox-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(11, 9, 20, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.wb-lightbox-dialog {
+  position: relative;
+  z-index: 1;
+  width: 94vw;
+  max-width: 1400px;
+  height: 88vh;
+  max-height: 900px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(103, 58, 183, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: wbModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-dialog {
+  background: #171326;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(179, 157, 219, 0.25);
+}
+
+@keyframes wbModalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.wb-lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #f7f5fb;
+  border-bottom: 1px solid rgba(103, 58, 183, 0.15);
+  user-select: none;
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-header {
+  background: #1e1933;
+  border-bottom: 1px solid rgba(179, 157, 219, 0.15);
+}
+
+.wb-lightbox-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wb-lightbox-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #673ab7;
+  letter-spacing: 0.5px;
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-badge {
+  color: #b39ddb;
+}
+
+.wb-lightbox-hint {
+  font-size: 0.75rem;
+  color: #666666;
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-hint {
+  color: #999999;
+}
+
+.wb-lightbox-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wb-lightbox-scale {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555555;
+  min-width: 44px;
+  text-align: center;
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-scale {
+  color: #cccccc;
+}
+
+.wb-lightbox-btn {
+  background: rgba(103, 58, 183, 0.08);
+  border: 1px solid rgba(103, 58, 183, 0.2);
+  color: #333333;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #e0e0e0;
+}
+
+.wb-lightbox-btn:hover {
+  background: rgba(103, 58, 183, 0.2);
+  color: #673ab7;
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-btn:hover {
+  background: rgba(179, 157, 219, 0.2);
+  color: #ffffff;
+}
+
+.wb-lightbox-close {
+  background: rgba(244, 67, 54, 0.1) !important;
+  border-color: rgba(244, 67, 54, 0.25) !important;
+  color: #d32f2f !important;
+}
+
+.wb-lightbox-close:hover {
+  background: rgba(244, 67, 54, 0.25) !important;
+}
+
+.wb-lightbox-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: radial-gradient(rgba(103, 58, 183, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+[data-md-color-scheme="slate"] .wb-lightbox-viewport {
+  background-image: radial-gradient(rgba(179, 157, 219, 0.08) 1px, transparent 1px);
+}
+
+.wb-lightbox-viewport.is-dragging {
+  cursor: grabbing !important;
+}
+
+.wb-lightbox-canvas {
+  transform-origin: center center;
+  transition: transform 0.06s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.wb-lightbox-canvas .mermaid,
+.wb-lightbox-canvas img {
+  border: none !important;
+  box-shadow: none !important;
+  cursor: grab !important;
+}
+
+.wb-lightbox-canvas svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* ==============================================================================
+   Embedded Video Player (.video-container)
+   ============================================================================== */
+
+.video-container {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1.75rem 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(103, 58, 183, 0.2);
+  background: #000000;
+}
+
+[data-md-color-scheme="slate"] .video-container {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(179, 157, 219, 0.3);
+}
+
+.video-container video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+/* ==============================================================================
+   Hero Header Graphic (.hero-header-img)
+   ============================================================================== */
+
+.hero-header-banner {
+  width: 100%;
+  margin: 1rem 0 2rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(103, 58, 183, 0.25);
+  display: flex;
+  justify-content: center;
+  background: #0b0914;
+}
+
+.hero-header-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+/* Footer Attribution Centering */
+.md-footer-meta__inner {
+  display: flex !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.md-copyright {
+  width: 100% !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+}
+
+.md-copyright__highlight {
+  display: inline-block;
+  text-align: center !important;
+}
