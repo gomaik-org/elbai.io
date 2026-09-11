@@ -1,0 +1,79 @@
+name: Build & Deploy to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build Astro & MkDocs -> Deploy Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.24'
+          cache: true
+
+      - name: Build elbai CLI
+        run: |
+          mkdir -p bin
+          go build -o bin/elbai ./cmd/elbai
+          chmod +x bin/elbai
+
+      - name: Set up Python for MkDocs
+        uses: actions/setup-python@a269c8e8789fed5e90d0b0b8c66e9a03dd4d95b2 # v6.2.0
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Unified Astro + MkDocs Distribution
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          npm run build
+
+      - name: Deploy to Cloudflare Pages via Wrangler
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+        run: |
+          npx wrangler pages deploy dist --project-name elbai-io --branch main
+
+      - name: Purge Cloudflare Edge Zone Cache
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+        run: |
+          # Purge everything for zone elbai.io (f44d3edfb4e8c85beeb187526026eb3a)
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/f44d3edfb4e8c85beeb187526026eb3a/purge_cache" \
+            -H "X-Auth-Email: ${CLOUDFLARE_EMAIL}" \
+            -H "X-Auth-Key: ${CLOUDFLARE_API_KEY}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'

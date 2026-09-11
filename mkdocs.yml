@@ -78,6 +78,7 @@ nav:
   - 4. Compliance & Recht:
       - Deutsches E-Commerce Recht: compliance/german-ecommerce.md
   - 5. Tech Lab & Strategie:
+      - Der moderne Tech-Stack: lab/modern-stack.md
       - Vision & Roadmap: lab/roadmap.md
       - Wiz-Blitz Synergien: lab/wiz-blitz.md
       - Domain- & Cloud-Strategie: strategy/domains.md
