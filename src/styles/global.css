@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: 'Fira Code', monospace;
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-display: 'Space Grotesk', sans-serif;
+}
