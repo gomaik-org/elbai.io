@@ -109,6 +109,7 @@ function cleanTitle(title: string): string {
           <!-- Official Cart Trigger Button matching Elbi Storefront exactly -->
           <button
             type="button"
+            id="header-cart-btn"
             class="relative inline-flex items-center gap-2 h-10 px-3.5 py-2 text-[15px] font-medium text-slate-800 hover:text-slate-950 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b57d0] rounded-full transition-all shrink-0 cursor-pointer"
             aria-label="Warenkorb öffnen"
           >
@@ -127,6 +128,12 @@ function cleanTitle(title: string): string {
               />
             </svg>
             <span class="hidden sm:inline font-sans text-slate-800 font-medium">Warenkorb</span>
+            <span
+              id="header-cart-count"
+              class="hidden items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-[#0b57d0] rounded-full"
+            >
+              0
+            </span>
           </button>
 
           <!-- Official Konto Button matching Elbi Storefront -->
@@ -328,15 +335,25 @@ function cleanTitle(title: string): string {
           const isStempel = p.sku.startsWith('S') || p.sku.startsWith('K') || p.title.toLowerCase().includes('stempel');
           const tag = isHeft ? 'hefte' : (isStempel ? 'stempel' : 'other');
           const title = cleanTitle(p.title);
+          const priceFormatted = formatPriceEur(p.price_gross ?? p.price_net ?? 290);
+          const subtitle = p.short_description || (p.title.replace(title, '').replace(/^[\s\-]+/, ''));
 
           return (
             <article 
-              class="product-card group flex flex-col justify-between rounded-3xl bg-white border border-slate-200/90 hover:border-slate-300 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              class="product-card group relative flex flex-col justify-between rounded-3xl bg-white border border-slate-200/90 hover:border-slate-300 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
               data-category={tag}
+              data-sku={p.sku}
+              data-title={title}
+              data-image={p.image_url}
+              data-price={priceFormatted}
+              data-description={p.description || p.short_description || ''}
             >
               <div>
-                <!-- Packshot Container -->
-                <div class="aspect-[4/3] w-full rounded-2xl bg-[#f8f9fa] p-4 flex items-center justify-center overflow-hidden mb-4 border border-slate-100 relative">
+                <!-- Packshot Container with Quick Detail Trigger Link -->
+                <div 
+                  class="aspect-[4/3] w-full rounded-2xl bg-[#f8f9fa] p-4 flex items-center justify-center overflow-hidden mb-4 border border-slate-100 relative cursor-pointer group-hover:bg-slate-50 transition-colors open-detail-card"
+                  title={`${title} ansehen`}
+                >
                   <img 
                     src={p.image_url} 
                     alt={p.title} 
@@ -344,7 +361,7 @@ function cleanTitle(title: string): string {
                     class="h-full w-full object-contain group-hover:scale-103 transition-transform duration-300 drop-shadow-xs"
                     onerror="this.onerror=null; this.src='/images/placeholder.svg'"
                   />
-                  <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-xs text-[10px] mono text-slate-700 font-bold border border-slate-200/80 shadow-2xs">
+                  <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-white/95 backdrop-blur-xs text-[10px] mono text-slate-700 font-bold border border-slate-200/80 shadow-2xs">
                     {p.sku}
                   </span>
                 </div>
@@ -357,28 +374,47 @@ function cleanTitle(title: string): string {
                   <span class="text-[10px] font-semibold text-emerald-700">✓ Auf Lager</span>
                 </div>
 
-                <!-- Title & Desc -->
-                <h3 class="font-bold text-slate-900 text-base leading-snug group-hover:text-sky-600 transition-colors line-clamp-2">
+                <!-- Title & Desc (Clickable) -->
+                <h3 class="font-bold text-slate-900 text-base leading-snug group-hover:text-[#0b57d0] transition-colors line-clamp-2 cursor-pointer open-detail-card" title={`${title} Details ansehen`}>
                   {title}
                 </h3>
-                {p.short_description && (
-                  <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                    {p.short_description}
+                {subtitle && (
+                  <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed cursor-pointer open-detail-card">
+                    {subtitle}
                   </p>
                 )}
               </div>
 
               <!-- Price & Add Action -->
-              <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+              <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between gap-2">
                 <div>
                   <span class="text-[10px] text-slate-400 block font-medium">inkl. MwSt.</span>
                   <span class="text-lg font-black text-slate-900 mono">
-                    {formatPriceEur(p.price_gross ?? p.price_net ?? 290)}
+                    {priceFormatted}
                   </span>
                 </div>
-                <button class="px-3.5 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-2xs">
-                  In den Korb
-                </button>
+                <div class="flex items-center gap-1.5">
+                  <button 
+                    type="button"
+                    class="open-detail-btn px-3 py-1.5 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                    title="Details ansehen"
+                  >
+                    Details
+                  </button>
+                  <button 
+                    type="button"
+                    class="add-to-cart-btn px-3.5 py-2 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-bold transition shadow-2xs hover:shadow-md cursor-pointer flex items-center gap-1 active:scale-95"
+                    data-sku={p.sku}
+                    data-title={title}
+                    data-price={p.price_gross ?? p.price_net ?? 290}
+                    data-image={p.image_url}
+                  >
+                    <svg class="w-3.5 h-3.5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Korb</span>
+                  </button>
+                </div>
               </div>
             </article>
           );
@@ -449,11 +485,165 @@ function cleanTitle(title: string): string {
       </div>
     </footer>
 
+    <!-- PRODUCT DETAIL VIEW MODAL (PURE ASTRO / VANILLA JS) -->
+    <div id="product-detail-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+      <div id="product-detail-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity cursor-pointer"></div>
+      
+      <div class="min-h-full flex items-center justify-center p-4 sm:p-6 text-center">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-2xl border border-slate-200">
+          
+          <!-- Close Button -->
+          <button 
+            type="button" 
+            id="close-detail-modal-btn"
+            class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm transition cursor-pointer"
+            aria-label="Schließen"
+          >
+            ✕
+          </button>
+
+          <div class="p-6 sm:p-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+              
+              <!-- Image Card -->
+              <div class="aspect-square w-full rounded-2xl bg-[#f8f9fa] p-6 flex items-center justify-center border border-slate-100 relative">
+                <img 
+                  id="detail-modal-image" 
+                  src="" 
+                  alt="" 
+                  class="max-h-full max-w-full object-contain drop-shadow-xs"
+                />
+                <span id="detail-modal-sku-badge" class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-white/95 text-[11px] mono text-slate-800 font-bold border border-slate-200 shadow-2xs">
+                </span>
+              </div>
+
+              <!-- Product Info -->
+              <div class="flex flex-col justify-between h-full">
+                <div>
+                  <div class="flex items-center gap-2 mb-2">
+                    <span id="detail-modal-tag" class="text-[11px] font-semibold text-slate-600 px-2.5 py-0.5 rounded-full bg-slate-100">
+                      Original ELBI
+                    </span>
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                      ✓ Sofort lieferbar
+                    </span>
+                  </div>
+
+                  <h2 id="detail-modal-title" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight font-sans">
+                  </h2>
+
+                  <p id="detail-modal-desc" class="text-xs text-slate-600 mt-3 leading-relaxed">
+                  </p>
+                </div>
+
+                <!-- Price and CTA -->
+                <div class="mt-6 pt-5 border-t border-slate-100">
+                  <div class="flex items-baseline justify-between mb-3">
+                    <div>
+                      <span class="text-[10px] text-slate-400 block font-medium">inkl. MwSt. zzgl. Versand</span>
+                      <span id="detail-modal-price" class="text-2xl font-black text-slate-900 mono">
+                      </span>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button" 
+                    id="detail-modal-add-btn"
+                    class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white font-bold text-sm shadow-md hover:shadow-lg transition cursor-pointer active:scale-98"
+                  >
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>In den Warenkorb legen</span>
+                  </button>
+
+                  <p class="text-[11px] text-slate-400 text-center mt-3">
+                    Bequemer Kauf auf Rechnung für Schulen &amp; Lehrkräfte
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CART SLIDEOVER DRAWER (PURE ASTRO / VANILLA JS) -->
+    <div id="cart-drawer-dialog" class="fixed inset-0 z-50 hidden overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <!-- Backdrop -->
+      <div id="cart-drawer-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity cursor-pointer"></div>
+
+      <div class="fixed inset-y-0 right-0 flex max-w-full pl-10">
+        <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <h2 id="cart-title" class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span>Warenkorb</span>
+              <span id="cart-drawer-title-count" class="text-sm font-semibold text-slate-500">(0)</span>
+            </h2>
+            <button
+              type="button"
+              id="close-cart-drawer-btn"
+              class="rounded-md p-1.5 text-slate-400 hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0b57d0] cursor-pointer"
+              aria-label="Warenkorb schließen"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Items list -->
+          <div id="cart-drawer-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Dynamic Items or Empty State -->
+          </div>
+
+          <!-- Summary & Checkout CTA -->
+          <div id="cart-drawer-summary" class="border-t border-slate-200 p-6 space-y-3 bg-slate-50">
+            <div class="flex justify-between text-xs text-slate-600">
+              <span>Zwischensumme</span>
+              <span id="cart-subtotal-val" class="mono font-semibold">0,00 €</span>
+            </div>
+            <div class="flex justify-between text-xs text-slate-600">
+              <span>Darin enthaltene MwSt. (inkl.)</span>
+              <span id="cart-vat-val" class="mono font-semibold">0,00 €</span>
+            </div>
+            <div class="flex justify-between text-xs text-slate-600">
+              <span>Versandkosten</span>
+              <span id="cart-shipping-val" class="mono font-semibold">4,64 €</span>
+            </div>
+            <div class="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
+              <span>Gesamtsumme</span>
+              <span id="cart-total-val" class="mono text-lg font-black text-[#0b57d0]">0,00 €</span>
+            </div>
+
+            <div class="pt-2">
+              <a
+                href="https://dev.elbi.de/checkout"
+                class="flex w-full items-center justify-center rounded-full bg-[#0b57d0] hover:bg-[#0842a0] px-4 py-3 text-sm font-bold text-white shadow-sm transition-colors cursor-pointer"
+              >
+                Zur Kasse (Kauf auf Rechnung)
+              </a>
+            </div>
+            <p class="text-[11px] text-slate-500 text-center">
+              Rechnungskauf &bull; Schnelle Lieferung an Ihre Schule
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- COMPACT, NON-BLUR FLOATING SHOP-COPILOT & ZEITMASCHINE -->
     <AlphaSandboxWidget />
 
     <script>
-      // Filter functionality
+      // ==========================================
+      // 1. Category Filtering
+      // ==========================================
       const allBtn = document.getElementById('filter-all-btn');
       const hefteBtn = document.getElementById('filter-hefte-btn');
       const stempelBtn = document.getElementById('filter-stempel-btn');
@@ -480,6 +670,282 @@ function cleanTitle(title: string): string {
       allBtn?.addEventListener('click', () => filterCategory('all', allBtn));
       hefteBtn?.addEventListener('click', () => filterCategory('hefte', hefteBtn));
       stempelBtn?.addEventListener('click', () => filterCategory('stempel', stempelBtn));
+
+      // ==========================================
+      // 2. Client-Side Cart Engine (Local Storage)
+      // ==========================================
+      interface CartItemData {
+        sku: string;
+        title: string;
+        priceCents: number;
+        imageUrl: string;
+        quantity: number;
+      }
+
+      const CART_KEY = 'elbi_alpha_cart_v1';
+
+      function loadCart(): Record<string, CartItemData> {
+        try {
+          const raw = localStorage.getItem(CART_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch {
+          return {};
+        }
+      }
+
+      function saveCart(cart: Record<string, CartItemData>) {
+        try {
+          localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        } catch {}
+        renderCartUI();
+      }
+
+      function formatPrice(cents: number): string {
+        return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+      }
+
+      function addToCart(sku: string, title: string, priceCents: number, imageUrl: string, quantity = 1) {
+        const cart = loadCart();
+        if (cart[sku]) {
+          cart[sku].quantity += quantity;
+        } else {
+          cart[sku] = { sku, title, priceCents, imageUrl, quantity };
+        }
+        saveCart(cart);
+        openCartDrawer();
+      }
+
+      function updateItemQty(sku: string, qty: number) {
+        const cart = loadCart();
+        if (qty <= 0) {
+          delete cart[sku];
+        } else if (cart[sku]) {
+          cart[sku].quantity = qty;
+        }
+        saveCart(cart);
+      }
+
+      function removeItem(sku: string) {
+        const cart = loadCart();
+        delete cart[sku];
+        saveCart(cart);
+      }
+
+      // Render Cart UI
+      function renderCartUI() {
+        const cart = loadCart();
+        const items = Object.values(cart);
+        const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+        // Header Count Badge
+        const headerCountBadge = document.getElementById('header-cart-count');
+        if (headerCountBadge) {
+          if (totalCount > 0) {
+            headerCountBadge.textContent = String(totalCount);
+            headerCountBadge.classList.remove('hidden');
+            headerCountBadge.classList.add('inline-flex');
+          } else {
+            headerCountBadge.classList.add('hidden');
+            headerCountBadge.classList.remove('inline-flex');
+          }
+        }
+
+        // Cart Drawer Title Count
+        const titleCount = document.getElementById('cart-drawer-title-count');
+        if (titleCount) titleCount.textContent = `(${totalCount})`;
+
+        // Items Container
+        const container = document.getElementById('cart-drawer-items');
+        if (!container) return;
+
+        if (items.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-12">
+              <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <p class="mt-4 text-sm font-bold text-slate-900">Ihr Warenkorb ist noch leer.</p>
+              <p class="mt-1 text-xs text-slate-500">Klicken Sie bei einem Artikel auf „Korb“ oder „Details“.</p>
+            </div>
+          `;
+          const summary = document.getElementById('cart-drawer-summary');
+          if (summary) summary.classList.add('hidden');
+        } else {
+          const summary = document.getElementById('cart-drawer-summary');
+          if (summary) summary.classList.remove('hidden');
+
+          let subtotalCents = 0;
+          container.innerHTML = items.map(item => {
+            const itemTotal = item.priceCents * item.quantity;
+            subtotalCents += itemTotal;
+            return `
+              <div class="flex items-start gap-4 pb-4 border-b border-slate-100">
+                <div class="w-16 h-16 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0">
+                  <img src="${item.imageUrl || '/images/placeholder.svg'}" alt="${item.title}" class="h-full w-full object-contain" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-xs font-bold text-slate-900 truncate">${item.title}</h4>
+                  <p class="text-[11px] text-slate-400 mono">Art.-Nr.: ${item.sku}</p>
+                  <p class="text-xs font-black text-slate-900 mono mt-1">${formatPrice(itemTotal)}</p>
+                  
+                  <div class="flex items-center gap-2 mt-2">
+                    <button type="button" class="cart-qty-minus w-6 h-6 rounded border border-slate-300 flex items-center justify-center text-xs text-slate-600 hover:bg-slate-100 font-bold cursor-pointer" data-sku="${item.sku}">-</button>
+                    <span class="text-xs font-semibold text-slate-800 px-1 mono">${item.quantity}</span>
+                    <button type="button" class="cart-qty-plus w-6 h-6 rounded border border-slate-300 flex items-center justify-center text-xs text-slate-600 hover:bg-slate-100 font-bold cursor-pointer" data-sku="${item.sku}">+</button>
+                    <button type="button" class="cart-remove text-[11px] text-rose-600 hover:underline ml-auto cursor-pointer" data-sku="${item.sku}">Entfernen</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Bind qty buttons
+          container.querySelectorAll('.cart-qty-minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const sku = btn.getAttribute('data-sku');
+              if (sku && cart[sku]) updateItemQty(sku, cart[sku].quantity - 1);
+            });
+          });
+          container.querySelectorAll('.cart-qty-plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const sku = btn.getAttribute('data-sku');
+              if (sku && cart[sku]) updateItemQty(sku, cart[sku].quantity + 1);
+            });
+          });
+          container.querySelectorAll('.cart-remove').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const sku = btn.getAttribute('data-sku');
+              if (sku) removeItem(sku);
+            });
+          });
+
+          // Summary amounts
+          const shippingCents = 464; // 3.90 + 19%
+          const vatEstimate = Math.round((subtotalCents * 19) / 119);
+          const totalCents = subtotalCents + shippingCents;
+
+          const subtotalEl = document.getElementById('cart-subtotal-val');
+          const vatEl = document.getElementById('cart-vat-val');
+          const shippingEl = document.getElementById('cart-shipping-val');
+          const totalEl = document.getElementById('cart-total-val');
+
+          if (subtotalEl) subtotalEl.textContent = formatPrice(subtotalCents);
+          if (vatEl) vatEl.textContent = formatPrice(vatEstimate);
+          if (shippingEl) shippingEl.textContent = formatPrice(shippingCents);
+          if (totalEl) totalEl.textContent = formatPrice(totalCents);
+        }
+      }
+
+      // Drawer Open/Close
+      const cartDrawer = document.getElementById('cart-drawer-dialog');
+      const cartBackdrop = document.getElementById('cart-drawer-backdrop');
+      const closeCartBtn = document.getElementById('close-cart-drawer-btn');
+      const headerCartBtn = document.getElementById('header-cart-btn');
+
+      function openCartDrawer() {
+        renderCartUI();
+        cartDrawer?.classList.remove('hidden');
+      }
+
+      function closeCartDrawer() {
+        cartDrawer?.classList.add('hidden');
+      }
+
+      headerCartBtn?.addEventListener('click', openCartDrawer);
+      closeCartBtn?.addEventListener('click', closeCartDrawer);
+      cartBackdrop?.addEventListener('click', closeCartDrawer);
+
+      // ==========================================
+      // 3. Product Detail Modal Logic
+      // ==========================================
+      const detailModal = document.getElementById('product-detail-modal');
+      const detailBackdrop = document.getElementById('product-detail-backdrop');
+      const closeDetailBtn = document.getElementById('close-detail-modal-btn');
+      const detailImage = document.getElementById('detail-modal-image') as HTMLImageElement;
+      const detailTitle = document.getElementById('detail-modal-title');
+      const detailSku = document.getElementById('detail-modal-sku-badge');
+      const detailDesc = document.getElementById('detail-modal-desc');
+      const detailPrice = document.getElementById('detail-modal-price');
+      const detailAddBtn = document.getElementById('detail-modal-add-btn');
+
+      let currentActiveProduct: any = null;
+
+      function openDetailModal(articleEl: HTMLElement) {
+        const sku = articleEl.getAttribute('data-sku') || '';
+        const title = articleEl.getAttribute('data-title') || '';
+        const image = articleEl.getAttribute('data-image') || '';
+        const price = articleEl.getAttribute('data-price') || '';
+        const desc = articleEl.getAttribute('data-description') || 'Praxiserprobtes Lehrmaterial direkt vom ELBI Verlag.';
+
+        currentActiveProduct = {
+          sku,
+          title,
+          image,
+          priceCents: sku.startsWith('H') ? 290 : 890,
+        };
+
+        if (detailImage) {
+          detailImage.src = image;
+          detailImage.alt = title;
+        }
+        if (detailTitle) detailTitle.textContent = title;
+        if (detailSku) detailSku.textContent = `Art.-Nr. ${sku}`;
+        if (detailDesc) detailDesc.textContent = desc;
+        if (detailPrice) detailPrice.textContent = price;
+
+        detailModal?.classList.remove('hidden');
+      }
+
+      function closeDetailModal() {
+        detailModal?.classList.add('hidden');
+      }
+
+      closeDetailBtn?.addEventListener('click', closeDetailModal);
+      detailBackdrop?.addEventListener('click', closeDetailModal);
+
+      detailAddBtn?.addEventListener('click', () => {
+        if (currentActiveProduct) {
+          addToCart(
+            currentActiveProduct.sku,
+            currentActiveProduct.title,
+            currentActiveProduct.priceCents,
+            currentActiveProduct.image
+          );
+          closeDetailModal();
+        }
+      });
+
+      // Bind all product card clicks to open detail
+      document.querySelectorAll('.open-detail-card, .open-detail-btn').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const card = (trigger as HTMLElement).closest('.product-card');
+          if (card) openDetailModal(card as HTMLElement);
+        });
+      });
+
+      // Bind "Korb" Quick-Add buttons on each card
+      document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const sku = btn.getAttribute('data-sku') || '';
+          const title = btn.getAttribute('data-title') || '';
+          const price = Number(btn.getAttribute('data-price')) || 290;
+          const image = btn.getAttribute('data-image') || '';
+          addToCart(sku, title, price, image);
+        });
+      });
+
+      // Escape key closes modals
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeDetailModal();
+          closeCartDrawer();
+        }
+      });
+
+      // Initial Cart UI sync
+      renderCartUI();
     </script>
   </body>
 </html>
