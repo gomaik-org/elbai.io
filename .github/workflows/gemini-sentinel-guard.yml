@@ -11,25 +11,38 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  id-token: write # Required for Google Cloud Workload Identity Federation OIDC
 
 jobs:
   triage:
-    name: Autonomous Gemini Triage
+    name: Autonomous Gemini Vertex AI Triage
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' || contains(github.event.comment.body, '@gemini') }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Gemini AI Analysis
+      - name: Authenticate to Google Cloud Vertex AI via WIF
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Gemini Vertex AI Sentinel Analysis
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Gemini Sentinel Guard initialized. Listening for workflow triage requests."
-          # If GEMINI_API_KEY is configured, trigger autonomous triage engine
-          if [ -n "$GEMINI_API_KEY" ]; then
-            echo "GEMINI_API_KEY detected. Ready for autonomous triage & security remediation."
-          else
-            echo "Awaiting GEMINI_API_KEY repository secret."
-          fi
+          echo "Gemini Sentinel Guard authenticated with Vertex AI (project: ${PROJECT_ID})."
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+          echo "Access Token acquired via Workload Identity Federation."
+          # Invoke Gemini 2.5 Flash on Vertex AI
+          curl -s -X POST \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/gemini-2.5-flash:generateContent" \
+            -d '{
+              "contents": [{"role": "user", "parts": [{"text": "Sentinel guard check: Confirm Vertex AI connection from GitHub Actions."}]}],
+              "generationConfig": {"maxOutputTokens": 50}
+            }' | jq -r '.candidates[0].content.parts[0].text // .'
