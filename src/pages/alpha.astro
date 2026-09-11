@@ -1,0 +1,123 @@
+---
+import '../styles/global.css';
+import AlphaSandboxWidget from '../components/AlphaSandboxWidget.astro';
+---
+<!DOCTYPE html>
+<html lang="de" class="min-h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>elbAI.io // TECH LAB (ALPHA)</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #08090e;
+      color: #e2e8f0;
+    }
+    .mono { font-family: 'Fira Code', monospace; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="w-full bg-[#0d0e14]/90 border-b border-sky-950/80 px-6 py-4 backdrop-blur z-30">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="https://elbai.io" class="flex items-center space-x-3 group">
+          <img src="/favicon.svg" alt="elbAI Logo" class="w-8 h-8 rounded-lg shadow-md group-hover:scale-105 transition-transform duration-200">
+          <span class="text-xl font-extrabold tracking-tight">elb<span class="text-cyan-400">AI</span>.io</span>
+        </a>
+        <span class="px-2.5 py-0.5 rounded text-[10px] mono bg-purple-950/70 text-purple-300 border border-purple-800/60 font-bold uppercase">
+          🔒 ZERO TRUST ALPHA LAB
+        </span>
+      </div>
+
+      <div class="flex items-center space-x-4 mono text-xs">
+        <a href="https://elbai.io/docs/" class="px-3.5 py-1.5 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-300 hover:text-white transition">
+          📚 Dokumentation
+        </a>
+        <a href="https://elbai.io" class="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition">
+          ← Zurück zu elbai.io
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="w-full max-w-5xl mx-auto px-4 py-12 flex-1 flex flex-col justify-center text-center">
+    
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-500/40 text-cyan-300 text-xs sm:text-sm mono mb-6 mx-auto shadow-[0_0_20px_rgba(6,182,212,0.25)]">
+      <span>🔒</span>
+      <span class="font-bold">Cloudflare Zero Trust Geschützt</span>
+      <span class="text-slate-500">•</span>
+      <span class="text-emerald-400">Autorisiertes Entwickler-Cockpit</span>
+    </div>
+
+    <!-- Live D1 Hero Showcase Title -->
+    <h1 class="text-4xl sm:text-6xl font-black uppercase tracking-tight text-white mb-4">
+      Next-Gen <span id="dynamic-hero-title" class="bg-gradient-to-r from-cyan-400 via-sky-300 to-fuchsia-400 bg-clip-text text-transparent">Tech Lab &amp; Sandbox</span>
+    </h1>
+
+    <p id="dynamic-hero-subtitle" class="mono text-sm sm:text-base text-slate-300 max-w-2xl mx-auto mb-8">
+      Hier testen Entwickler und Architekten autonome KI-Workflows, Cloudflare D1 Live-Mutationen und die Snapshot-Zeitmaschine in geschützter Umgebung.
+    </p>
+
+    <!-- Lab Feature Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-10">
+      
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-cyan-500/30 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-2xl mb-4">
+          🤖
+        </div>
+        <h3 class="font-bold text-white text-lg mb-2">KI-Copilot Sandbox</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mono">
+          Texte und Zustände können via natürlicher Sprache angepasst und sofort im Edge-Speicher gesichert werden.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-purple-500/30 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-2xl mb-4">
+          ⏳
+        </div>
+        <h3 class="font-bold text-white text-lg mb-2">D1 Zeitmaschine</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mono">
+          Jede Mutation erzeugt einen unveränderbaren Snapshot in Cloudflare D1. 1-Klick-Rollback stellt jeden Zustand sofort wieder her.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-emerald-500/30 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-2xl mb-4">
+          🛡️
+        </div>
+        <h3 class="font-bold text-white text-lg mb-2">Zero Trust Perimeter</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mono">
+          Vollständiger Schutz vor unbefugtem Zugriff. Nur autorisierte Teammitglieder können diese Labor-Ebene einsehen.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Info Box -->
+    <div class="p-5 rounded-2xl bg-[#0d0f17] border border-slate-800 text-xs mono text-slate-400 max-w-2xl mx-auto">
+      👉 Nutzen Sie den Button <strong class="text-cyan-400">"Alpha Copilot &amp; Zeitmaschine"</strong> unten rechts, um das Cockpit zu öffnen.
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-slate-900 bg-[#090a10] py-6 text-center text-xs mono text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>&copy; 2026 ELBI &bull; All Rights Reserved</div>
+      <div>Coded with 💖 <a href="https://emaik.io" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-cyan-300 transition-colors font-bold underline decoration-pink-500/50 underline-offset-2">emaik.io</a></div>
+    </div>
+  </footer>
+
+  <!-- Floating Copilot & Zeitmaschine Widget -->
+  <AlphaSandboxWidget />
+
+</body>
+</html>
