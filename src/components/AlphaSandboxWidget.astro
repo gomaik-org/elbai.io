@@ -27,11 +27,11 @@
     </button>
   </div>
 
-  <!-- Non-Modal Floating Compact Window (No full-screen blur backdrop, sleek & translucent) -->
-  <div id="sandbox-modal" class="fixed bottom-16 right-4 sm:right-5 z-50 hidden w-[92vw] sm:w-[420px] max-h-[78vh] bg-slate-900/95 text-slate-100 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden transition-all duration-200">
+  <!-- Non-Modal Floating Compact Window (relative for absolute full-card modal overlay) -->
+  <div id="sandbox-modal" class="relative fixed bottom-16 right-4 sm:right-5 z-50 hidden w-[92vw] sm:w-[420px] h-[520px] max-h-[80vh] bg-slate-900/95 text-slate-100 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden transition-all duration-200">
     
     <!-- Compact Header -->
-    <div class="p-3.5 px-4 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between">
+    <div class="p-3.5 px-4 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-2.5">
         <span class="text-lg">🤖</span>
         <div>
@@ -48,7 +48,7 @@
     </div>
 
     <!-- Navigation Tabs -->
-    <div class="flex border-b border-slate-800 bg-slate-950/50 text-xs font-semibold">
+    <div class="flex border-b border-slate-800 bg-slate-950/50 text-xs font-semibold shrink-0">
       <button id="tab-btn-assistant" class="flex-1 py-2.5 px-3 border-b-2 border-sky-400 text-sky-400 bg-sky-950/20 flex items-center justify-center gap-1.5 cursor-pointer">
         <span>✨ 1. Shop anpassen</span>
       </button>
@@ -57,8 +57,8 @@
       </button>
     </div>
 
-    <!-- Scrollable Body with relative positioning for modal overlay -->
-    <div class="relative flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+    <!-- Scrollable Body Container -->
+    <div id="sandbox-scroll-container" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
       
       <!-- VIEW 1: ASSISTANT -->
       <div id="view-assistant" class="space-y-3.5">
@@ -121,37 +121,38 @@
         </div>
       </div>
 
-      <!-- Centered Modal Confirmation Overlay (Always visible regardless of scroll position) -->
-      <div 
-        id="rollback-prompt" 
-        class="absolute inset-0 z-20 hidden bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-4 transition-all duration-200"
-      >
-        <div class="w-full max-w-xs rounded-2xl bg-slate-900 border-2 border-amber-500/80 p-4 shadow-2xl text-center space-y-3">
-          <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl font-bold">
-            ⏳
-          </div>
-          <div>
-            <h4 class="font-bold text-amber-200 text-sm">Stand wiederherstellen?</h4>
-            <p id="rollback-details" class="text-slate-300 text-xs mt-1 leading-snug line-clamp-3"></p>
-          </div>
-          <div class="flex gap-2 pt-1">
-            <button 
-              id="confirm-rollback-btn" 
-              class="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition cursor-pointer shadow-md active:scale-95"
-            >
-              Ja, jetzt laden
-            </button>
-            <button 
-              id="cancel-rollback-btn" 
-              class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium text-xs transition cursor-pointer"
-            >
-              Abbrechen
-            </button>
-          </div>
+    </div>
+
+    <!-- Centered Modal Confirmation Overlay (Fixed directly to #sandbox-modal, unaffected by scrolling) -->
+    <div 
+      id="rollback-prompt" 
+      class="absolute inset-0 z-30 hidden bg-slate-950/90 backdrop-blur-xs flex items-center justify-center p-5 transition-all duration-200"
+    >
+      <div class="w-full max-w-xs rounded-2xl bg-slate-900 border-2 border-amber-500 p-5 shadow-2xl text-center space-y-3.5">
+        <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-2xl font-bold">
+          ⏳
+        </div>
+        <div>
+          <h4 class="font-bold text-amber-200 text-sm">Diesen Stand wiederherstellen?</h4>
+          <p id="rollback-details" class="text-slate-200 text-xs mt-1.5 leading-snug line-clamp-3 font-medium bg-slate-950/60 p-2.5 rounded-xl border border-slate-800"></p>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button 
+            id="confirm-rollback-btn" 
+            class="flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition cursor-pointer shadow-lg active:scale-95"
+          >
+            Ja, jetzt laden
+          </button>
+          <button 
+            id="cancel-rollback-btn" 
+            class="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium text-xs transition cursor-pointer"
+          >
+            Abbrechen
+          </button>
         </div>
       </div>
-
     </div>
+
   </div>
 </div>
 
@@ -207,6 +208,7 @@
     viewAssistant?.classList.remove('hidden');
     viewHistory?.classList.add('hidden');
     rollbackPrompt?.classList.add('hidden');
+    rollbackPrompt?.classList.remove('flex');
   });
 
   tabHistory?.addEventListener('click', () => {
@@ -343,11 +345,11 @@
     });
   }
 
-  // Trigger Rollback Dialog (Centered Modal Overlay)
+  // Trigger Rollback Dialog (Always centered over the modal window)
   function triggerRollbackDialog(id: string, label: string) {
     activeSnapshotIdToRollback = id;
     if (rollbackDetails) {
-      rollbackDetails.textContent = `Stand: "${label}"`;
+      rollbackDetails.textContent = label;
     }
     rollbackPrompt?.classList.remove('hidden');
     rollbackPrompt?.classList.add('flex');
