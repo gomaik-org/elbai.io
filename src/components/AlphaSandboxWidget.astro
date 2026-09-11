@@ -28,10 +28,10 @@
   </div>
 
   <!-- Non-Modal Floating Compact Window (No full-screen blur backdrop, sleek & translucent) -->
-  <div id="sandbox-modal" class="fixed bottom-16 right-4 sm:right-5 z-50 hidden w-[92vw] sm:w-[400px] max-h-[75vh] bg-slate-900/90 text-slate-100 border border-slate-700/70 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden transition-all duration-200">
+  <div id="sandbox-modal" class="fixed bottom-16 right-4 sm:right-5 z-50 hidden w-[92vw] sm:w-[420px] max-h-[78vh] bg-slate-900/95 text-slate-100 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden transition-all duration-200">
     
     <!-- Compact Header -->
-    <div class="p-3.5 px-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
+    <div class="p-3.5 px-4 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <span class="text-lg">🤖</span>
         <div>
@@ -48,9 +48,9 @@
     </div>
 
     <!-- Navigation Tabs -->
-    <div class="flex border-b border-slate-800 bg-slate-950/40 text-xs font-semibold">
+    <div class="flex border-b border-slate-800 bg-slate-950/50 text-xs font-semibold">
       <button id="tab-btn-assistant" class="flex-1 py-2.5 px-3 border-b-2 border-sky-400 text-sky-400 bg-sky-950/20 flex items-center justify-center gap-1.5 cursor-pointer">
-        <span>✨ 1. Text ändern</span>
+        <span>✨ 1. Shop anpassen</span>
       </button>
       <button id="tab-btn-history" class="flex-1 py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer">
         <span>⏳ 2. Zeitmaschine (Snapshots)</span>
@@ -65,16 +65,16 @@
         
         <!-- Suggestions -->
         <div>
-          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Vorschläge zum Ausprobieren:</span>
+          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Klickbare Beispiele:</span>
           <div class="grid grid-cols-1 gap-1.5">
             <button class="suggestion-chip text-left px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 text-sky-300 transition cursor-pointer">
-              Ändere den Titel zu "ELBI – Freude am Schreibenlernen"
+              Färbe die Überschrift pink
             </button>
             <button class="suggestion-chip text-left px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 text-sky-300 transition cursor-pointer">
               Banner oben: "Schulen bestellen bei uns bequem auf Rechnung!"
             </button>
             <button class="suggestion-chip text-left px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 text-sky-300 transition cursor-pointer">
-              Untertitel: "Praxiserprobte Hefte und Stempel direkt vom Hamburger Schulbuchverlag"
+              Titel zu: "ELBI – Freude am Schreibenlernen"
             </button>
           </div>
         </div>
@@ -88,7 +88,7 @@
             <textarea
               id="user-prompt"
               rows="3"
-              placeholder="z.B. 'Ändere die Hauptüberschrift in...' oder 'Erstelle ein gelbes Hinweis-Banner...'"
+              placeholder="z.B. 'Färbe die Überschrift pink', 'Schalte Banner ein...', 'Ändere Überschrift zu...'"
               class="w-full rounded-xl bg-slate-950/80 border border-slate-700 p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition"
               required
             ></textarea>
@@ -109,22 +109,18 @@
 
       <!-- VIEW 2: TIME MACHINE (SNAPSHOTS) -->
       <div id="view-history" class="hidden space-y-3.5">
-        <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
+        <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
           <span>Gespeicherte Stände in Cloudflare D1:</span>
           <button id="refresh-snapshots-btn" class="text-sky-400 hover:underline cursor-pointer">Neu laden</button>
         </div>
 
-        <div id="snapshots-list" class="space-y-2">
-          <div class="p-4 text-center text-slate-500">Lade Snapshots...</div>
-        </div>
-
         <!-- Confirm Rollback Action -->
-        <div id="rollback-prompt" class="hidden p-3.5 rounded-xl bg-amber-950/60 border border-amber-600/50 space-y-2">
-          <p class="font-bold text-amber-200">Zurücksetzen bestätigen?</p>
+        <div id="rollback-prompt" class="hidden p-3.5 rounded-xl bg-amber-950/80 border border-amber-600/70 space-y-2">
+          <p class="font-bold text-amber-200">Diesen Stand wiederherstellen?</p>
           <p id="rollback-details" class="text-slate-300 text-[11px]"></p>
           <div class="flex gap-2 pt-1">
             <button id="confirm-rollback-btn" class="flex-1 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition cursor-pointer">
-              Ja, Stand laden
+              Ja, jetzt laden
             </button>
             <button id="cancel-rollback-btn" class="py-1.5 px-3 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer">
               Abbrechen
@@ -133,6 +129,10 @@
         </div>
 
         <div id="rollback-status" class="hidden p-3 rounded-xl text-xs"></div>
+
+        <div id="snapshots-list" class="space-y-2">
+          <div class="p-4 text-center text-slate-500">Lade Snapshots...</div>
+        </div>
       </div>
 
     </div>
@@ -140,7 +140,7 @@
 </div>
 
 <script>
-  let activeSnapshotIdToRollback: number | null = null;
+  let activeSnapshotIdToRollback: string | null = null;
 
   // DOM Elements
   const toggleBtn = document.getElementById('sandbox-toggle-btn');
@@ -217,26 +217,31 @@
   function applyLiveState(state: any) {
     if (!state) return;
 
-    // 1. Hero Title
-    const heroTitle = document.getElementById('dynamic-hero-title');
-    if (heroTitle && state.hero_title) {
-      heroTitle.textContent = state.hero_title;
+    // 1. Headline Text & Color
+    const heroTitle = document.getElementById('shop-hero-headline');
+    if (heroTitle) {
+      if (state.hero_title) {
+        heroTitle.textContent = state.hero_title;
+      }
+      if (state.hero_title_color) {
+        heroTitle.style.color = state.hero_title_color;
+      } else {
+        heroTitle.style.color = '';
+      }
     }
 
-    // 2. Hero Subtitle
-    const heroSubtitle = document.getElementById('dynamic-hero-subtitle');
+    // 2. Subtitle Text
+    const heroSubtitle = document.getElementById('shop-hero-subtitle');
     if (heroSubtitle && state.hero_subtitle) {
       heroSubtitle.textContent = state.hero_subtitle;
     }
 
     // 3. Alpha Banner
     const banner = document.getElementById('dynamic-alpha-banner');
-    if (banner) {
-      if (state.banner_text && state.banner_visible) {
-        banner.innerHTML = `<div class="flex items-center gap-3">
-          <span class="text-xl">📢</span>
-          <div class="flex-1 font-semibold text-xs sm:text-sm leading-snug">${state.banner_text}</div>
-        </div>`;
+    const bannerText = document.getElementById('dynamic-alpha-banner-text');
+    if (banner && bannerText) {
+      if (state.banner_text && (state.banner_visible !== false)) {
+        bannerText.textContent = state.banner_text;
         banner.classList.remove('hidden');
       } else {
         banner.classList.add('hidden');
@@ -269,30 +274,34 @@
 
     snapshotsList.innerHTML = snapshots
       .map(
-        (s) => `
-      <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between gap-3">
-        <div class="flex-1 min-w-0">
-          <div class="font-bold text-white text-xs truncate">${s.label}</div>
-          <div class="text-[10px] mono text-slate-400 mt-0.5">
-            Snapshot #${s.id} &bull; ${new Date(s.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr
+        (s) => {
+          const title = s.summary || s.label || 'Snapshot';
+          const time = s.created_at ? new Date(s.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
+          return `
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-bold text-white text-xs truncate">${title}</div>
+              <div class="text-[10px] mono text-slate-400 mt-0.5">
+                Snapshot #${s.id} ${time ? '&bull; ' + time + ' Uhr' : ''}
+              </div>
+            </div>
+            <button 
+              data-id="${s.id}" 
+              data-label="${title.replace(/"/g, '&quot;')}"
+              class="rollback-btn px-2.5 py-1.5 rounded-lg bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sky-300 text-[10px] font-bold transition shrink-0 cursor-pointer"
+            >
+              Wiederherstellen
+            </button>
           </div>
-        </div>
-        <button 
-          data-id="${s.id}" 
-          data-label="${s.label}"
-          class="rollback-btn px-2.5 py-1.5 rounded-lg bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sky-300 text-[10px] font-bold transition shrink-0 cursor-pointer"
-        >
-          Wiederherstellen
-        </button>
-      </div>
-    `
+        `;
+        }
       )
       .join('');
 
     // Attach listeners to rollback buttons
     document.querySelectorAll('.rollback-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const id = Number(btn.getAttribute('data-id'));
+        const id = btn.getAttribute('data-id') || '';
         const label = btn.getAttribute('data-label') || '';
         triggerRollbackDialog(id, label);
       });
@@ -300,10 +309,10 @@
   }
 
   // Trigger Rollback Dialog
-  function triggerRollbackDialog(id: number, label: string) {
+  function triggerRollbackDialog(id: string, label: string) {
     activeSnapshotIdToRollback = id;
     if (rollbackDetails) {
-      rollbackDetails.textContent = `Stand: "${label}" (ID #${id})`;
+      rollbackDetails.textContent = `Stand: "${label}" (#${id})`;
     }
     rollbackPrompt?.classList.remove('hidden');
     rollbackStatus?.classList.add('hidden');
@@ -331,7 +340,7 @@
 
       const result = await res.json();
       rollbackPrompt?.classList.add('hidden');
-      confirmRollbackBtn.textContent = 'Ja, Stand laden';
+      confirmRollbackBtn.textContent = 'Ja, jetzt laden';
 
       if (result.success) {
         if (rollbackStatus) {
@@ -341,12 +350,14 @@
         }
         applyLiveState(result.state);
         loadStateAndSnapshots();
+      } else {
+        throw new Error(result.error || 'Fehler beim Wiederherstellen');
       }
     } catch (e: any) {
-      confirmRollbackBtn.textContent = 'Ja, Stand laden';
+      confirmRollbackBtn.textContent = 'Ja, jetzt laden';
       if (rollbackStatus) {
         rollbackStatus.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs';
-        rollbackStatus.textContent = 'Fehler beim Zurücksetzen.';
+        rollbackStatus.textContent = `Fehler: ${e.message}`;
         rollbackStatus.classList.remove('hidden');
       }
     }
@@ -387,6 +398,7 @@
         }
         userPrompt.value = '';
         applyLiveState(result.state);
+        loadStateAndSnapshots();
       } else {
         throw new Error(result.error || 'Fehler');
       }
@@ -404,6 +416,11 @@
   });
 
   refreshBtn?.addEventListener('click', () => loadStateAndSnapshots());
+
+  // Close dynamic banner handler
+  document.getElementById('close-dynamic-banner')?.addEventListener('click', () => {
+    document.getElementById('dynamic-alpha-banner')?.classList.add('hidden');
+  });
 
   // Initial Load on page entry
   loadStateAndSnapshots();

@@ -20,7 +20,7 @@ export async function onRequestGet(context: { env: Env; request: Request }) {
     ).first<{ content_json: string; updated_at: string }>();
 
     const snapshotsResult = await env.DB.prepare(
-      "SELECT id, author, summary, created_at FROM snapshots ORDER BY created_at DESC LIMIT 20"
+      "SELECT id, author, summary, created_at FROM snapshots ORDER BY created_at DESC LIMIT 25"
     ).all<{ id: string; author: string; summary: string; created_at: string }>();
 
     let content = {};
@@ -72,14 +72,14 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
     const now = new Date().toISOString();
 
     if (action === "rollback") {
-      const { snapshot_id } = body;
+      const snapshot_id = body.snapshot_id || body.snapshotId;
       if (!snapshot_id) {
-        return new Response(JSON.stringify({ error: "snapshot_id required" }), { status: 400 });
+        return new Response(JSON.stringify({ error: "snapshot_id erforderlich" }), { status: 400 });
       }
 
       const snap = await env.DB.prepare(
         "SELECT state_json, summary FROM snapshots WHERE id = ?"
-      ).bind(snapshot_id).first<{ state_json: string; summary: string }>();
+      ).bind(String(snapshot_id)).first<{ state_json: string; summary: string }>();
 
       if (!snap) {
         return new Response(JSON.stringify({ error: "Snapshot nicht gefunden" }), { status: 404 });
@@ -124,31 +124,63 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
       ).first<{ content_json: string }>();
       
       const activeState = stateRow ? JSON.parse(stateRow.content_json) : (current_state || {});
-
-      // Apply simple, intuitive natural language interpretations or direct keys
-      const p = prompt.toLowerCase();
       const newState = { ...activeState };
+      const p = prompt.toLowerCase();
       let changeSummary = "";
 
-      if (p.includes("titel") || p.includes("überschrift") || p.includes("headline")) {
-        const match = prompt.match(/(?:zu|in|auf)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
-        const newTitle = match ? match[1].trim() : prompt.replace(/.*(?:titel|überschrift|headline)\s*(?:zu|auf|in)?\s*/i, "").trim();
-        newState.hero_title = newTitle || "ELBI – Freude am Lernen & Lehren";
-        changeSummary = `Haupttitel geändert: "${newState.hero_title}"`;
-      } else if (p.includes("untertitel") || p.includes("subtitle")) {
-        const match = prompt.match(/(?:zu|in|auf)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
+      // 1. Color / Styling Request
+      const colorMatch = prompt.match(/\b(pink|rosa|blau|rot|grün|gelb|lila|orange|schwarz|gold|türkis|violett|cyan)\b/i);
+      const isColorChange = p.includes("farbe") || p.includes("färbe") || p.includes("color") || !!colorMatch;
+
+      if (isColorChange && colorMatch) {
+        const colorName = colorMatch[1].toLowerCase();
+        const colorMap: Record<string, string> = {
+          pink: "#ec4899",
+          rosa: "#f472b6",
+          blau: "#0b57d0",
+          rot: "#ef4444",
+          grün: "#10b981",
+          gelb: "#eab308",
+          lila: "#8b5cf6",
+          violett: "#8b5cf6",
+          orange: "#f97316",
+          schwarz: "#0f172a",
+          gold: "#d97706",
+          türkis: "#06b6d4",
+          cyan: "#06b6d4"
+        };
+        const hex = colorMap[colorName] || "#ec4899";
+        newState.hero_title_color = hex;
+        changeSummary = `Farbe der Überschrift auf ${colorName} geändert (${hex})`;
+      } 
+      // 2. Banner Request
+      else if (p.includes("banner") || p.includes("hinweis") || p.includes("leiste")) {
+        const match = prompt.match(/(?:zu|in|auf|mit dem text|lautet)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
+        const newBanner = match ? match[1].trim() : prompt.replace(/.*(?:banner|hinweis|leiste)\s*(?:zu|auf|in|mit dem text)?\s*/i, "").trim();
+        newState.banner_text = newBanner || "📢 Jetzt neu: Bequemer Kauf auf Rechnung für Schulen & Lehrkräfte!";
+        newState.banner_visible = true;
+        changeSummary = `Hinweis-Banner aktiviert: "${newState.banner_text}"`;
+      } 
+      // 3. Subtitle Request
+      else if (p.includes("untertitel") || p.includes("subtitle")) {
+        const match = prompt.match(/(?:zu|in|auf|mit dem text|lautet)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
         const newSub = match ? match[1].trim() : prompt.replace(/.*(?:untertitel|subtitle)\s*(?:zu|auf|in)?\s*/i, "").trim();
-        newState.hero_subtitle = newSub || "Modernste Lehr- und Lernmittel für Schulen, Kitas und Therapeuten.";
+        newState.hero_subtitle = newSub || "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.";
         changeSummary = `Untertitel angepasst: "${newState.hero_subtitle}"`;
-      } else if (p.includes("badge") || p.includes("hinweis") || p.includes("banner")) {
-        const match = prompt.match(/(?:zu|in|auf)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
-        const newBadge = match ? match[1].trim() : prompt.replace(/.*(?:badge|banner|hinweis)\s*(?:zu|auf|in)?\s*/i, "").trim();
-        newState.notice_banner = newBadge || "✨ Jetzt neu: Schulen & Behörden bestellen bequem auf Rechnung.";
-        changeSummary = `Banner aktualisiert: "${newState.notice_banner}"`;
-      } else {
-        // General text update: update hero_subtitle with prompt
-        newState.hero_subtitle = prompt;
-        changeSummary = `Text auf der Startseite aktualisiert: "${prompt}"`;
+      } 
+      // 4. Headline / Title Request
+      else if (p.includes("titel") || p.includes("überschrift") || p.includes("headline")) {
+        const match = prompt.match(/(?:zu|in|auf|mit dem text|lautet)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
+        const newTitle = match ? match[1].trim() : prompt.replace(/.*(?:titel|überschrift|headline)\s*(?:zu|auf|in)?\s*/i, "").trim();
+        newState.hero_title = newTitle || "ELBI – Freude am Schreibenlernen";
+        changeSummary = `Hauptüberschrift geändert: "${newState.hero_title}"`;
+      } 
+      // 5. General fallback text
+      else {
+        // If it starts with an imperative phrase like "ändere...", clean it up
+        const cleaned = prompt.replace(/^(ändere|mache|setze|aktualisiere)\s+/i, "");
+        newState.hero_title = cleaned;
+        changeSummary = `Überschrift aktualisiert: "${newState.hero_title}"`;
       }
 
       const stateJson = JSON.stringify(newState);
