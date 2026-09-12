@@ -8,18 +8,18 @@ use_directory_urls: false
 theme:
   name: material
   palette:
-    - scheme: slate
-      primary: cyan
-      accent: deep purple
-      toggle:
-        icon: material/brightness-4
-        name: In den hellen Modus wechseln
     - scheme: default
-      primary: cyan
+      primary: deep purple
       accent: deep purple
       toggle:
         icon: material/brightness-7
         name: In den dunklen Modus wechseln
+    - scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: In den hellen Modus wechseln
   font:
     text: Space Grotesk
     code: Fira Code

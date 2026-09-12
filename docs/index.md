@@ -3,6 +3,11 @@
 Willkommen in der lebenden Dokumentation von **elbAI.io** und **ELBI**.  
 Hier dokumentieren wir alle technischen Meilensteine, Architektur-Entscheidungen, Edge-Deployments und KI-Automatisierungen.
 
+> 💡 **Für Tester & Redakteure:**  
+> Direkt zur Bedienungsanleitung und Checkliste für die Testumgebung `dev.elbi.de`:  
+> 👉 [**Tester-Leitfaden für Testbetrieb & Versender**](operations/tester-guide-dad.md)  
+> 👉 [**Alpha-Werkstatt & Zeitmaschine (Assistent)**](operations/alpha-timemachine-guide.md)
+
 ---
 
 ## 🎯 Die 3 Kernsäulen
