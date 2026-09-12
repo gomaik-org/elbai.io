@@ -3,7 +3,7 @@
 ---
 <div id="alpha-sandbox-container">
   <!-- Floating Launcher Button Bottom-Right with Glowing Beacon & Tooltip -->
-  <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
+  <div class="fixed bottom-5 right-5 z-[100] flex flex-col items-end gap-2 pointer-events-auto">
     
     <!-- Animated Callout Badge ("Hier klicken & Shop anpassen!") -->
     <div id="copilot-hint-badge" class="animate-bounce flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500 text-white text-[11px] font-bold shadow-lg border border-sky-300">
@@ -15,6 +15,7 @@
     <!-- Glowing Pill Button with Cyan Aura Pulse -->
     <button 
       id="sandbox-toggle-btn" 
+      onclick="window.__toggleAlphaSandbox?.()"
       class="group relative flex items-center gap-2.5 px-5 py-3 rounded-full bg-slate-900/95 hover:bg-black text-white font-bold text-xs tracking-wide shadow-[0_0_25px_rgba(14,165,233,0.6)] hover:shadow-[0_0_35px_rgba(14,165,233,0.9)] border-2 border-sky-400 hover:border-sky-300 backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer ring-4 ring-sky-400/20"
       aria-label="Alpha Copilot & Zeitmaschine öffnen"
     >
@@ -27,8 +28,8 @@
     </button>
   </div>
 
-  <!-- Non-Modal Floating Compact Window (relative for absolute full-card modal overlay) -->
-  <div id="sandbox-modal" class="relative fixed bottom-16 right-4 sm:right-5 z-50 hidden w-[92vw] sm:w-[420px] h-[520px] max-h-[80vh] bg-slate-900/95 text-slate-100 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden transition-all duration-200">
+  <!-- Non-Modal Floating Compact Window (fixed position bottom-right) -->
+  <div id="sandbox-modal" class="fixed bottom-16 right-4 sm:right-5 z-[101] hidden w-[92vw] sm:w-[420px] h-[520px] max-h-[80vh] bg-slate-900/95 text-slate-100 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden transition-all duration-200 pointer-events-auto">
     
     <!-- Compact Header -->
     <div class="p-3.5 px-4 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between shrink-0">
@@ -186,15 +187,27 @@
 
   // Toggle Window
   const hintBadge = document.getElementById('copilot-hint-badge');
-  toggleBtn?.addEventListener('click', () => {
-    modal?.classList.toggle('hidden');
-    if (!modal?.classList.contains('hidden')) {
-      hintBadge?.classList.add('hidden');
+  function toggleSandboxModal() {
+    const m = document.getElementById('sandbox-modal');
+    const badge = document.getElementById('copilot-hint-badge');
+    if (!m) return;
+    m.classList.toggle('hidden');
+    if (!m.classList.contains('hidden')) {
+      badge?.classList.add('hidden');
       loadStateAndSnapshots();
     }
+  }
+
+  // Expose globally for resilient onclick access
+  (window as any).__toggleAlphaSandbox = toggleSandboxModal;
+
+  toggleBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSandboxModal();
   });
 
-  closeBtn?.addEventListener('click', () => {
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
     modal?.classList.add('hidden');
   });
 
@@ -219,6 +232,8 @@
 
     viewHistory?.classList.remove('hidden');
     viewAssistant?.classList.add('hidden');
+    rollbackPrompt?.classList.add('hidden');
+    rollbackPrompt?.classList.remove('flex');
     loadStateAndSnapshots();
   });
 
