@@ -279,8 +279,12 @@ body.wb-lightbox-open {
 }
 
 .wb-lightbox-canvas svg {
-  max-width: 100% !important;
+  max-width: 90vw !important;
+  max-height: 78vh !important;
+  width: auto !important;
   height: auto !important;
+  display: block !important;
+  margin: auto !important;
 }
 
 /* ==============================================================================

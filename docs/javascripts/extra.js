@@ -131,40 +131,46 @@
     const canvas = document.getElementById('wb-lightbox-canvas');
     if (!modal || !canvas) return;
 
-    // Clone target diagram
     canvas.innerHTML = '';
-    const clone = element.cloneNode(true);
-    clone.classList.remove('fullscreen', 'mermaid-hover');
-    clone.style.cursor = 'grab';
 
-    // Remove any badges from clone
-    const badges = clone.querySelectorAll('.wb-diagram-zoom-badge');
-    badges.forEach(b => b.remove());
-
-    // If it's an SVG inside mermaid, ensure width and height scale gracefully
-    const originalSvgs = element.querySelectorAll('svg');
-    const svgs = clone.querySelectorAll('svg');
-    svgs.forEach((svg, idx) => {
-      svg.style.maxWidth = '90vw';
-      svg.style.maxHeight = '75vh';
-      svg.style.width = 'auto';
-      svg.style.height = 'auto';
-      svg.style.display = 'block';
-      svg.style.visibility = 'visible';
-      svg.style.opacity = '1';
+    // Check if element contains a rendered SVG (e.g. Mermaid) or is an IMG
+    const originalSvg = element.querySelector('svg');
+    if (originalSvg) {
+      const svgClone = originalSvg.cloneNode(true);
+      svgClone.removeAttribute('id');
+      svgClone.style.maxWidth = '90vw';
+      svgClone.style.maxHeight = '78vh';
+      svgClone.style.width = '100%';
+      svgClone.style.height = 'auto';
+      svgClone.style.display = 'block';
+      svgClone.style.margin = 'auto';
+      svgClone.style.cursor = 'grab';
       
-      // Preserve viewBox and aspect ratio from original SVG
-      if (originalSvgs[idx]) {
-        const origViewBox = originalSvgs[idx].getAttribute('viewBox');
-        if (origViewBox && !svg.getAttribute('viewBox')) {
-          svg.setAttribute('viewBox', origViewBox);
-        }
+      const origViewBox = originalSvg.getAttribute('viewBox');
+      if (origViewBox && !svgClone.getAttribute('viewBox')) {
+        svgClone.setAttribute('viewBox', origViewBox);
       }
-    });
+      canvas.appendChild(svgClone);
+    } else if (element.tagName && element.tagName.toLowerCase() === 'img') {
+      const imgClone = element.cloneNode(true);
+      imgClone.style.maxWidth = '90vw';
+      imgClone.style.maxHeight = '78vh';
+      imgClone.style.width = 'auto';
+      imgClone.style.height = 'auto';
+      imgClone.style.display = 'block';
+      imgClone.style.margin = 'auto';
+      imgClone.style.cursor = 'grab';
+      canvas.appendChild(imgClone);
+    } else {
+      const clone = element.cloneNode(true);
+      clone.classList.remove('fullscreen', 'mermaid-hover');
+      clone.style.cursor = 'grab';
+      const badges = clone.querySelectorAll('.wb-diagram-zoom-badge');
+      badges.forEach(b => b.remove());
+      canvas.appendChild(clone);
+    }
 
-    canvas.appendChild(clone);
     resetZoom();
-
     modal.classList.add('is-active');
     document.body.classList.add('wb-lightbox-open');
   }
