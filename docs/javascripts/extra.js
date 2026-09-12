@@ -4,6 +4,16 @@
  * Supports Mermaid diagrams, SVG renders, and architecture graphics.
  */
 
+// Intercept attachShadow globally so shadow roots created by MkDocs Material remain accessible for lightbox cloning
+if (typeof Element !== 'undefined' && Element.prototype.attachShadow) {
+  const _origAttachShadow = Element.prototype.attachShadow;
+  Element.prototype.attachShadow = function (init) {
+    const shadow = _origAttachShadow.call(this, Object.assign({}, init, { mode: 'open' }));
+    this.__wbShadowRoot = shadow;
+    return shadow;
+  };
+}
+
 (function () {
   'use strict';
 
@@ -132,18 +142,29 @@
     const viewport = document.getElementById('wb-lightbox-viewport');
     if (!modal || !canvas) return;
 
-    // Reset canvas and clone target diagram
+    // Reset canvas and prepare diagram element
     canvas.innerHTML = '';
-    const clone = element.cloneNode(true);
-    clone.classList.remove('fullscreen', 'mermaid-hover');
-    clone.style.cursor = 'grab';
+    
+    // Check if element contains shadowRoot with SVG (MkDocs Material renders into shadow root)
+    const shadow = element.shadowRoot || element.__wbShadowRoot;
+    let targetNode = null;
+    if (shadow && shadow.querySelector('svg')) {
+      targetNode = shadow.querySelector('svg').cloneNode(true);
+    } else {
+      targetNode = element.cloneNode(true);
+    }
 
-    // Remove zoom badge if present in clone
-    const badge = clone.querySelector('.wb-diagram-zoom-badge');
+    targetNode.classList.remove('fullscreen', 'mermaid-hover');
+    targetNode.style.cursor = 'grab';
+
+    // Remove zoom badge if present in targetNode
+    const badge = targetNode.querySelector ? targetNode.querySelector('.wb-diagram-zoom-badge') : null;
     if (badge) badge.remove();
 
     // Scale SVGs based on their viewBox for optimal initial presentation
-    const svgs = clone.querySelectorAll('svg');
+    const svgs = targetNode.tagName && targetNode.tagName.toLowerCase() === 'svg'
+      ? [targetNode]
+      : (targetNode.querySelectorAll ? targetNode.querySelectorAll('svg') : []);
     const availW = (viewport ? viewport.clientWidth : window.innerWidth * 0.9) || 1200;
     const availH = (viewport ? viewport.clientHeight : window.innerHeight * 0.75) || 700;
 
@@ -171,7 +192,7 @@
       }
     });
 
-    canvas.appendChild(clone);
+    canvas.appendChild(targetNode);
     resetZoom();
 
     modal.classList.add('is-active');
