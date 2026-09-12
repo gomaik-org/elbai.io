@@ -264,6 +264,72 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
             newState.hero_title = newTitle || "ELBI – Freude am Schreibenlernen";
             changeSummary = `Startseiten-Überschrift aktualisiert: "${newState.hero_title}"`;
           }
+        } else if (target_element === "mascot_title") {
+          if (isColorChange && colorMatch) {
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#0b57d0";
+            newState.mascot_title_color = hex;
+            changeSummary = `Farbe der Lernstufen-Überschrift auf ${colorName} geändert (${hex})`;
+          } else {
+            const newTitle = extractText(prompt, "titel|überschrift|headline|text");
+            newState.mascot_title = newTitle || "„Der Elbi“ führt durch alle Lernstufen";
+            changeSummary = `Lernstufen-Überschrift aktualisiert: "${newState.mascot_title}"`;
+          }
+        } else if (target_element === "mascot_subtitle") {
+          if (isColorChange && colorMatch) {
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#64748b";
+            newState.mascot_subtitle_color = hex;
+            changeSummary = `Farbe des Lernstufen-Untertitels auf ${colorName} geändert (${hex})`;
+          } else {
+            const newSub = extractText(prompt, "untertitel|subtitle|text");
+            newState.mascot_subtitle = newSub || "Vom Schwungübungsheft bis zur freien Schönschrift";
+            changeSummary = `Lernstufen-Untertitel aktualisiert: "${newState.mascot_subtitle}"`;
+          }
+        } else if (target_element === "stufensystem_title") {
+          if (isColorChange && colorMatch) {
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#0b57d0";
+            newState.stufensystem_title_color = hex;
+            changeSummary = `Farbe der Stufensystem-Überschrift auf ${colorName} geändert (${hex})`;
+          } else {
+            const newTitle = extractText(prompt, "titel|überschrift|headline|text");
+            newState.stufensystem_title = newTitle || "Das Elbi-Stufensystem";
+            changeSummary = `Stufensystem-Überschrift aktualisiert: "${newState.stufensystem_title}"`;
+          }
+        } else if (target_element === "stufensystem_subtitle") {
+          if (isColorChange && colorMatch) {
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#475569";
+            newState.stufensystem_subtitle_color = hex;
+            changeSummary = `Farbe der Stufensystem-Beschreibung auf ${colorName} geändert (${hex})`;
+          } else {
+            const newSub = extractText(prompt, "untertitel|subtitle|beschreibung|text");
+            newState.stufensystem_subtitle = newSub;
+            changeSummary = `Stufensystem-Beschreibung aktualisiert: "${newState.stufensystem_subtitle}"`;
+          }
+        } else if (target_element === "katalog_title") {
+          if (isColorChange && colorMatch) {
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#0b57d0";
+            newState.katalog_title_color = hex;
+            changeSummary = `Farbe der Sortiments-Überschrift auf ${colorName} geändert (${hex})`;
+          } else {
+            const newTitle = extractText(prompt, "titel|überschrift|headline|text");
+            newState.katalog_title = newTitle || "Praxiserprobte Hefte & Lehrerstempel";
+            changeSummary = `Sortiments-Überschrift aktualisiert: "${newState.katalog_title}"`;
+          }
+        } else if (target_element === "katalog_subtitle") {
+          if (isColorChange && colorMatch) {
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#64748b";
+            newState.katalog_subtitle_color = hex;
+            changeSummary = `Farbe des Sortiments-Untertitels auf ${colorName} geändert (${hex})`;
+          } else {
+            const newSub = extractText(prompt, "untertitel|subtitle|text");
+            newState.katalog_subtitle = newSub;
+            changeSummary = `Sortiments-Untertitel aktualisiert: "${newState.katalog_subtitle}"`;
+          }
         } else if (target_element === "product_title" || target_element === "product_card_title") {
           if (productSlug) {
             if (!newState.products[productSlug]) newState.products[productSlug] = {};

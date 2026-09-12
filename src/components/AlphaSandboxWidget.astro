@@ -61,7 +61,6 @@
         <div>
           <h3 class="text-sm font-bold text-white flex items-center gap-2">
             <span>Shop-Copilot &amp; Zeitmaschine</span>
-            <span class="px-1.5 py-0.2 rounded text-[9px] mono bg-sky-950 text-sky-300 border border-sky-800 font-bold uppercase">D1 Live</span>
           </h3>
           <p class="text-[11px] text-slate-400">Änderungen werden live im Shop sichtbar</p>
         </div>
@@ -162,7 +161,7 @@
       <!-- VIEW 2: TIME MACHINE (SNAPSHOTS) -->
       <div id="view-history" class="hidden space-y-3.5">
         <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
-          <span>Gespeicherte Stände in Cloudflare D1:</span>
+          <span>Gespeicherte Stände (Snapshots):</span>
           <div class="flex items-center gap-2">
             <button id="refresh-snapshots-btn" class="text-sky-400 hover:underline cursor-pointer">Neu laden</button>
           </div>
@@ -340,15 +339,16 @@
   document.addEventListener('click', (e) => {
     if (!isInspectorActive) return;
 
-    // Ignore clicks inside the sandbox modal itself
+    // Ignore clicks inside the sandbox modal itself so the user can interact with controls
     const modalEl = document.getElementById('sandbox-modal');
     if (modalEl && modalEl.contains(e.target as Node)) return;
 
+    // UNCONDITIONALLY prevent default and stop propagation so NO links or buttons navigate away!
+    e.preventDefault();
+    e.stopPropagation();
+
     const targetEl = (e.target as HTMLElement).closest('[data-ai-editable]') as HTMLElement | null;
     if (targetEl) {
-      e.preventDefault();
-      e.stopPropagation();
-
       const type = targetEl.getAttribute('data-ai-editable');
       const name = targetEl.getAttribute('data-ai-name') || targetEl.textContent?.trim().slice(0, 30) || type;
       const slug = targetEl.getAttribute('data-product-slug');
@@ -357,6 +357,11 @@
       toggleInspector(false); // Turn off inspector mode after selection
       // Re-focus prompt input
       userPrompt?.focus();
+    } else {
+      // Clicked on a non-editable element: provide gentle feedback
+      const clickedEl = e.target as HTMLElement;
+      clickedEl.classList.add('ai-shake');
+      setTimeout(() => clickedEl.classList.remove('ai-shake'), 400);
     }
   }, true);
 
@@ -511,6 +516,48 @@
       } else {
         banner.classList.add('hidden');
       }
+    }
+
+    // 4. Mascot Section
+    const mascotTitle = document.getElementById('shop-mascot-title');
+    if (mascotTitle) {
+      if (state.mascot_title) mascotTitle.textContent = state.mascot_title;
+      if (state.mascot_title_color) mascotTitle.style.color = state.mascot_title_color;
+      else mascotTitle.style.color = '';
+    }
+    const mascotSubtitle = document.getElementById('shop-mascot-subtitle');
+    if (mascotSubtitle) {
+      if (state.mascot_subtitle) mascotSubtitle.textContent = state.mascot_subtitle;
+      if (state.mascot_subtitle_color) mascotSubtitle.style.color = state.mascot_subtitle_color;
+      else mascotSubtitle.style.color = '';
+    }
+
+    // 5. Stufensystem Section
+    const stufensystemTitle = document.getElementById('shop-stufensystem-title');
+    if (stufensystemTitle) {
+      if (state.stufensystem_title) stufensystemTitle.textContent = state.stufensystem_title;
+      if (state.stufensystem_title_color) stufensystemTitle.style.color = state.stufensystem_title_color;
+      else stufensystemTitle.style.color = '';
+    }
+    const stufensystemSubtitle = document.getElementById('shop-stufensystem-subtitle');
+    if (stufensystemSubtitle) {
+      if (state.stufensystem_subtitle) stufensystemSubtitle.textContent = state.stufensystem_subtitle;
+      if (state.stufensystem_subtitle_color) stufensystemSubtitle.style.color = state.stufensystem_subtitle_color;
+      else stufensystemSubtitle.style.color = '';
+    }
+
+    // 6. Katalog Section
+    const katalogTitle = document.getElementById('shop-katalog-title');
+    if (katalogTitle) {
+      if (state.katalog_title) katalogTitle.textContent = state.katalog_title;
+      if (state.katalog_title_color) katalogTitle.style.color = state.katalog_title_color;
+      else katalogTitle.style.color = '';
+    }
+    const katalogSubtitle = document.getElementById('shop-katalog-subtitle');
+    if (katalogSubtitle) {
+      if (state.katalog_subtitle) katalogSubtitle.textContent = state.katalog_subtitle;
+      if (state.katalog_subtitle_color) katalogSubtitle.style.color = state.katalog_subtitle_color;
+      else katalogSubtitle.style.color = '';
     }
   }
 
@@ -787,6 +834,24 @@
     background-color: rgba(14, 165, 233, 0.18) !important;
     border-radius: 6px;
   }
+  /* Floating element indicator tag on hover */
+  body.ai-inspector-active [data-ai-editable]:hover::before {
+    content: "🎯 " attr(data-ai-name);
+    position: absolute;
+    top: -28px;
+    left: 4px;
+    z-index: 9999;
+    background-color: #0284c7;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    padding: 2px 8px;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    white-space: nowrap;
+  }
 
   /* Persistent Highlight for the Selected Target Element */
   [data-ai-editable].ai-selected-target {
@@ -797,6 +862,23 @@
     border-radius: 6px !important;
     animation: ai-target-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
     transition: all 0.2s ease-in-out !important;
+  }
+  [data-ai-editable].ai-selected-target::after {
+    content: "✓ Ausgewählt: " attr(data-ai-name);
+    position: absolute;
+    bottom: -28px;
+    left: 4px;
+    z-index: 9999;
+    background-color: #f59e0b;
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    padding: 2px 8px;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    white-space: nowrap;
   }
 
   @keyframes ai-target-pulse {
