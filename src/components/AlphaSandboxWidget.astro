@@ -135,8 +135,20 @@
       <div id="view-history" class="hidden space-y-3.5">
         <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
           <span>Gespeicherte Stände in Cloudflare D1:</span>
-          <button id="refresh-snapshots-btn" class="text-sky-400 hover:underline cursor-pointer">Neu laden</button>
+          <div class="flex items-center gap-2">
+            <button id="refresh-snapshots-btn" class="text-sky-400 hover:underline cursor-pointer">Neu laden</button>
+          </div>
         </div>
+
+        <!-- 1-Click Reset to Initial State Button -->
+        <button
+          id="reset-to-init-btn"
+          type="button"
+          class="w-full py-2 px-3 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 font-semibold text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98"
+        >
+          <span>🔄</span>
+          <span>Shop komplett auf Init (Standard) zurücksetzen</span>
+        </button>
 
         <div id="rollback-status" class="hidden p-3 rounded-xl text-xs"></div>
 
@@ -459,6 +471,47 @@
         rollbackStatus.textContent = `Fehler: ${e.message}`;
         rollbackStatus.classList.remove('hidden');
       }
+    }
+  });
+
+  // 1-Click Reset to Init
+  const resetToInitBtn = document.getElementById('reset-to-init-btn');
+  resetToInitBtn?.addEventListener('click', async () => {
+    if (!confirm('Möchtest du den gesamten Shop wirklich auf die Standard-Werkseinstellungen (Init) zurücksetzen?')) {
+      return;
+    }
+
+    resetToInitBtn.setAttribute('disabled', 'true');
+    const originalText = resetToInitBtn.innerHTML;
+    resetToInitBtn.innerHTML = '<span>⚡</span><span>Wird zurückgesetzt...</span>';
+
+    try {
+      const res = await fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset' }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        if (rollbackStatus) {
+          rollbackStatus.className = 'p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs';
+          rollbackStatus.textContent = `✓ ${result.message}`;
+          rollbackStatus.classList.remove('hidden');
+        }
+        applyLiveState(result.state);
+        loadStateAndSnapshots();
+      } else {
+        throw new Error(result.error || 'Fehler beim Zurücksetzen');
+      }
+    } catch (e: any) {
+      if (rollbackStatus) {
+        rollbackStatus.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs';
+        rollbackStatus.textContent = `Fehler: ${e.message}`;
+        rollbackStatus.classList.remove('hidden');
+      }
+    } finally {
+      resetToInitBtn.removeAttribute('disabled');
+      resetToInitBtn.innerHTML = originalText;
     }
   });
 

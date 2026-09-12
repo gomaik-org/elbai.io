@@ -112,6 +112,42 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
       );
     }
 
+    if (action === "reset") {
+      const initialState = {
+        hero_title: "ELBI – Freude am Schreibenlernen",
+        hero_subtitle: "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.",
+        hero_title_color: null,
+        banner_visible: false,
+        banner_text: "",
+        products: {}
+      };
+      const stateJson = JSON.stringify(initialState);
+
+      await env.DB.prepare(
+        "UPDATE site_state SET content_json = ?, updated_at = ? WHERE id = 'active_config'"
+      ).bind(stateJson, now).run();
+
+      const resetSnapId = "snap_" + Date.now();
+      await env.DB.prepare(
+        "INSERT INTO snapshots (id, author, summary, created_at, state_json) VALUES (?, ?, ?, ?, ?)"
+      ).bind(
+        resetSnapId,
+        userEmail,
+        "🔄 Vollständiger Reset auf Werkseinstellungen (Init)",
+        now,
+        stateJson
+      ).run();
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Shop-Zustand erfolgreich auf Original-Init zurückgesetzt",
+          state: initialState
+        }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     if (action === "update") {
       const { prompt, current_state, pathname } = body;
       if (!prompt) {
