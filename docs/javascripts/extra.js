@@ -129,20 +129,46 @@
     ensureLightboxModal();
     const modal = document.getElementById('wb-diagram-lightbox');
     const canvas = document.getElementById('wb-lightbox-canvas');
+    const viewport = document.getElementById('wb-lightbox-viewport');
     if (!modal || !canvas) return;
 
-    // Clone target diagram
+    // Reset canvas and clone target diagram
     canvas.innerHTML = '';
     const clone = element.cloneNode(true);
     clone.classList.remove('fullscreen', 'mermaid-hover');
     clone.style.cursor = 'grab';
 
-    // If it's an SVG inside mermaid, ensure width and height scale gracefully
+    // Remove zoom badge if present in clone
+    const badge = clone.querySelector('.wb-diagram-zoom-badge');
+    if (badge) badge.remove();
+
+    // Scale SVGs based on their viewBox for optimal initial presentation
     const svgs = clone.querySelectorAll('svg');
+    const availW = (viewport ? viewport.clientWidth : window.innerWidth * 0.9) || 1200;
+    const availH = (viewport ? viewport.clientHeight : window.innerHeight * 0.75) || 700;
+
     svgs.forEach(svg => {
-      svg.style.maxWidth = 'none';
-      svg.style.maxHeight = 'none';
-      svg.style.display = 'block';
+      const vb = svg.getAttribute('viewBox');
+      if (vb) {
+        const parts = vb.trim().split(/\s+/).map(Number);
+        if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+          const vbWidth = parts[2];
+          const vbHeight = parts[3];
+          
+          const scaleW = availW / vbWidth;
+          const scaleH = availH / vbHeight;
+          const fitScale = Math.min(scaleW, scaleH, 1.5);
+          
+          const targetW = Math.max(Math.round(vbWidth * fitScale), 400);
+          const targetH = Math.round(targetW * (vbHeight / vbWidth));
+
+          svg.style.width = targetW + 'px';
+          svg.style.height = targetH + 'px';
+          svg.style.maxWidth = 'none';
+          svg.style.maxHeight = 'none';
+          svg.style.display = 'block';
+        }
+      }
     });
 
     canvas.appendChild(clone);
@@ -200,34 +226,53 @@
     }
   });
 
+  // Asynchronously render all mermaid code blocks into clean SVGs
+  async function renderMermaidDiagrams() {
+    if (typeof mermaid === 'undefined') return;
+    const mermaidElements = document.querySelectorAll('.mermaid');
+    let seq = 0;
+    for (const el of mermaidElements) {
+      if (el.dataset.mermaidRendered === 'true') continue;
+      seq++;
+      const codeEl = el.querySelector('code');
+      const code = codeEl ? codeEl.textContent : el.textContent;
+      const renderId = 'mermaid-render-' + seq + '-' + Date.now();
+      try {
+        const { svg } = await window.mermaid.render(renderId, code);
+        el.dataset.mermaidCode = code;
+        el.dataset.mermaidRendered = 'true';
+        el.innerHTML = svg;
+        el.style.position = 'relative';
+        el.style.cursor = 'zoom-in';
+
+        if (!el.querySelector('.wb-diagram-zoom-badge')) {
+          const badge = document.createElement('span');
+          badge.className = 'wb-diagram-zoom-badge';
+          badge.innerHTML = '🔍 Click to expand';
+          el.appendChild(badge);
+        }
+      } catch (err) {
+        console.warn('Mermaid render error for element', el, err);
+      }
+    }
+  }
+
+  // Initialize immediately and also subscribe to document$ for instant navigation
+  function initAll() {
+    ensureLightboxModal();
+    renderMermaidDiagrams();
+  }
+
   // Hook into MkDocs Material navigation cycle
   if (typeof document$ !== 'undefined') {
     document$.subscribe(function () {
-      ensureLightboxModal();
+      initAll();
+    });
+  }
 
-      // Render mermaid diagrams on navigation
-      if (typeof mermaid !== 'undefined') {
-        mermaid.run({
-          querySelector: '.mermaid'
-        }).then(() => {
-          // Add hover badges to all rendered mermaid diagrams
-          document.querySelectorAll('.mermaid').forEach(diagram => {
-            if (!diagram.querySelector('.wb-diagram-zoom-badge')) {
-              const badge = document.createElement('span');
-              badge.className = 'wb-diagram-zoom-badge';
-              badge.innerHTML = '🔍 Click to expand';
-              diagram.style.position = 'relative';
-              diagram.appendChild(badge);
-            }
-          });
-        }).catch(err => {
-          console.warn('Mermaid render notice:', err);
-        });
-      }
-    });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
   } else {
-    document.addEventListener('DOMContentLoaded', function () {
-      ensureLightboxModal();
-    });
+    initAll();
   }
 })();
