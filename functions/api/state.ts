@@ -171,6 +171,24 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
       const p = prompt.toLowerCase();
       let changeSummary = "";
 
+      // Robust text extraction helper
+      const extractText = (str: string, keywordPattern: string): string => {
+        const quoteMatch = str.match(/["„']([^"„']+)["“']/);
+        if (quoteMatch && quoteMatch[1].trim()) return quoteMatch[1].trim();
+
+        const colonMatch = str.match(/:\s*(.+)$/);
+        if (colonMatch && colonMatch[1].trim()) {
+          return colonMatch[1].replace(/^["„']|["“']$/g, '').trim();
+        }
+
+        const prefixMatch = str.replace(
+          new RegExp(`^.*?(?:${keywordPattern})\\s*(?:oben|unten)?\\s*(?:zu|in|auf|mit dem text|lautet|ist)?\\s*`, "i"),
+          ""
+        ).replace(/^["„']|["“']$/g, '').trim();
+
+        return prefixMatch || str.trim();
+      };
+
       // 1. Color / Styling Request
       const colorMatch = prompt.match(/\b(pink|rosa|blau|rot|grün|gelb|lila|orange|schwarz|gold|türkis|violett|cyan)\b/i);
       const isColorChange = p.includes("farbe") || p.includes("färbe") || p.includes("color") || !!colorMatch;
@@ -205,23 +223,20 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
       } 
       // 2. Banner Request
       else if (p.includes("banner") || p.includes("hinweis") || p.includes("leiste")) {
-        const match = prompt.match(/(?:zu|in|auf|mit dem text|lautet)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
-        const newBanner = match ? match[1].trim() : prompt.replace(/.*(?:banner|hinweis|leiste)\s*(?:zu|auf|in|mit dem text)?\s*/i, "").trim();
+        const newBanner = extractText(prompt, "banner|hinweis|leiste");
         newState.banner_text = newBanner || "📢 Jetzt neu: Bequemer Kauf auf Rechnung für Schulen & Lehrkräfte!";
         newState.banner_visible = true;
         changeSummary = `Hinweis-Banner aktiviert: "${newState.banner_text}"`;
       } 
       // 3. Subtitle Request
       else if (p.includes("untertitel") || p.includes("subtitle")) {
-        const match = prompt.match(/(?:zu|in|auf|mit dem text|lautet)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
-        const newSub = match ? match[1].trim() : prompt.replace(/.*(?:untertitel|subtitle)\s*(?:zu|auf|in)?\s*/i, "").trim();
+        const newSub = extractText(prompt, "untertitel|subtitle");
         newState.hero_subtitle = newSub || "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.";
         changeSummary = `Untertitel angepasst: "${newState.hero_subtitle}"`;
       } 
       // 4. Headline / Title Request
       else if (p.includes("titel") || p.includes("überschrift") || p.includes("headline")) {
-        const match = prompt.match(/(?:zu|in|auf|mit dem text|lautet)\s*["„']?([^"„']+)["„']?$/i) || prompt.match(/:\s*["„']?([^"„']+)["„']?$/i);
-        const newTitle = match ? match[1].trim() : prompt.replace(/.*(?:titel|überschrift|headline)\s*(?:zu|auf|in)?\s*/i, "").trim();
+        const newTitle = extractText(prompt, "titel|überschrift|headline");
         
         if (isProductPage && productSlug) {
           if (!newState.products[productSlug]) newState.products[productSlug] = {};
