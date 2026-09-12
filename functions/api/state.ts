@@ -5,13 +5,26 @@ interface Env {
   DB: D1Database;
 }
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, cf-access-authenticated-user-email",
+};
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: CORS_HEADERS
+  });
+}
+
 export async function onRequestGet(context: { env: Env; request: Request }) {
   try {
     const { env } = context;
     if (!env.DB) {
       return new Response(JSON.stringify({ error: "D1 database not bound" }), {
         status: 500,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json", ...CORS_HEADERS }
       });
     }
 
@@ -42,14 +55,15 @@ export async function onRequestGet(context: { env: Env; request: Request }) {
       {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-store, no-cache, must-revalidate"
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+          ...CORS_HEADERS
         }
       }
     );
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json", ...CORS_HEADERS }
     });
   }
 }
@@ -60,7 +74,7 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
     if (!env.DB) {
       return new Response(JSON.stringify({ error: "D1 database not bound" }), {
         status: 500,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json", ...CORS_HEADERS }
       });
     }
 
@@ -74,7 +88,10 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
     if (action === "rollback") {
       const snapshot_id = body.snapshot_id || body.snapshotId;
       if (!snapshot_id) {
-        return new Response(JSON.stringify({ error: "snapshot_id erforderlich" }), { status: 400 });
+        return new Response(JSON.stringify({ error: "snapshot_id erforderlich" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS }
+        });
       }
 
       const snap = await env.DB.prepare(
@@ -82,7 +99,10 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
       ).bind(String(snapshot_id)).first<{ state_json: string; summary: string }>();
 
       if (!snap) {
-        return new Response(JSON.stringify({ error: "Snapshot nicht gefunden" }), { status: 404 });
+        return new Response(JSON.stringify({ error: "Snapshot nicht gefunden" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS }
+        });
       }
 
       // Update current state to this snapshot
@@ -108,7 +128,7 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
           message: `Erfolgreich zurückgesetzt auf Stand "${snap.summary}"`,
           state: JSON.parse(snap.state_json)
         }),
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
       );
     }
 
@@ -144,20 +164,23 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
           message: "Shop-Zustand erfolgreich auf Original-Init zurückgesetzt",
           state: initialState
         }),
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
       );
     }
 
     if (action === "update") {
-      const { prompt, current_state, pathname } = body;
+      const { prompt, current_state, pathname, target_element, target_slug } = body;
       if (!prompt) {
-        return new Response(JSON.stringify({ error: "Prompt erforderlich" }), { status: 400 });
+        return new Response(JSON.stringify({ error: "Prompt erforderlich" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS }
+        });
       }
 
       // Check page context (Home vs. Product Detail Page)
-      const isProductPage = pathname && pathname.includes("/products/");
+      const isProductPage = (pathname && pathname.includes("/products/")) || !!target_slug;
       const productSlugMatch = pathname ? pathname.match(/\/products\/([^\/\?#]+)/) : null;
-      const productSlug = productSlugMatch ? productSlugMatch[1] : null;
+      const productSlug = target_slug || (productSlugMatch ? productSlugMatch[1] : null);
 
       // Fetch active state
       const stateRow = await env.DB.prepare(
@@ -189,74 +212,117 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
         return prefixMatch || str.trim();
       };
 
-      // 1. Color / Styling Request
+      // Color palette mapping
       const colorMatch = prompt.match(/\b(pink|rosa|blau|rot|grün|gelb|lila|orange|schwarz|gold|türkis|violett|cyan)\b/i);
       const isColorChange = p.includes("farbe") || p.includes("färbe") || p.includes("color") || !!colorMatch;
+      const colorMap: Record<string, string> = {
+        pink: "#ec4899",
+        rosa: "#f472b6",
+        blau: "#0b57d0",
+        rot: "#ef4444",
+        grün: "#10b981",
+        gelb: "#eab308",
+        lila: "#8b5cf6",
+        violett: "#8b5cf6",
+        orange: "#f97316",
+        schwarz: "#0f172a",
+        gold: "#d97706",
+        türkis: "#06b6d4",
+        cyan: "#06b6d4"
+      };
 
-      if (isColorChange && colorMatch) {
-        const colorName = colorMatch[1].toLowerCase();
-        const colorMap: Record<string, string> = {
-          pink: "#ec4899",
-          rosa: "#f472b6",
-          blau: "#0b57d0",
-          rot: "#ef4444",
-          grün: "#10b981",
-          gelb: "#eab308",
-          lila: "#8b5cf6",
-          violett: "#8b5cf6",
-          orange: "#f97316",
-          schwarz: "#0f172a",
-          gold: "#d97706",
-          türkis: "#06b6d4",
-          cyan: "#06b6d4"
-        };
-        const hex = colorMap[colorName] || "#ec4899";
+      // 0. Explicit Targeted Element mode (from Visual Point-and-Click Inspector)
+      if (target_element) {
+        if (target_element === "banner") {
+          const newBanner = extractText(prompt, "banner|hinweis|leiste|text");
+          newState.banner_text = newBanner || "📢 Jetzt neu: Bequemer Kauf auf Rechnung für Schulen & Lehrkräfte!";
+          newState.banner_visible = true;
+          changeSummary = `Hinweis-Banner aktualisiert: "${newState.banner_text}"`;
+        } else if (target_element === "hero_subtitle") {
+          const newSub = extractText(prompt, "untertitel|subtitle|text");
+          newState.hero_subtitle = newSub || "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.";
+          changeSummary = `Startseiten-Untertitel aktualisiert: "${newState.hero_subtitle}"`;
+        } else if (target_element === "hero_title") {
+          if (isColorChange && colorMatch) {
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#ec4899";
+            newState.hero_title_color = hex;
+            changeSummary = `Farbe der Startseiten-Überschrift auf ${colorName} geändert (${hex})`;
+          } else {
+            const newTitle = extractText(prompt, "titel|überschrift|headline|text");
+            newState.hero_title = newTitle || "ELBI – Freude am Schreibenlernen";
+            changeSummary = `Startseiten-Überschrift aktualisiert: "${newState.hero_title}"`;
+          }
+        } else if (target_element === "product_title" || target_element === "product_card_title") {
+          if (productSlug) {
+            if (!newState.products[productSlug]) newState.products[productSlug] = {};
+            if (isColorChange && colorMatch) {
+              const colorName = colorMatch[1].toLowerCase();
+              const hex = colorMap[colorName] || "#ec4899";
+              newState.products[productSlug].title_color = hex;
+              changeSummary = `Farbe des Produkts (${productSlug}) auf ${colorName} geändert (${hex})`;
+            } else {
+              const newTitle = extractText(prompt, "titel|überschrift|headline|text");
+              newState.products[productSlug].title = newTitle;
+              changeSummary = `Produkttitel (${productSlug}) geändert: "${newTitle}"`;
+            }
+          }
+        }
+      }
 
-        if (isProductPage && productSlug) {
-          if (!newState.products[productSlug]) newState.products[productSlug] = {};
-          newState.products[productSlug].title_color = hex;
-          changeSummary = `Farbe des Produkttitels auf ${colorName} geändert (${hex})`;
-        } else {
-          newState.hero_title_color = hex;
-          changeSummary = `Farbe der Startseiten-Überschrift auf ${colorName} geändert (${hex})`;
-        }
-      } 
-      // 2. Banner Request
-      else if (p.includes("banner") || p.includes("hinweis") || p.includes("leiste")) {
-        const newBanner = extractText(prompt, "banner|hinweis|leiste");
-        newState.banner_text = newBanner || "📢 Jetzt neu: Bequemer Kauf auf Rechnung für Schulen & Lehrkräfte!";
-        newState.banner_visible = true;
-        changeSummary = `Hinweis-Banner aktiviert: "${newState.banner_text}"`;
-      } 
-      // 3. Subtitle Request
-      else if (p.includes("untertitel") || p.includes("subtitle")) {
-        const newSub = extractText(prompt, "untertitel|subtitle");
-        newState.hero_subtitle = newSub || "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.";
-        changeSummary = `Untertitel angepasst: "${newState.hero_subtitle}"`;
-      } 
-      // 4. Headline / Title Request
-      else if (p.includes("titel") || p.includes("überschrift") || p.includes("headline")) {
-        const newTitle = extractText(prompt, "titel|überschrift|headline");
-        
-        if (isProductPage && productSlug) {
-          if (!newState.products[productSlug]) newState.products[productSlug] = {};
-          newState.products[productSlug].title = newTitle;
-          changeSummary = `Produkttitel geändert: "${newTitle}"`;
-        } else {
-          newState.hero_title = newTitle || "ELBI – Freude am Schreibenlernen";
-          changeSummary = `Startseiten-Überschrift geändert: "${newState.hero_title}"`;
-        }
-      } 
-      // 5. General fallback text
-      else {
-        const cleaned = prompt.replace(/^(ändere|mache|setze|aktualisiere)\s+/i, "");
-        if (isProductPage && productSlug) {
-          if (!newState.products[productSlug]) newState.products[productSlug] = {};
-          newState.products[productSlug].title = cleaned;
-          changeSummary = `Produkttitel aktualisiert: "${cleaned}"`;
-        } else {
-          newState.hero_title = cleaned;
-          changeSummary = `Überschrift aktualisiert: "${newState.hero_title}"`;
+      // If not handled by explicit target, use intelligent heuristics:
+      if (!changeSummary) {
+        // 1. Color / Styling Request
+        if (isColorChange && colorMatch) {
+          const colorName = colorMatch[1].toLowerCase();
+          const hex = colorMap[colorName] || "#ec4899";
+
+          if (isProductPage && productSlug) {
+            if (!newState.products[productSlug]) newState.products[productSlug] = {};
+            newState.products[productSlug].title_color = hex;
+            changeSummary = `Farbe des Produkttitels auf ${colorName} geändert (${hex})`;
+          } else {
+            newState.hero_title_color = hex;
+            changeSummary = `Farbe der Startseiten-Überschrift auf ${colorName} geändert (${hex})`;
+          }
+        } 
+        // 2. Banner Request
+        else if (p.includes("banner") || p.includes("hinweis") || p.includes("leiste")) {
+          const newBanner = extractText(prompt, "banner|hinweis|leiste");
+          newState.banner_text = newBanner || "📢 Jetzt neu: Bequemer Kauf auf Rechnung für Schulen & Lehrkräfte!";
+          newState.banner_visible = true;
+          changeSummary = `Hinweis-Banner aktiviert: "${newState.banner_text}"`;
+        } 
+        // 3. Subtitle Request
+        else if (p.includes("untertitel") || p.includes("subtitle")) {
+          const newSub = extractText(prompt, "untertitel|subtitle");
+          newState.hero_subtitle = newSub || "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.";
+          changeSummary = `Untertitel angepasst: "${newState.hero_subtitle}"`;
+        } 
+        // 4. Headline / Title Request
+        else if (p.includes("titel") || p.includes("überschrift") || p.includes("headline")) {
+          const newTitle = extractText(prompt, "titel|überschrift|headline");
+          
+          if (isProductPage && productSlug) {
+            if (!newState.products[productSlug]) newState.products[productSlug] = {};
+            newState.products[productSlug].title = newTitle;
+            changeSummary = `Produkttitel geändert: "${newTitle}"`;
+          } else {
+            newState.hero_title = newTitle || "ELBI – Freude am Schreibenlernen";
+            changeSummary = `Startseiten-Überschrift geändert: "${newState.hero_title}"`;
+          }
+        } 
+        // 5. General fallback text
+        else {
+          const cleaned = prompt.replace(/^(ändere|mache|setze|aktualisiere)\s+/i, "");
+          if (isProductPage && productSlug) {
+            if (!newState.products[productSlug]) newState.products[productSlug] = {};
+            newState.products[productSlug].title = cleaned;
+            changeSummary = `Produkttitel aktualisiert: "${cleaned}"`;
+          } else {
+            newState.hero_title = cleaned;
+            changeSummary = `Überschrift aktualisiert: "${newState.hero_title}"`;
+          }
         }
       }
 
@@ -285,15 +351,18 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
           message: changeSummary,
           state: newState
         }),
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
       );
     }
 
-    return new Response(JSON.stringify({ error: "Unbekannte Aktion" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "Unbekannte Aktion" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json", ...CORS_HEADERS }
+    });
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json", ...CORS_HEADERS }
     });
   }
 }

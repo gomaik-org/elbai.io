@@ -65,10 +65,20 @@
           </h3>
           <p class="text-[11px] text-slate-400">Änderungen werden live im Shop sichtbar</p>
         </div>
+      <div class="flex items-center gap-2">
+        <button
+          id="inspector-toggle-btn"
+          type="button"
+          class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-sky-950/80 hover:bg-sky-900 border border-sky-600 text-sky-300 hover:text-white flex items-center gap-1.5 transition cursor-pointer"
+          title="Klicke auf ein Element im Shop, um es direkt auszuwählen"
+        >
+          <span id="inspector-icon">🎯</span>
+          <span id="inspector-text">Element wählen</span>
+        </button>
+        <button id="sandbox-close-btn" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition cursor-pointer" title="Schließen">
+          ✕
+        </button>
       </div>
-      <button id="sandbox-close-btn" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition cursor-pointer" title="Schließen">
-        ✕
-      </button>
     </div>
 
     <!-- Navigation Tabs -->
@@ -105,6 +115,23 @@
 
         <!-- Prompt Form -->
         <form id="assistant-form" class="space-y-2.5">
+          <!-- Active Target Element Indicator Chip -->
+          <div id="target-element-badge" class="hidden items-center justify-between p-2 rounded-xl bg-sky-950/90 border border-sky-500/60 text-sky-200">
+            <div class="flex items-center gap-1.5 font-medium">
+              <span>🎯</span>
+              <span>Gewählt:</span>
+              <strong id="target-element-name" class="text-white underline">Startseiten-Überschrift</strong>
+            </div>
+            <button
+              id="clear-target-btn"
+              type="button"
+              class="w-5 h-5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-[10px] cursor-pointer"
+              title="Auswahl aufheben"
+            >
+              ✕
+            </button>
+          </div>
+
           <label for="user-prompt" class="block font-semibold text-slate-300">
             Eigene Anweisung an den Copiloten:
           </label>
@@ -194,11 +221,21 @@
 
 <script>
   let activeSnapshotIdToRollback: string | null = null;
+  let activeTargetElement: string | null = null;
+  let activeTargetSlug: string | null = null;
+  let isInspectorActive = false;
 
   // DOM Elements
   const toggleBtn = document.getElementById('sandbox-toggle-btn');
   const modal = document.getElementById('sandbox-modal');
   const closeBtn = document.getElementById('sandbox-close-btn');
+
+  const inspectorToggleBtn = document.getElementById('inspector-toggle-btn');
+  const inspectorText = document.getElementById('inspector-text');
+  const inspectorIcon = document.getElementById('inspector-icon');
+  const targetElementBadge = document.getElementById('target-element-badge');
+  const targetElementName = document.getElementById('target-element-name');
+  const clearTargetBtn = document.getElementById('clear-target-btn');
 
   const tabAssistant = document.getElementById('tab-btn-assistant');
   const tabHistory = document.getElementById('tab-btn-history');
@@ -220,6 +257,92 @@
   const cancelRollbackBtn = document.getElementById('cancel-rollback-btn');
   const rollbackStatus = document.getElementById('rollback-status');
 
+  // Inspector Mode Logic
+  function setTargetElement(type: string | null, name?: string, slug?: string | null) {
+    activeTargetElement = type;
+    activeTargetSlug = slug || null;
+
+    if (type && targetElementBadge && targetElementName) {
+      targetElementName.textContent = name || type;
+      targetElementBadge.classList.remove('hidden');
+      targetElementBadge.classList.add('flex');
+      if (userPrompt) {
+        userPrompt.placeholder = `Was möchtest du an "${name || type}" ändern?`;
+        userPrompt.focus();
+      }
+    } else if (targetElementBadge) {
+      targetElementBadge.classList.add('hidden');
+      targetElementBadge.classList.remove('flex');
+      if (userPrompt) {
+        userPrompt.placeholder = "z.B. 'Färbe die Überschrift pink', 'Schalte Banner ein...', 'Ändere Überschrift zu...'";
+      }
+    }
+  }
+
+  clearTargetBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setTargetElement(null);
+  });
+
+  function toggleInspector(force?: boolean) {
+    isInspectorActive = typeof force === 'boolean' ? force : !isInspectorActive;
+
+    if (isInspectorActive) {
+      document.body.classList.add('ai-inspector-active');
+      if (inspectorToggleBtn) {
+        inspectorToggleBtn.classList.remove('bg-sky-950/80', 'border-sky-600', 'text-sky-300');
+        inspectorToggleBtn.classList.add('bg-amber-500', 'border-amber-400', 'text-slate-950', 'font-bold', 'animate-pulse');
+      }
+      if (inspectorText) inspectorText.textContent = 'Klick im Shop...';
+      if (inspectorIcon) inspectorIcon.textContent = '👆';
+
+      // Attach hover & click listeners to all editable elements
+      document.querySelectorAll('[data-ai-editable]').forEach((el) => {
+        el.classList.add('ai-editable-highlight');
+      });
+    } else {
+      document.body.classList.remove('ai-inspector-active');
+      if (inspectorToggleBtn) {
+        inspectorToggleBtn.classList.add('bg-sky-950/80', 'border-sky-600', 'text-sky-300');
+        inspectorToggleBtn.classList.remove('bg-amber-500', 'border-amber-400', 'text-slate-950', 'font-bold', 'animate-pulse');
+      }
+      if (inspectorText) inspectorText.textContent = 'Element wählen';
+      if (inspectorIcon) inspectorIcon.textContent = '🎯';
+
+      document.querySelectorAll('[data-ai-editable]').forEach((el) => {
+        el.classList.remove('ai-editable-highlight');
+      });
+    }
+  }
+
+  inspectorToggleBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleInspector();
+  });
+
+  // Global click interceptor when Inspector is active
+  document.addEventListener('click', (e) => {
+    if (!isInspectorActive) return;
+
+    // Ignore clicks inside the sandbox modal itself
+    const modalEl = document.getElementById('sandbox-modal');
+    if (modalEl && modalEl.contains(e.target as Node)) return;
+
+    const targetEl = (e.target as HTMLElement).closest('[data-ai-editable]') as HTMLElement | null;
+    if (targetEl) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const type = targetEl.getAttribute('data-ai-editable');
+      const name = targetEl.getAttribute('data-ai-name') || targetEl.textContent?.trim().slice(0, 30) || type;
+      const slug = targetEl.getAttribute('data-product-slug');
+
+      setTargetElement(type, name || undefined, slug);
+      toggleInspector(false); // Turn off inspector mode after selection
+    }
+  }, true);
+
   // Toggle Window
   const hintBadge = document.getElementById('copilot-hint-badge');
   function toggleSandboxModal(force?: boolean) {
@@ -239,6 +362,7 @@
       } else {
         m.classList.add('hidden');
         m.style.display = 'none';
+        if (isInspectorActive) toggleInspector(false);
       }
     }
   }
@@ -248,18 +372,15 @@
 
   closeBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (typeof (window as any).toggleAlphaSandbox === 'function') {
-      (window as any).toggleAlphaSandbox(false);
-    }
+    toggleSandboxModal(false);
   });
 
   // Switch Tabs
   tabAssistant?.addEventListener('click', () => {
     tabAssistant.classList.add('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
     tabAssistant.classList.remove('border-transparent', 'text-slate-400');
-    tabHistory?.classList.remove('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
     tabHistory?.classList.add('border-transparent', 'text-slate-400');
-
+    tabHistory?.classList.remove('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
     viewAssistant?.classList.remove('hidden');
     viewHistory?.classList.add('hidden');
     rollbackPrompt?.classList.add('hidden');
@@ -269,8 +390,8 @@
   tabHistory?.addEventListener('click', () => {
     tabHistory.classList.add('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
     tabHistory.classList.remove('border-transparent', 'text-slate-400');
-    tabAssistant?.classList.remove('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
     tabAssistant?.classList.add('border-transparent', 'text-slate-400');
+    tabAssistant?.classList.remove('border-sky-400', 'text-sky-400', 'bg-sky-950/20');
 
     viewHistory?.classList.remove('hidden');
     viewAssistant?.classList.add('hidden');
@@ -361,97 +482,104 @@
   // Render Snapshots list
   function renderSnapshots(snapshots: any[]) {
     if (!snapshotsList) return;
+
     if (!snapshots || snapshots.length === 0) {
-      snapshotsList.innerHTML = `<div class="p-3 text-center text-slate-500">Keine Snapshots vorhanden.</div>`;
+      snapshotsList.innerHTML = '<div class="p-4 text-center text-slate-500 italic">Noch keine Snapshots aufgezeichnet. Führe eine Änderung durch!</div>';
       return;
     }
 
-    snapshotsList.innerHTML = snapshots
-      .map(
-        (s) => {
-          const title = s.summary || s.label || 'Snapshot';
-          const time = s.created_at ? new Date(s.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
-          return `
-          <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between gap-3">
-            <div class="flex-1 min-w-0">
-              <div class="font-bold text-white text-xs truncate">${title}</div>
-              <div class="text-[10px] mono text-slate-400 mt-0.5">
-                Snapshot #${s.id} ${time ? '&bull; ' + time + ' Uhr' : ''}
-              </div>
-            </div>
-            <button 
-              data-id="${s.id}" 
-              data-label="${title.replace(/"/g, '&quot;')}"
-              class="rollback-btn px-2.5 py-1.5 rounded-lg bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sky-300 text-[10px] font-bold transition shrink-0 cursor-pointer"
-            >
-              Wiederherstellen
-            </button>
-          </div>
-        `;
-        }
-      )
-      .join('');
+    snapshotsList.innerHTML = '';
+    snapshots.forEach((snap, idx) => {
+      const isLatest = idx === 0;
+      const date = new Date(snap.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const el = document.createElement('div');
+      el.className = `p-3 rounded-xl border transition flex items-center justify-between gap-3 ${
+        isLatest 
+          ? 'bg-sky-950/40 border-sky-600/50 text-sky-100 shadow-sm' 
+          : 'bg-slate-950/70 border-slate-800 hover:border-slate-700 text-slate-300'
+      }`;
 
-    // Attach listeners to rollback buttons
-    document.querySelectorAll('.rollback-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-id') || '';
-        const label = btn.getAttribute('data-label') || '';
-        triggerRollbackDialog(id, label);
+      el.innerHTML = `
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5 text-[11px] text-slate-400 mb-0.5">
+            <span class="mono">${date}</span>
+            <span>•</span>
+            <span class="truncate">${snap.author || 'Tester'}</span>
+            ${isLatest ? '<span class="px-1.5 py-0.2 rounded text-[9px] bg-sky-900 text-sky-300 font-bold uppercase">Aktiv</span>' : ''}
+          </div>
+          <div class="text-xs font-medium text-white truncate" title="${snap.summary}">
+            ${snap.summary}
+          </div>
+        </div>
+        <div>
+          ${
+            !isLatest ? `
+              <button 
+                class="rollback-trigger-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-sky-600 text-slate-300 hover:text-white font-medium text-[11px] transition shadow cursor-pointer whitespace-nowrap"
+                data-snap-id="${snap.id}"
+                data-snap-summary="${snap.summary}"
+              >
+                Zurücksetzen ↺
+              </button>
+            ` : `
+              <span class="text-sky-400 text-xs font-bold px-2">✓ Jetzt</span>
+            `
+          }
+        </div>
+      `;
+
+      snapshotsList.appendChild(el);
+    });
+
+    // Attach rollback handlers
+    document.querySelectorAll('.rollback-trigger-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const snapId = target.getAttribute('data-snap-id');
+        const snapSummary = target.getAttribute('data-snap-summary');
+
+        if (snapId && rollbackPrompt && rollbackDetails) {
+          activeSnapshotIdToRollback = snapId;
+          rollbackDetails.textContent = `Möchtest du den Shop-Zustand auf folgenden Stand zurücksetzen? "${snapSummary}"`;
+          rollbackPrompt.classList.remove('hidden');
+          rollbackPrompt.classList.add('flex');
+          rollbackStatus?.classList.add('hidden');
+          rollbackPrompt.scrollIntoView({ behavior: 'smooth' });
+        }
       });
     });
   }
 
-  // Trigger Rollback Dialog (Always centered over the modal window)
-  function triggerRollbackDialog(id: string, label: string) {
-    activeSnapshotIdToRollback = id;
-    if (rollbackDetails) {
-      rollbackDetails.textContent = label;
-    }
-    if (rollbackPrompt) {
-      rollbackPrompt.classList.remove('hidden');
-      rollbackPrompt.classList.add('flex');
-      rollbackPrompt.style.display = 'flex';
-    }
-    rollbackStatus?.classList.add('hidden');
-    // Ensure the scroll container resets so the dialog is visible immediately
-    const scrollContainer = document.getElementById('sandbox-scroll-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-    }
-  }
-
+  // Cancel Rollback
   cancelRollbackBtn?.addEventListener('click', () => {
-    if (rollbackPrompt) {
-      rollbackPrompt.classList.add('hidden');
-      rollbackPrompt.classList.remove('flex');
-      rollbackPrompt.style.display = 'none';
-    }
     activeSnapshotIdToRollback = null;
+    rollbackPrompt?.classList.add('hidden');
+    rollbackPrompt?.classList.remove('flex');
   });
 
-  // Confirm Rollback Action
+  // Confirm Rollback
   confirmRollbackBtn?.addEventListener('click', async () => {
     if (!activeSnapshotIdToRollback) return;
 
-    confirmRollbackBtn.textContent = 'Stelle her...';
+    confirmRollbackBtn.setAttribute('disabled', 'true');
+    confirmRollbackBtn.textContent = 'Setze zurück...';
+
     try {
       const res = await fetch('/api/state', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'rollback',
-          snapshotId: activeSnapshotIdToRollback,
+          snapshot_id: activeSnapshotIdToRollback,
         }),
       });
 
       const result = await res.json();
-      if (rollbackPrompt) {
-        rollbackPrompt.classList.add('hidden');
-        rollbackPrompt.classList.remove('flex');
-        rollbackPrompt.style.display = 'none';
-      }
-      confirmRollbackBtn.textContent = 'Ja, jetzt laden';
+
+      confirmRollbackBtn.removeAttribute('disabled');
+      confirmRollbackBtn.textContent = 'Ja, Zustand wiederherstellen';
+      rollbackPrompt?.classList.add('hidden');
+      rollbackPrompt?.classList.remove('flex');
 
       if (result.success) {
         if (rollbackStatus) {
@@ -462,36 +590,43 @@
         applyLiveState(result.state);
         loadStateAndSnapshots();
       } else {
-        throw new Error(result.error || 'Fehler beim Wiederherstellen');
+        throw new Error(result.error || 'Fehler beim Rollback');
       }
-    } catch (e: any) {
-      confirmRollbackBtn.textContent = 'Ja, jetzt laden';
+    } catch (err: any) {
+      confirmRollbackBtn.removeAttribute('disabled');
+      confirmRollbackBtn.textContent = 'Ja, Zustand wiederherstellen';
+
       if (rollbackStatus) {
         rollbackStatus.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs';
-        rollbackStatus.textContent = `Fehler: ${e.message}`;
+        rollbackStatus.textContent = `Fehler: ${err.message}`;
         rollbackStatus.classList.remove('hidden');
       }
     }
   });
 
-  // 1-Click Reset to Init
+  // 1-Click Reset to Initial State Button Handler
   const resetToInitBtn = document.getElementById('reset-to-init-btn');
   resetToInitBtn?.addEventListener('click', async () => {
-    if (!confirm('Möchtest du den gesamten Shop wirklich auf die Standard-Werkseinstellungen (Init) zurücksetzen?')) {
+    if (!confirm('Möchtest du wirklich alle Änderungen verwerfen und den Shop auf den Original-Zustand (Init) zurücksetzen?')) {
       return;
     }
 
-    resetToInitBtn.setAttribute('disabled', 'true');
     const originalText = resetToInitBtn.innerHTML;
-    resetToInitBtn.innerHTML = '<span>⚡</span><span>Wird zurückgesetzt...</span>';
+    resetToInitBtn.setAttribute('disabled', 'true');
+    resetToInitBtn.innerHTML = '<span>⏳ Setze auf Init zurück...</span>';
 
     try {
       const res = await fetch('/api/state', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reset' }),
+        body: JSON.stringify({ action: 'reset' })
       });
+
       const result = await res.json();
+
+      resetToInitBtn.removeAttribute('disabled');
+      resetToInitBtn.innerHTML = originalText;
+
       if (result.success) {
         if (rollbackStatus) {
           rollbackStatus.className = 'p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs';
@@ -501,15 +636,9 @@
         applyLiveState(result.state);
         loadStateAndSnapshots();
       } else {
-        throw new Error(result.error || 'Fehler beim Zurücksetzen');
+        throw new Error(result.error || 'Reset fehlgeschlagen');
       }
-    } catch (e: any) {
-      if (rollbackStatus) {
-        rollbackStatus.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs';
-        rollbackStatus.textContent = `Fehler: ${e.message}`;
-        rollbackStatus.classList.remove('hidden');
-      }
-    } finally {
+    } catch (err: any) {
       resetToInitBtn.removeAttribute('disabled');
       resetToInitBtn.innerHTML = originalText;
     }
@@ -527,14 +656,23 @@
     assistantStatus?.classList.add('hidden');
 
     try {
+      const payload: any = {
+        action: 'update',
+        prompt: prompt,
+        pathname: window.location.pathname,
+      };
+
+      if (activeTargetElement) {
+        payload.target_element = activeTargetElement;
+      }
+      if (activeTargetSlug) {
+        payload.target_slug = activeTargetSlug;
+      }
+
       const res = await fetch('/api/state', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update',
-          prompt: prompt,
-          pathname: window.location.pathname,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
@@ -550,6 +688,7 @@
           assistantStatus.classList.remove('hidden');
         }
         userPrompt.value = '';
+        setTargetElement(null); // Clear active target on success
         applyLiveState(result.state);
         loadStateAndSnapshots();
       } else {
@@ -578,3 +717,23 @@
   // Initial Load on page entry
   loadStateAndSnapshots();
 </script>
+
+<style is:global>
+  /* Visual point-and-click inspector mode styling */
+  body.ai-inspector-active {
+    cursor: crosshair !important;
+  }
+  body.ai-inspector-active [data-ai-editable] {
+    cursor: crosshair !important;
+    position: relative;
+    outline: 2px dashed rgba(56, 189, 248, 0.6) !important;
+    outline-offset: 4px !important;
+    transition: all 0.15s ease-in-out;
+  }
+  body.ai-inspector-active [data-ai-editable]:hover {
+    outline: 3px solid #38bdf8 !important;
+    outline-offset: 4px !important;
+    background-color: rgba(56, 189, 248, 0.12) !important;
+    border-radius: 4px;
+  }
+</style>
