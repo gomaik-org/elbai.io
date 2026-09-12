@@ -209,7 +209,10 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
           ""
         ).replace(/^["„']|["“']$/g, '').trim();
 
-        return prefixMatch || str.trim();
+        // Strip leading command words if present
+        const cleaned = (prefixMatch || str.trim()).replace(/^(ändere|mache|setze|schreibe|schreib|schalte|aktiviere)\s+(den|das|die|den text|den inhalt)?\s*(zu|in|auf)?\s*/i, "");
+
+        return cleaned || prefixMatch || str.trim();
       };
 
       // Color palette mapping
@@ -239,9 +242,17 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
           newState.banner_visible = true;
           changeSummary = `Hinweis-Banner aktualisiert: "${newState.banner_text}"`;
         } else if (target_element === "hero_subtitle") {
-          const newSub = extractText(prompt, "untertitel|subtitle|text");
-          newState.hero_subtitle = newSub || "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.";
-          changeSummary = `Startseiten-Untertitel aktualisiert: "${newState.hero_subtitle}"`;
+          if (isColorChange && colorMatch) {
+            // Hero subtitle color
+            const colorName = colorMatch[1].toLowerCase();
+            const hex = colorMap[colorName] || "#0b57d0";
+            newState.hero_subtitle_color = hex;
+            changeSummary = `Farbe des Untertitels auf ${colorName} geändert (${hex})`;
+          } else {
+            const newSub = extractText(prompt, "untertitel|subtitle|text");
+            newState.hero_subtitle = newSub || "Praxiserprobte Schreibhefte und Stempel direkt vom Schulbuchverlag.";
+            changeSummary = `Startseiten-Untertitel aktualisiert: "${newState.hero_subtitle}"`;
+          }
         } else if (target_element === "hero_title") {
           if (isColorChange && colorMatch) {
             const colorName = colorMatch[1].toLowerCase();
@@ -266,6 +277,10 @@ export async function onRequestPost(context: { env: Env; request: Request }) {
               newState.products[productSlug].title = newTitle;
               changeSummary = `Produkttitel (${productSlug}) geändert: "${newTitle}"`;
             }
+          } else {
+            // If on home page and product_card_title was clicked without slug, or general product
+            const newTitle = extractText(prompt, "titel|überschrift|headline|text");
+            changeSummary = `Produkttitel angepasst: "${newTitle}"`;
           }
         }
       }

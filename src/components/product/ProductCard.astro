@@ -74,7 +74,7 @@ const categoryTag = isHeft ? 'hefte' : (isStempel ? 'stempel' : 'other');
       </span>
     </div>
 
-    <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#3395d1] transition-colors leading-snug font-sans tracking-tight">
+    <h3 data-ai-editable="product_card_title" data-ai-name={`Produkt-Titel (${product.sku})`} data-product-slug={product.slug} class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#3395d1] transition-colors leading-snug font-sans tracking-tight">
       <a href={`/products/${product.slug}`} class="block">
         <span aria-hidden="true" class="absolute inset-0"></span>
         {displayTitle}

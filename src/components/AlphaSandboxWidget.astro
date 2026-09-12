@@ -224,6 +224,7 @@
   let activeSnapshotIdToRollback: string | null = null;
   let activeTargetElement: string | null = null;
   let activeTargetSlug: string | null = null;
+  let activeTargetDomEl: HTMLElement | null = null;
   let isInspectorActive = false;
 
   // DOM Elements
@@ -258,10 +259,23 @@
   const cancelRollbackBtn = document.getElementById('cancel-rollback-btn');
   const rollbackStatus = document.getElementById('rollback-status');
 
+
   // Inspector Mode Logic
-  function setTargetElement(type: string | null, name?: string, slug?: string | null) {
+  function setTargetElement(type: string | null, name?: string, slug?: string | null, domEl?: HTMLElement | null) {
+    // Clear previous selected element highlight
+    if (activeTargetDomEl) {
+      activeTargetDomEl.classList.remove('ai-selected-target');
+    }
+
     activeTargetElement = type;
     activeTargetSlug = slug || null;
+    activeTargetDomEl = domEl || null;
+
+    if (type && activeTargetDomEl) {
+      activeTargetDomEl.classList.add('ai-selected-target');
+      // Scroll smoothly into view if offscreen
+      activeTargetDomEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
     if (type && targetElementBadge && targetElementName) {
       targetElementName.textContent = name || type;
@@ -339,8 +353,10 @@
       const name = targetEl.getAttribute('data-ai-name') || targetEl.textContent?.trim().slice(0, 30) || type;
       const slug = targetEl.getAttribute('data-product-slug');
 
-      setTargetElement(type, name || undefined, slug);
+      setTargetElement(type, name || undefined, slug, targetEl);
       toggleInspector(false); // Turn off inspector mode after selection
+      // Re-focus prompt input
+      userPrompt?.focus();
     }
   }, true);
 
@@ -446,10 +462,43 @@
       }
     }
 
-    // 2. Subtitle Text
+    // Catalog & Overview Product Cards Title & Color
+    if (state.products) {
+      document.querySelectorAll('[data-ai-editable="product_card_title"]').forEach((el) => {
+        const cardSlug = el.getAttribute('data-product-slug');
+        if (cardSlug && state.products[cardSlug]) {
+          const pState = state.products[cardSlug];
+          const link = el.querySelector('a');
+          if (pState.title) {
+            if (link) {
+              // Retain inner span if present
+              const overlay = link.querySelector('span[aria-hidden="true"]');
+              link.textContent = pState.title;
+              if (overlay) link.prepend(overlay);
+            } else {
+              el.textContent = pState.title;
+            }
+          }
+          if (pState.title_color) {
+            el.setAttribute('style', `color: ${pState.title_color} !important;`);
+          } else {
+            el.removeAttribute('style');
+          }
+        }
+      });
+    }
+
+    // 2. Subtitle Text & Color
     const heroSubtitle = document.getElementById('shop-hero-subtitle');
-    if (heroSubtitle && state.hero_subtitle) {
-      heroSubtitle.textContent = state.hero_subtitle;
+    if (heroSubtitle) {
+      if (state.hero_subtitle) {
+        heroSubtitle.textContent = state.hero_subtitle;
+      }
+      if (state.hero_subtitle_color) {
+        heroSubtitle.style.color = state.hero_subtitle_color;
+      } else {
+        heroSubtitle.style.color = '';
+      }
     }
 
     // 3. Alpha Banner
@@ -727,14 +776,37 @@
   body.ai-inspector-active [data-ai-editable] {
     cursor: crosshair !important;
     position: relative;
-    outline: 2px dashed rgba(56, 189, 248, 0.6) !important;
+    outline: 2px dashed #0284c7 !important;
     outline-offset: 4px !important;
+    background-color: rgba(14, 165, 233, 0.08) !important;
     transition: all 0.15s ease-in-out;
   }
   body.ai-inspector-active [data-ai-editable]:hover {
-    outline: 3px solid #38bdf8 !important;
+    outline: 3px solid #0284c7 !important;
     outline-offset: 4px !important;
-    background-color: rgba(56, 189, 248, 0.12) !important;
-    border-radius: 4px;
+    background-color: rgba(14, 165, 233, 0.18) !important;
+    border-radius: 6px;
+  }
+
+  /* Persistent Highlight for the Selected Target Element */
+  [data-ai-editable].ai-selected-target {
+    position: relative !important;
+    outline: 3px solid #f59e0b !important;
+    outline-offset: 4px !important;
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.25), 0 10px 25px -5px rgba(245, 158, 11, 0.3) !important;
+    border-radius: 6px !important;
+    animation: ai-target-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  @keyframes ai-target-pulse {
+    0%, 100% {
+      outline-color: #f59e0b;
+      box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.3), 0 10px 25px -5px rgba(245, 158, 11, 0.3);
+    }
+    50% {
+      outline-color: #fbbf24;
+      box-shadow: 0 0 0 10px rgba(251, 191, 36, 0.15), 0 15px 30px -5px rgba(251, 191, 36, 0.4);
+    }
   }
 </style>
