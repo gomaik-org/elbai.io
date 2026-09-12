@@ -1,15 +1,14 @@
 # 🧪 Alpha-Umgebung & KI-Assistent: Die einfache Anleitung für Tester
 
-Herzlich willkommen in der **ELBI Alpha-Testwerkstatt** (`alpha.elbi.de`)!  
-Hier können Sie den Shop nach Ihren Wünschen anpassen – ganz ohne Programmierkenntnisse, einfach per Chat.
+Herzlich willkommen in der **ELBI Alpha-Testwerkstatt** (`alpha.elbai.io`)!  
+Hier können Sie den Shop nach Ihren Wünschen anpassen – ganz ohne Programmierkenntnisse, einfach per Klick oder Textanweisung.
 
 ---
 
 ## 1. Wie funktioniert das?
 
-Auf `alpha.elbi.de` finden Sie unten rechts ein kleines rundes Chat-Symbol mit dem **ELBI-Assistenten**.
-
-Klicken Sie darauf und schreiben Sie dem Assistenten einfach, was Sie am Shop verändern möchten:
+Auf `alpha.elbai.io` finden Sie den **ELBI-Assistenten** (Alpha-Copilot).
+Sie können Elemente auf der Seite direkt mit der Maus anvisieren (visueller Inspektor) oder dem Assistenten einfach schreiben, was Sie am Shop verändern möchten:
 - *„Ändere bitte die Beschreibung beim Schreibheft H10: Schreib hinein, dass es sich besonders für Schulanfänger mit Druckbleistiften eignet.“*
 - *„Kannst du die Überschrift auf der Startseite freundlicher formulieren?“*
 - *„Sortiere den Lehrerkalender in der Kategorie ganz nach oben.“*

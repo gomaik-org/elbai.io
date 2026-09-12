@@ -27,7 +27,7 @@ graph TD
     C --> C3[Wiz Security Scans]
 
     D --> D1[Google Cloud Gemini Enterprise]
-    D --> D2[Wiz-Blitz Modular Framework]
+    D --> D2[AI-Factory Modular Framework]
     D --> D3[Intelligente Bildungs-Tools]
 ```
 
@@ -35,12 +35,13 @@ graph TD
 - **Moderne Webseiten auf Cloudflare:** Astro 7+ Zero-JS SSG mit reaktiven React 19 Islands.
 - **Globales Edge-Netzwerk:** Sub-50ms TTFB weltweit, Auslieferung via Cloudflare Pages & Workers.
 - **Kryptografische Sicherheit:** TLS 1.2+, HSTS Preload, Strict SSL, RFC-konformes Null-SPF und DMARC Reject.
+- **Zero Trust Perimeter:** `alpha.elbai.io` und `elbai.io/docs` sind per Cloudflare Access mit Einmal-PIN/E-Mail-OTP geschützt.
 
 ### 2. Erste Automatisierungen mit AI
 - **Täglicher Lagerbestand-Sync:** Automatisierter Abgleich aller Bestände aus dem PG-Verlag Kundenportal direkt in Cloudflare D1.
 - **Anomalie- & Fail-Safe-Gates:** Verhindert falsche Bestandsdaten bei Ausfällen oder HTML-Änderungen.
-- **Gemini Autonomous Guard:** KI-gestützte Triage von CI/CD-Fehlern und Wiz Security Alerts direkt in GitHub Actions.
+- **Gemini Autonomous Guard:** KI-gestützte Triage von CI/CD-Fehlern und Security Alerts direkt in GitHub Actions.
 
 ### 3. Next-Gen Tech Lab
-- Synergien zwischen **Wiz-Blitz v2/v3** und modernen Cloud-APIs (Cloudflare Developer Platform & GCP Gemini Enterprise).
+- Synergien zwischen **AI-Factory Framework** und modernen Cloud-APIs (Cloudflare Developer Platform & GCP Gemini Enterprise).
 - Schrittweise Evolution vom reinen Webshop hin zum zukunftsweisenden Bildungs-Tech-Ökosystem.
