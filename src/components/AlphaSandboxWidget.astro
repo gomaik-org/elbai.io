@@ -2,6 +2,29 @@
 // Alpha Sandbox Interactive Floating Widget (Non-modal, draggable/docked floating card)
 ---
 <div id="alpha-sandbox-container">
+  <!-- Inline Script for instant synchronous modal toggling -->
+  <script is:inline>
+    function toggleAlphaSandbox(force) {
+      var m = document.getElementById('sandbox-modal');
+      var b = document.getElementById('copilot-hint-badge');
+      if (!m) return;
+      var isHidden = m.classList.contains('hidden') || m.style.display === 'none' || window.getComputedStyle(m).display === 'none';
+      var show = (typeof force === 'boolean') ? force : isHidden;
+      if (show) {
+        m.classList.remove('hidden');
+        m.style.display = 'flex';
+        if (b) b.style.display = 'none';
+        if (typeof window.__alphaLoadSnapshots === 'function') {
+          window.__alphaLoadSnapshots();
+        }
+      } else {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    }
+    window.__toggleAlphaSandbox = toggleAlphaSandbox;
+  </script>
+
   <!-- Floating Launcher Button Bottom-Right with Glowing Beacon & Tooltip -->
   <div class="fixed bottom-5 right-5 z-[100] flex flex-col items-end gap-2 pointer-events-auto">
     
@@ -15,7 +38,7 @@
     <!-- Glowing Pill Button with Cyan Aura Pulse -->
     <button 
       id="sandbox-toggle-btn" 
-      onclick="window.__toggleAlphaSandbox?.()"
+      onclick="toggleAlphaSandbox()"
       class="group relative flex items-center gap-2.5 px-5 py-3 rounded-full bg-slate-900/95 hover:bg-black text-white font-bold text-xs tracking-wide shadow-[0_0_25px_rgba(14,165,233,0.6)] hover:shadow-[0_0_35px_rgba(14,165,233,0.9)] border-2 border-sky-400 hover:border-sky-300 backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer ring-4 ring-sky-400/20"
       aria-label="Alpha Copilot & Zeitmaschine öffnen"
     >
@@ -187,18 +210,29 @@
 
   // Toggle Window
   const hintBadge = document.getElementById('copilot-hint-badge');
-  function toggleSandboxModal() {
-    const m = document.getElementById('sandbox-modal');
-    const badge = document.getElementById('copilot-hint-badge');
-    if (!m) return;
-    m.classList.toggle('hidden');
-    if (!m.classList.contains('hidden')) {
-      badge?.classList.add('hidden');
-      loadStateAndSnapshots();
+  function toggleSandboxModal(force?: boolean) {
+    if (typeof (window as any).toggleAlphaSandbox === 'function') {
+      (window as any).toggleAlphaSandbox(force);
+    } else {
+      const m = document.getElementById('sandbox-modal');
+      const badge = document.getElementById('copilot-hint-badge');
+      if (!m) return;
+      const isHidden = m.classList.contains('hidden') || m.style.display === 'none';
+      const show = typeof force === 'boolean' ? force : isHidden;
+      if (show) {
+        m.classList.remove('hidden');
+        m.style.display = 'flex';
+        badge?.classList.add('hidden');
+        loadStateAndSnapshots();
+      } else {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
     }
   }
 
-  // Expose globally for resilient onclick access
+  // Expose loadStateAndSnapshots globally for inline script
+  (window as any).__alphaLoadSnapshots = loadStateAndSnapshots;
   (window as any).__toggleAlphaSandbox = toggleSandboxModal;
 
   toggleBtn?.addEventListener('click', (e) => {
@@ -208,7 +242,7 @@
 
   closeBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
-    modal?.classList.add('hidden');
+    toggleSandboxModal(false);
   });
 
   // Switch Tabs
@@ -366,14 +400,25 @@
     if (rollbackDetails) {
       rollbackDetails.textContent = label;
     }
-    rollbackPrompt?.classList.remove('hidden');
-    rollbackPrompt?.classList.add('flex');
+    if (rollbackPrompt) {
+      rollbackPrompt.classList.remove('hidden');
+      rollbackPrompt.classList.add('flex');
+      rollbackPrompt.style.display = 'flex';
+    }
     rollbackStatus?.classList.add('hidden');
+    // Ensure the scroll container resets so the dialog is visible immediately
+    const scrollContainer = document.getElementById('sandbox-scroll-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+    }
   }
 
   cancelRollbackBtn?.addEventListener('click', () => {
-    rollbackPrompt?.classList.add('hidden');
-    rollbackPrompt?.classList.remove('flex');
+    if (rollbackPrompt) {
+      rollbackPrompt.classList.add('hidden');
+      rollbackPrompt.classList.remove('flex');
+      rollbackPrompt.style.display = 'none';
+    }
     activeSnapshotIdToRollback = null;
   });
 
@@ -393,8 +438,11 @@
       });
 
       const result = await res.json();
-      rollbackPrompt?.classList.add('hidden');
-      rollbackPrompt?.classList.remove('flex');
+      if (rollbackPrompt) {
+        rollbackPrompt.classList.add('hidden');
+        rollbackPrompt.classList.remove('flex');
+        rollbackPrompt.style.display = 'none';
+      }
       confirmRollbackBtn.textContent = 'Ja, jetzt laden';
 
       if (result.success) {
