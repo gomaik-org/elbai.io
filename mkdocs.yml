@@ -70,6 +70,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - 📋 Changelog: changelog.md
   - 1. Cloudflare Edge:
       - Übersicht & Caching: edge/overview.md
       - elbi.de Storefront & D1: edge/elbi-storefront.md
