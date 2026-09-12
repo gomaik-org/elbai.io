@@ -233,16 +233,12 @@
 
   // Expose loadStateAndSnapshots globally for inline script
   (window as any).__alphaLoadSnapshots = loadStateAndSnapshots;
-  (window as any).__toggleAlphaSandbox = toggleSandboxModal;
-
-  toggleBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleSandboxModal();
-  });
 
   closeBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
-    toggleSandboxModal(false);
+    if (typeof (window as any).toggleAlphaSandbox === 'function') {
+      (window as any).toggleAlphaSandbox(false);
+    }
   });
 
   // Switch Tabs
