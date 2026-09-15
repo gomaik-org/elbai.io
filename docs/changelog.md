@@ -22,62 +22,59 @@ flowchart LR
     P2 --> P5
 ```
 
-- **Gesamtzahl erfasster Aufgaben:** 65
-- **Erfolgreich abgeschlossen:** 49
+- **Gesamtzahl erfasster Aufgaben:** 70
+- **Erfolgreich abgeschlossen:** 54
 - **In Vorbereitung / Geplant:** 16
 
 ---
 
 ## 🚀 Wichtige Meilensteine & Backlog-Tickets (September 2026)
 
-### 1. Qualitätssicherung & Test-Automatisierung (Autonomous Self-Verification)
+### 1. Storefront, Branding & Didaktischer Feinschliff (v3)
+- **Offizielles Elbi-Verlagslogo & neues Favicon**:
+  - Einbindung des klassischen, hochauflösenden Original-Verlagslogos als gestochen scharfe Vektorgrafik (SVG) auf der Startseite und im Admin-Dashboard.
+  - Neues Browser-Favicon: Rotes Elbi-„e“ in Maximalgröße mit prägnanter schwarzer Umrandung – perfekt lesbar und kontrastreich auf allen Geräten.
+- **`AF-630` | Didaktische Lineaturkorrektur**:
+  - Bereinigung der didaktischen Progression auf der Startseite und im CMS: Präzise Führung von 32 mm Großlineatur bis zur Standardlineatur der 4. Klasse.
+- **Frontend-CMS für Shop-Texte (`AF-552`, `AF-553`, `AF-555`)**:
+  - Sämtliche Texte (Hero, Vertrauenssignale, Stufensystem, Footer, Versandtexte) lassen sich im Admin-Bereich unter „Shop-Texte / CMS“ direkt bearbeiten und speichern.
+  - Dynamisches Ankündigungsbanner mit 1-Klick-Aktivierung im Shop-Kopf.
+
+### 2. Lagerbestand, PG-Verlag Synchronisation & Bestandsampel
+- **`AF-597` & `AF-603` | PG-Lager Bestandsampel & Schwellenwerte**:
+  - Rebranding der Spalte in der Admin-Produkttabelle zu **„PG Lager“**.
+  - Dreistufige Ampel-Farbkodierung: Grün (> 50 Stück), Gelb (11–50 Stück, Warnung), Rot (<= 10 Stück, kritischer Tiefstand).
+  - Schwellenwerte für Gelb und Rot sowie die Empfänger-E-Mail für automatische Lager-Alerts (`bestellung@elbi.de`) direkt unter „Einstellungen & Cache“ im Admin-Dashboard konfigurierbar.
+- **Automatisierter PG-Lagerabgleich & Beseitigung alter Initialisierungs-Migrationen**:
+  - Tägliche und ad-hoc Synchronisation der echten Bestände (18.780 Stück über 47 Katalogartikel) direkt in Cloudflare D1 (`elbi-store-eu`).
+  - Restlose Entfernung veralteter Override-Migrationen (`stock = 100`) und dauerhafte Deaktivierung nächtlicher Demo-Resets für 100%ige Persistenz.
+
+### 3. Rechtssicherheit, Versandkosten-Steuer & Bestellverwaltung
+- **`AF-607` & `AF-585` | Steuerrechtliche Versandkostenberechnung als Nebenleistung**:
+  - Gesetzlich exakte Mehrwertsteuer-Berechnung auf Versandkosten nach UStG (3,90 € Netto-Basis): 4,17 € brutto bei reinen 7%-Warenkörben (Bücher/Hefte), 4,64 € brutto bei reinen 19%-Warenkörben (Stempel/Zubehör) sowie proportionale Aufteilung bei Mischwarenkörben.
+  - Transparente Aufschlüsselung im Warenkorb-Drawer und auf `/versand/`.
+- **`AF-551` | Bestellverwaltung & Autonome Stornierungs-API**:
+  - Bestellungen im Admin-Dashboard durchsuchbar, filterbar und GoBD-konform stornierbar.
+  - Autonome B2B-Stornierungsschnittstelle für den Logistikpartner PG-Verlag.
+- **Aktualisierung des Impressums (§ 5 DDG & § 18 MStV)**:
+  - Hinterlegung der neuen Faxnummer (+49 (0) 8104 90840 15) und Bereinigung der Anschrift.
+
+### 4. Qualitätssicherung & Test-Automatisierung (Autonomous Self-Verification)
 - **`AF-520` | Headless Browser Self-Verification & Quality Gates**:
-  - Implementierung einer vollautomatisierten Playwright-basierten Headless-Browser-Suite (`scripts/verify-web.py`) für `elbai.io` und `elbi.de`.
+  - Playwright-basierte Testsuite (`scripts/verify-web.py`) für `elbai.io` und `elbi.de`.
   - Überprüft DOM-Rendering, Navigation, interaktive Komponenten (Diagramm-Lightbox, Zoom-Modals, Warenkorb-Drawer) und erzwingt **0 unhandled Console Errors** vor jedem Deployment.
-  - Verankerung des Web-Verifikations-Gates in allen relevanten Agenten-Skills (`astro-cloudflare`, `ecommerce-storefront`, `typescript-developer`, `dev-docs`, `doc-standards`).
 - **`AF-547` | Mermaid Diagramm-Lightbox & Shadow DOM Interceptor**:
-  - Behebung des Anzeige-Fehlers bei vergrößerten Architektur-Diagrammen: MkDocs Material kapselt gerenderte Mermaid-SVGs in einem `closed` Shadow DOM. Ein gezielter Hook in `extra.js` fängt diese nun sauber ab und rendert sie gestochen scharf im responsiven Vollbild-Modal mit Schließen-Funktion (`ESC`, Klick außerhalb, Close-Button).
+  - MkDocs Material Shadow DOM Interceptor in `extra.js` für gestochen scharfe Architektur-Diagramme im responsiven Vollbild-Modal mit Schließen-Funktion (`ESC`, Klick außerhalb, Close-Button).
+- **`AF-558` | 1-Klick Cloudflare Cache-Purge**:
+  - Integrierter Cache-Purge-Button im Admin-Dashboard zur sofortigen globalen Cache-Invalidierung (`purge_everything: true`).
 
-### 2. CI/CD Stabilität, FinOps & GitHub Actions Härtung
+### 5. CI/CD Stabilität, FinOps & GitHub Actions Härtung
 - **`AF-550` | 20-Minuten-Timeout-Regel & CI Green State**:
-  - Alle GitHub Workflows in `gomaik-org/elbi.de` und `gomaik-org/elbai.io` wurden mit strikten `timeout-minutes: 20` (auf Job-Ebene) und `concurrency: cancel-in-progress: true` gehärtet, um Runner-Minuten zu schonen und Budgetüberläufe zu verhindern.
-  - Vollständige Umstellung auf GitHub Actions mit Node 24 Laufzeit und unveränderlichen SHA-Hashes (`actions/checkout@v7.0.1`, `actions/setup-go@v7.0.0`, `actions/cache@v6.1.0`), um Deprecation-Warnungen vor der Abschaltung von Node 20 auszuschließen.
-  - Korrektur von `TestGetFreeDiskSpaceGB` in `pkg/tokens`: OverlayFS-Mounts in CI-Containern melden teils `0 GB` frei; der Test toleriert nun isolierte Containerumgebungen (`>= 0`).
-  - Alle historischen, fehlgeschlagenen CI-Läufe wurden via GitHub API bereinigt – das Actions-Dashboard beider Repositories ist zu 100 % grün.
-- **`AF-525` | Rebrand & Clean Workspace: Replace wiz-blitz with ai-factory**:
-  - Sämtliche Pfade, Framework-Templates, Plugins, Binaries und Dokumentationen wurden vollständig auf `ai-factory` bereinigt.
-
-### 3. KI-Copilot, Point-and-Click Inspector & Zeitmaschine (`alpha.elbai.io`)
-- **`AF-520` | Modulare Entkopplung des KI-Assistenten**:
-  - Der AI Copilot wurde als isoliertes, einbettbares Web-Widget (`AlphaSandboxWidget.tsx`) entkoppelt, sodass die Produktions-Storefront (`dev.elbi.de`) schlank und manipulationssicher bleibt.
-- **Visueller Point-and-Click Inspector-Modus**:
-  - Tester können jedes Seitenelement (Header, Banner, Buttons, Kacheln) anklicken. Das ausgewählte Element wird mit einem pulsierenden bernsteinfarbenen Rahmen hervorgehoben und kann gezielt per Freitextbefehl geändert werden.
-- **1-Klick-Reset & Zeitmaschine (Rollback)**:
-  - Vollständige Historie aller Änderungen mit Vorher/Nachher-Vergleich und 1-Klick-Wiederherstellung des Ausgangszustands oder eines früheren Snapshots.
-- **Authentisches Shop-Design im Alpha-Modus**:
-  - Vollständige Nachbildung des offiziellen Elbi-Designs (Lernstufensystem, kreisförmige Warenkorb-Buttons, interaktive Produktdetails, Slide-Over Cart Drawer).
-- **`AF-529` | Modulares Copilot-Framework (Konzept)**:
-  - Vorbereitung einer wiederverwendbaren, entkoppelten Copilot-Library mit Multi-LLM-Anbindung (Gemini, OpenAI, Anthropic, lokale Ollama-Instanzen).
-
-### 4. Edge-Architektur & Zero-Trust Sicherheit
-- **`AF-540` | Zero Trust Perimeter Isolation**:
-  - `elbi.de/docs` existiert nicht und ist aus allen Vorlagen entfernt.
-  - Die Root-Landingpage `https://elbai.io` ist öffentlich ohne Authentifizierung erreichbar.
-  - Die geschützten Preview- und Dokumentationsbereiche (`https://alpha.elbai.io` und `https://elbai.io/docs/`) sind durch Cloudflare Zero Trust Access mit E-Mail-OTP geschützt.
-- **`AF-458` | Cloudflare Invariante: Auto-Deploy & Cache Purge**:
-  - Jeder Storefront-Build deployt automatisch auf `dev.elbi.de` und führt sofort einen Edge Cache Purge (`purge_everything: true` für Zone `elbi.de`) aus.
-- **`AF-017` & `AF-006` | Edge WAF & DNS Hardening**:
-  - Auflösung von WAF-Blockaden, TLS 1.3 Strict SSL, RFC-konformes Null-SPF (`v=spf1 -all`) und DMARC-Reject (`p=reject; sp=reject; aspf=s`).
-
-### 5. Backend, Datenbank & Bestandsautomatisierung
-- **`AF-061` & `inventory-sync` | PG-Verlag Fulfillment & Bestandsabgleich**:
-  - Täglicher Cron-Workflow gleicht Bestände aus dem PG-Verlag Kundenportal ab und schreibt sie sicher nach Cloudflare D1.
-  - Strikte Vorab-Validierung und Anomalie-Erkennung (Blackout Protection) gegen versehentliche Null-Bestände bei Ausfällen.
-- **`AF-374` & `AF-429` | Korrektur der Mehrwertsteuersätze**:
-  - Exakte Angleichung an gesetzliche Sätze (7 % Bücher/Hefte, 19 % Non-Books) in D1 und Storefront sowie klare Beschriftung im Admin-Portal.
-- **`AF-401` & `AF-488` | Katalog-Modernisierung & Lernstufen**:
-  - Umstellung des Katalogs von unübersichtlichen Schriftfiltern auf ein klares 4-Stufen-System (Vorschule, 1. Halbjahr Kl. 1, 2. Halbjahr Kl. 1, Kl. 2–4).
-  - Schrittweises Nachladen der Bestseller auf der Startseite ("Mehr Produkte laden").
+  - Alle GitHub Workflows mit strikten `timeout-minutes: 20` und `concurrency: cancel-in-progress: true` gehärtet.
+  - Vollständige Umstellung auf Node 24 Laufzeit und unveränderliche SHA-Hashes für alle Actions.
+  - Bereinigung von Runner-OverlayFS-Checks in `pkg/tokens`.
+- **`AF-525` | Rebrand & Clean Workspace: ai-factory**:
+  - Sämtliche Pfade, Framework-Templates, Plugins, Binaries und Dokumentationen vollständig auf `ai-factory` bereinigt.
 
 ---
 
@@ -98,6 +95,17 @@ flowchart LR
 ---
 
 ## 📅 Chronologische Versionshistorie
+
+### Version 0.3.0 — 14.–15. September 2026
+- `AF-597` / `AF-603`: PG-Lager Bestandsampel mit Farbkodierung (Grün/Gelb/Rot) und konfigurierbaren Schwellenwerten im Admin-Dashboard.
+- `AF-607` / `AF-585`: Gesetzeskonforme Mehrwertsteuer-Berechnung der Versandkosten als Nebenleistung (3,90 € Netto-Basis, 4,17 € bzw. 4,64 € brutto).
+- `AF-630`: Didaktische Korrektur der Lineaturführung auf 32 mm Großlineatur bis Klasse 4.
+- `AF-558`: 1-Klick Cloudflare Edge Cache Purge Button im Admin-Dashboard.
+- `AF-551`: Bestellungsübersicht & GoBD-Stornierungs-API für PG-Verlag Logistikpartner.
+- `AF-552` / `AF-553`: Frontend-CMS für Shop-Texte und dynamisches Header-Ankündigungsbanner.
+- `feat(inventory)`: PG-Lagerbestand synchronisiert (18.780 Stück über 47 Artikel), veraltete `stock = 100` Migrationen dauerhaft entfernt und Shop-Reset deaktiviert.
+- `feat(branding)`: Original Elbi-Vektorlogo eingebunden, Favicon mit maximalem roten „e“ und schwarzer Umrandung geschärft.
+- `fix(compliance)`: Impressum nach § 5 DDG mit neuer Faxnummer aktualisiert.
 
 ### Version 0.2.1 — 11.–12. September 2026
 - `AF-550`: Strikte 20-Minuten-Timeouts und Concurrency-Cancelling für alle GitHub Workflows; Behebung von Runner-OverlayFS-Checks.
